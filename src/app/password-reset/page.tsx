@@ -19,8 +19,8 @@ export default function Home() {
 
                             <div className="mb-3">
                                 <div className="text-center">
-                                    <h5 className="font-medium text-gray-700">Welcome Back.!</h5>
-                                    <p className="mt-2 mb-4 text-gray-500">Sign in to continue.</p>
+                                    <h5 className="font-medium text-gray-700">Password Reset</h5>
+                                    <p className="mt-2 mb-4 text-gray-500">Enter username to continue.</p>
                                 </div>
 
                                 <form className="pt-2" action="#">
@@ -28,26 +28,12 @@ export default function Home() {
                                         <label className="block mb-2 font-medium text-gray-700">Username</label>
                                         <input type="text" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" id="username" placeholder="Enter username" />
                                     </div>
-                                    <div className="mb-3">
-                                        <div className="flex">
-                                            <div className="flex-auto">
-                                                <label className="block mb-2 font-medium text-gray-600">Password</label>
-                                            </div>
-                                            <div className="flex-auto text-right">
-                                                <Link href="/password-reset" className="text-color-secondary font-bold">Forgot password?</Link>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex">
-                                            <input type="password" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" />
-                                        </div>
-                                    </div>
                                     <div className="mb-6 row">
                                        
 
                                     </div>
                                     <div className="mb-3">
-                                        <button className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-primary rounded-md font-bold hover:bg-blue-100" type="button">Log In</button>
+                                        <button className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-primary rounded-md font-bold hover:bg-blue-100" type="submit">Reset Password</button>
                                     </div>
                                 </form>
 
@@ -60,7 +46,7 @@ export default function Home() {
                                 </div>
 
                                 <div className="mt-12 text-center">
-                                    <p className="text-gray-500">Don&apos;t have an account ? <a href="#" className="font-semibold text-color-secondary"> Signup now </a> </p>
+                                    <p className="text-gray-500">Remember password ? <Link href="/" className="font-semibold text-color-secondary"> Login now </Link> </p>
                                 </div>
                             </div>
 
