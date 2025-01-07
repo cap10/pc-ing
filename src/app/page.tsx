@@ -1,8 +1,14 @@
+'use client';
+
 import Image from "next/image"; 
 import Link from "next/link";
 
 export default function Login() {
   const year = new Date().getFullYear();
+
+  const login = () => {
+    document.location.href = '/dashboard';
+  }
 
   return (
     <section className="group">
@@ -47,7 +53,7 @@ export default function Login() {
 
                                     </div>
                                     <div className="mb-3">
-                                        <button className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-primary rounded-md font-bold hover:bg-blue-100" type="button">Log In</button>
+                                        <button onClick={login} className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-primary rounded-md font-bold hover:bg-blue-100" type="button">Log In</button>
                                     </div>
                                 </form>
 
