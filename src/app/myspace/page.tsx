@@ -1,49 +1,105 @@
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: 'Home',
 };
 
-export default function AdminHome() {
+export default function Home() {
 
     return (
         
         <main>
             <div className="md:flex items-center justify-between px-[2px] mb-5">
                 <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0">Dashboard</h4>
+                <Link href={'/myspace/transfers'} type="button" className="p-1 text-white bg-color-primary rounded-md">Transfer Money</Link>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
 
-                <div className="card p-5 border rounded-2xl border-gray-400">
+                <div className="card p-5 border-2 rounded-2xl border-blue-700">
                     <div className="card-body">
-                        <h4 className="font-bold">Card 1</h4>
-                        <h6 className="text-gray-500">1</h6>
+                        <h4 className="font-bold">Current Account ZWL</h4>
+                        <h6 className="text-gray-500">6837363822</h6>
                         <div className="mt-5">
-                            <span className="text-gray-500">.</span>
-                            <span className="font-bold ml-2">.</span>
+                            <span className="text-gray-500">ZWL</span>
+                            <span className="font-bold ml-2">6852.14</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="card p-5 border rounded-2xl border-gray-400">
                     <div className="card-body">
-                        <h4 className="font-bold">Card 2</h4>
-                        <h6 className="text-gray-500">2</h6>
+                        <h4 className="font-bold">Personal Account ZWL</h4>
+                        <h6 className="text-gray-500">6837363822</h6>
                         <div className="mt-5">
-                            <span className="text-gray-500">.</span>
-                            <span className="font-bold ml-2">.</span>
+                            <span className="text-gray-500">ZWL</span>
+                            <span className="font-bold ml-2">6852.14</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="card p-5 border rounded-2xl border-gray-400">
                     <div className="card-body">
-                        <h4 className="font-bold">Card 3</h4>
-                        <h6 className="text-gray-500">3</h6>
+                        <h4 className="font-bold">Savings Account ZWL</h4>
+                        <h6 className="text-gray-500">6837363822</h6>
                         <div className="mt-5">
-                            <span className="text-gray-500">.</span>
-                            <span className="font-bold ml-2">.</span>
+                            <span className="text-gray-500">ZWL</span>
+                            <span className="font-bold ml-2">6852.14</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mt-5">
+
+                <div className="card p-5 border rounded-2xl border-gray-400 col-span-2">
+                    <div className="card-body">
+                        <h4 className="font-bold">Recent Bill Payment</h4>                        
+                        <div className="mt-5 grid grid-cols-5 gap-2">
+                            <div className="card border border-gray-400 rounded-md p-4">
+                                <div className="card-body">
+                                    <div className="mb-5">
+                                        <span className="text-gray-300">
+                                            <i className="fa-solid fa-circle text-5xl"></i>
+                                        </span> 
+                                    </div>
+                                    <span className="font-semibold">ZESA Prepaid <br /> (ZWL)</span>
+                                </div>
+                            </div>
+
+                            <div className="card border border-gray-400 rounded-md p-4">
+                                <div className="card-body">
+                                    <div className="mb-5">
+                                        <span className="text-gray-300">
+                                            <i className="fa-solid fa-circle text-5xl"></i>
+                                        </span> 
+                                    </div>
+                                    <span className="font-semibold">Buy Airtime <br /> (ZWL)</span>
+                                </div>
+                            </div>
+
+                            <div className="card border border-gray-400 rounded-md p-4">
+                                <div className="card-body">
+                                    <div className="mb-5">
+                                        <span className="text-gray-300">
+                                            <i className="fa-solid fa-circle text-5xl"></i>
+                                        </span> 
+                                    </div>
+                                    <span className="font-semibold">ZESA Prepaid <br /> (ZWL)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="card p-5 border rounded-2xl border-gray-400">
+                    <div className="card-body">
+                        <h6 className="text-gray-500">Interbank Exchange Rate</h6>
+                        <h4 className="font-bold">ZWL 800 : 1 USD</h4>
+                        <div className="mt-5">
+                            <em>#chart</em>
                         </div>
                     </div>
                 </div>

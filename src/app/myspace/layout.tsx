@@ -1,8 +1,8 @@
+import Sidebar from '@/shared/ui/sidebar';
 import './../globals.css'
 import Navbar from '@/shared/ui/navbar';
 import Footer from '@/shared/ui/footer';
 import Script from 'next/script';
-import AdminSidebar from '@/shared/ui/AdminSidebar';
 
 
 export default function DashboardLayout({
@@ -15,7 +15,7 @@ export default function DashboardLayout({
     <section>
         <div className="fixed bottom-0 z-10 h-screen vertical-menu top-[70px] bg-slate-50 border-gray-50 print:hidden">
     
-            <AdminSidebar />
+            <Sidebar />
             
         </div>
         

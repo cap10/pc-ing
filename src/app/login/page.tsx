@@ -7,7 +7,7 @@ export default function Login() {
   const year = new Date().getFullYear();
 
   const login = () => {
-    document.location.href = '/myspace';
+    document.location.href = '/dashboard';
   }
 
   return (
@@ -25,7 +25,7 @@ export default function Login() {
 
                             <div className="mb-3">
                                 <div className="text-center">
-                                    <h5 className="font-medium text-gray-700">Welcome Back.!</h5>
+                                    <h5 className="font-medium text-gray-700">Administration</h5>
                                     <p className="mt-2 mb-4 text-gray-500">Sign in to continue.</p>
                                 </div>
 
@@ -63,10 +63,6 @@ export default function Login() {
 
                                     <div className="flex justify-center gap-3">
                                     </div>
-                                </div>
-
-                                <div className="mt-12 text-center">
-                                    <p className="text-gray-500">Don&apos;t have an account ? <a href="#" className="font-semibold text-color-secondary"> Signup now </a> </p>
                                 </div>
                             </div>
 
