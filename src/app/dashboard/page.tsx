@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: 'Home',
@@ -11,7 +12,7 @@ export default function Home() {
         <main>
             <div className="md:flex items-center justify-between px-[2px] mb-5">
                 <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0">Dashboard</h4>
-                <button type="button" className="p-1 text-white bg-color-primary rounded-md">Transfer Money</button>
+                <Link href={'/dashboard/transfers'} type="button" className="p-1 text-white bg-color-primary rounded-md">Transfer Money</Link>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -108,7 +109,68 @@ export default function Home() {
             <section className="mt-5 pt-4">
                 <h4 className="font-bold">Recent Transactions</h4>
                 <div className="mt-5">
-                    <em>#table</em>
+                    <table className="w-full text-sm text-left text-gray-500">
+                        <thead className="text-sm text-gray-700 bg-gray-200">
+                            <tr className="">
+                                <th scope="col" className="px-6 py-3">
+                                    #
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    First Name
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Last Name
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Username
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="bg-white border border-gray-200">
+                                <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                                    1
+                                </th>
+                                <td className="px-6 py-3.5">
+                                    Mark
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    Otto
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    @mdo
+                                </td>
+                            </tr>
+                            <tr className="bg-white border border-gray-200">
+                                <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                                    2
+                                </th>
+                                <td className="px-6 py-3.5">
+                                    Jacob
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    Thornton
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    @fat
+                                </td>
+                            </tr>
+                            <tr className="bg-white border border-gray-200">
+                                <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                                    3
+                                </th>
+                                <td className="px-6 py-3.5">
+                                    Larry
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    the Bird
+                                </td>
+                                <td className="px-6 py-3.5">
+                                    @twitter
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 

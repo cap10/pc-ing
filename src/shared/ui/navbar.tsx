@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Navbar() {
 
@@ -7,9 +8,10 @@ export default function Navbar() {
             
             <div className="flex justify-between w-full">
                 <div className="flex items-center topbar-brand">
-                    <div className="hidden lg:flex navbar-brand items-center justify-between shrink px-6 h-[70px] bg-[#fbfaff] border-b border-[#e9e9ef] shadow-none">
+                    <div className="hidden lg:block navbar-brand items-center justify-between shrink px-6 h-[70px] bg-[#fbfaff] border-b border-[#e9e9ef] shadow-none">
                         <a href="#" className="flex items-center text-lg flex-shrink-0 font-bold text-white leading-[69px]">
-                            <Image width={280} height={60} src="/images/metbank-logo.png" alt="" className="inline-block align-middle w-40" />
+                            <Image width={1062} height={2075} src="/images/logo-mini.png" alt="" className="inline-block align-middle w-10 md:hidden mt-3" id="mini-logo"/>
+                            <Image width={280} height={60} src="/images/logo.svg" alt="" className="align-middle w-36 mt-2 hidden md:block" id="full-logo"/>
                             {/* <span className="hidden font-bold text-gray-700 align-middle xl:block leading-[69px]">Minia</span> */}
                         </a>
                     </div>
@@ -37,21 +39,21 @@ export default function Navbar() {
                                 </button>
                                 <div className="absolute top-0 z-50 hidden w-40 list-none bg-white dropdown-menu dropdown-animation rounded shadow " id="profile/log">
                                     <div className="border border-gray-50" aria-labelledby="navNotifications">
-                                        <div className="dropdown-item text-gray-100">
+                                        {/* <div className="dropdown-item text-gray-100">
                                             <a className="block px-3 py-2 hover:bg-gray-50/50" href="apps-contacts-profile.html">
                                                 <i className="mr-1 align-middle mdi mdi-face-man text-16"></i> Profile
                                             </a>
-                                        </div>
-                                        <div className="dropdown-item text-gray-100">
-                                            <a className="block px-3 py-2 hover:bg-gray-50/50" href="lock-screen.html">
+                                        </div> */}
+                                        <div className="dropdown-item">
+                                            <a className="block px-3 py-2 hover:bg-gray-200" href="#">
                                                 <i className="mr-1 align-middle mdi mdi-lock text-16"></i> Lock Screen
                                             </a>
                                         </div>
                                         <hr className="border-gray-50" />
-                                        <div className="dropdown-item text-gray-100">
-                                            <a className="block p-3 hover:bg-gray-50/50" href="logout.html">
+                                        <div className="dropdown-item">
+                                            <Link className="block p-3 hover:bg-red-400" href="/">
                                                 <i className="mr-1 align-middle mdi mdi-logout text-16"></i> Logout
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>

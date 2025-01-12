@@ -19,7 +19,7 @@ export default function Login() {
                         <div className="flex h-[100vh] flex-col w-80 lg:w-96 m-auto">
                             <div className="mx-auto">
                                 <a href="#" className="">
-                                    <Image width={828} height={315} src="/images/logo.png" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
+                                    <Image width={828} height={315} src="/images/logo.svg" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
                                 </a>
                             </div>
 
@@ -53,7 +53,7 @@ export default function Login() {
 
                                     </div>
                                     <div className="mb-3">
-                                        <button onClick={login} className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-primary rounded-md font-bold hover:bg-blue-100" type="button">Log In</button>
+                                        <button onClick={login} className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600" type="button">Log In</button>
                                     </div>
                                 </form>
 

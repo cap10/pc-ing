@@ -23,11 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="shortcut icon" href="/images/metbank-mini.png" type="image/x-png" />
+        <link rel="shortcut icon" href="/images/favicon.png" type="image/x-png" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></link>
       </head>
       <body
-        className={`${inter.className} antialiased`}
+        className={`${inter.className} antialiased group`}
       >
         {children}
       </body>
