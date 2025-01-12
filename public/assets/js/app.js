@@ -26,7 +26,6 @@
       (function (index) {
         verticalButton[index] && verticalButton[index].addEventListener('click', function (event) {
           event.preventDefault();
-          console.log('ehe');
           
           document.body.classList.toggle('sidebar-enable');
           if (window.innerWidth >= 992) {
