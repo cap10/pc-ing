@@ -307,7 +307,7 @@ Array.from(modalTrigger).forEach(function (item) {
 var closeButton = document.querySelectorAll('[data-tw-dismiss="modal"]');
 Array.from(closeButton).forEach(function (subElem) {
   subElem.addEventListener("click", function () {
-
+    
     var modalWindow = subElem.closest(".modal");
     if (modalWindow.classList.contains("hidden")) {
       modalWindow.classList.remove('hidden');

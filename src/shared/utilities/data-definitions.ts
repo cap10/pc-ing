@@ -1,6 +1,7 @@
 // This file contains type definitions
 
 export type UserClerk = {
+    id: string,
     email: string,
     username: string,
     groupId: string,
