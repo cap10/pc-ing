@@ -1,4 +1,5 @@
-import { getUserClerks } from "@/shared/repositories/main-repository";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { getClerkUsers } from "@/shared/repositories/main-repository";
 import UserForm from "@/shared/ui/userForm";
 import { Metadata } from "next";
 
@@ -7,8 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Users() {
-    const users = await getUserClerks();
-    console.log(users.content);
+    const users = await getClerkUsers(0, 100);
     
     return (
         <main>
@@ -76,10 +76,11 @@ export default async function Users() {
                                 <th scope="col" className="px-6 py-3">
                                     Status
                                 </th>
+                                <th scope="col" className="px-6 py-3">action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {users?.content.map((u) => (
+                            {users?.content.map((u: any) => (
                                 <tr className="bg-white border border-gray-200" key={u.id}>
                                     <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
                                         {u.username}
@@ -100,7 +101,17 @@ export default async function Users() {
                                         {u.group?.name}
                                     </td>
                                     <td className="px-6 py-3.5">
-                                        {u.enabled ? 'enabled' : 'disabled'}
+                                        {u.enabled ? 
+                                            (<span className="rounded-full bg-green-500 text-white text-xs px-1.5 py-0.5">enabled</span>) : 
+                                            (<span className="rounded-full bg-red-500 text-white text-xs px-1.5 py-0.5">disabled</span>)}
+                                    </td>
+                                    <td>
+                                        {!u.enabled ? 
+                                            (<span title="Enable User" className="text-green-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-check"></i></span>) : 
+                                            (<span title="Disable User" className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-xmark"></i></span>)}
+                                        <span title="Edit User" className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-edit"></i></span>
+                                        <span title="Reset User" className="text-blue-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-key"></i></span>
+                                        <span title="Delete User" className="text-red-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-trash"></i></span>
                                     </td>
                                 </tr>
                             ))}

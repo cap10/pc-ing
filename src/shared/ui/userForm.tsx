@@ -1,6 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { getUserRoles } from "../repositories/main-repository";
 import { createUser } from "../utilities/utils";
 
-export default function UserForm() {
+export default async function UserForm() {
+
+    const groups = await getUserRoles();
+    // console.log(groups);
 
     return (
         <div className="relative z-50 hidden modal" id="modal-userform" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -39,8 +46,10 @@ export default function UserForm() {
                                     <div className="mb-4">
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input6">Role</label>
                                         <select name="role" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input6" required>
-                                            <option value="" defaultValue="" disabled>select...</option>
-                                            <option value="test">test</option>
+                                            <option value="" defaultValue={""}>select...</option>
+                                            {groups?.map((g: any) => (
+                                                <option value={g.id} key={g.id}>{g.name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>

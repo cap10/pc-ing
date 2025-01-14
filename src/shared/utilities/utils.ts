@@ -1,51 +1,23 @@
 'use server';
 
-// import { revalidatePath } from 'next/cache';
-// import { redirect } from 'next/navigation';
-import { z } from 'zod';
+import { createClerkUser } from "../repositories/main-repository";
+import { UserSchema } from "./data-definitions";
 
-const UserSchema = z.object({
-    id: z.string(),
-    username: z.string({
-        invalid_type_error: 'Please enter a username.',
-    }),
-    name: z.string({
-        invalid_type_error: 'Please enter a name.',
-    }),
-    email: z.string({
-        invalid_type_error: 'Please enter an email.',
-    }),
-    phoneNumber: z.string({
-        invalid_type_error: 'Please enter a phone number.',
-    }),
-    nationalId: z.string({
-        invalid_type_error: 'Please enter a nationali ID.',
-    }),
-    groupId: z.string({
-        invalid_type_error: 'Please select a role.',
-    }),
-});
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
 
 const CreateUser = UserSchema.omit({id: true});
 
 export async function createUser(formData: FormData){
 
-    // const rawFormData = {
-    //     customerId: formData.get('customerId'),
-    //     amount: formData.get('amount'),
-    //     status: formData.get('status'),
-    // };
-    // const rawFormData = Object.fromEntries(formData.entries())
-
-    // console.log(rawFormData);
-
     const validatedFields = CreateUser.safeParse({
-        username: formData.get('username'),
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phoneNumber: formData.get('phone'),
-        nationalId: formData.get('national'),
-        groupId: formData.get('role'),
+        username: formData?.get('username'),
+        name: formData?.get('name'),
+        email: formData?.get('email'),
+        phoneNumber: formData?.get('phone'),
+        nationalId: formData?.get('national'),
+        groupId: formData?.get('role'),
     });
     // console.log(validatedFields);
     
@@ -58,10 +30,19 @@ export async function createUser(formData: FormData){
         };
     }
 
-    console.log(validatedFields.data);
-    
+    try {
+        await createClerkUser(validatedFields.data);    
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to Create User.',
+        };
+    }
 
-    // revalidatePath('/dashboard/users');
-    // redirect('/dashboard/users');
+    // console.log(resp);    
+
+    revalidatePath('/dashboard/users');
+    redirect('/dashboard/users');
 
 }
