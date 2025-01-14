@@ -149,6 +149,10 @@ table tr:first-child th:last-child {
     z-index: 6;
     color: var(--bs-sidebar-menu-sub-item-color);
   }
+
+  body[data-sidebar-size=sm] .nav-menu:after {
+    margin-top: 16%;
+  }
 }
 
 .nav-menu {
@@ -163,6 +167,7 @@ table tr:first-child th:last-child {
   right: 1.25rem;
   position: absolute;
   font-weight: 700;
+  margin-top: 1%;
 }
 .nav-menu:where([dir="ltr"], [dir="ltr"] *):after {
   right: 1.25rem;
@@ -215,11 +220,24 @@ table tr:first-child th:last-child {
   -webkit-transition-duration: 0.35s;
   transition-duration: 0.35s;
 }
+.metismenu a {
+  margin: 0 6%;
+}
 .metismenu .active a {
   background-color: #2AAAE1;
   color: white;
-  margin: 0 6%;
   border-radius: 7px;
-  /* font-weight: 900; */
-  /* color: rgb(81 86 190 / var(--tw-text-opacity)); */
+}
+.metismenu .active a:hover {
+  color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+  background-color: #2AAAE1;
+}
+
+.animate-translate {
+  -webkit-animation: animate-translate !important;
+  animation: animate-translate !important;
+  -webkit-animation-duration: .8s !important;
+  animation-duration: .8s !important;
+  -webkit-animation-fill-mode: both !important;
+  animation-fill-mode: both !important;
 }
