@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,6 +30,14 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased group`}
       >
+        <Toaster 
+        position="bottom-center" 
+        toastOptions={
+          {
+            success: {style: {border: '1px solid green'}},
+            error: {style: {border: '1px solid red'}}
+          }
+        }/>
         {children}
       </body>
     </html>

@@ -22,7 +22,7 @@ export default function Navbar() {
                 </div>
                 <div className="flex justify-between w-full items-center border-b border-[#e9e9ef] ltr:pl-6 rtl:pr-6">
                     <div>
-                        <h1>Module Name</h1>
+                        <h1 id="modName">&nbsp;</h1>
                     </div>
                     <div className="flex">
                         <div>

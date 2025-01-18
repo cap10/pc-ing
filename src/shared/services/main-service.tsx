@@ -27,7 +27,8 @@ export const createUserClerk = async(data: any) => {
 
 export const deleteUser = async(ref: string) => {
   const res = await fetch(`${nextConfig.API_Endpoint}users/${ref}`, {method: 'DELETE'});
-  return await res.json();
+  // console.log(res.text());
+  return await res.text();
 }
 
 export const updateUser = async(ref: string, data: any) => {

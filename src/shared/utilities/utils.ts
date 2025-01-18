@@ -1,6 +1,7 @@
 'use server';
 
 import { createClerkUser } from "../repositories/main-repository";
+import { showToast } from "./commons";
 import { UserSchema } from "./data-definitions";
 
 import { revalidatePath } from 'next/cache';
@@ -24,6 +25,8 @@ export async function createUser(formData: FormData){
 
     // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {
+        
+        showToast('Fill in all required fields.', 'info');
         return {
             errors: validatedFields.error.flatten().fieldErrors,
             message: 'Missing Fields. Failed to Create User.',
@@ -34,6 +37,7 @@ export async function createUser(formData: FormData){
         await createClerkUser(validatedFields.data);    
     } catch (err) {
         console.log(err);
+        showToast('Failed to create User.', 'error');
         return {
             errors: err,
             message: 'Server Side Error. Failed to Create User.',
