@@ -53,7 +53,7 @@ export const forgotPassword = async (data: any) => {
           'Content-type': 'application/json'
       }
     });
-    return await response.json();
+    return await response.text();
 }
 
 export const setPassword = async (data: any) => {

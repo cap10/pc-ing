@@ -7,9 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Login() {
-  const year = new Date().getFullYear();
+    const year = new Date().getFullYear();
 
-  const login = () => {
+    const login = () => {
         const uname = document.getElementById('username');
         const upwd = document.getElementById('password');
 
@@ -34,7 +34,7 @@ export default function Login() {
 
         // console.log(uname);
 
-        loginAuthUtil(uname.value, upwd.value, 'admin')
+        loginAuthUtil(uname.value, upwd.value, 'customer')
         .then(resp => {
             console.log(resp);
             

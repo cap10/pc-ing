@@ -1,6 +1,6 @@
 'use server';
 
-import { adminLogin, customerLogin } from "../services/auth-service";
+import { adminLogin, customerLogin, forgotPassword, setPassword } from "../services/auth-service";
 import { createBank, createUserClerk } from "../services/main-service";
 import { showToast } from "./commons";
 import { BankSchema, UserSchema } from "./data-definitions";
@@ -108,3 +108,44 @@ export async function loginAuthUtil(uname: string, upwd: string, utyp: string){
     }
 
 }
+
+export async function forgotPwdUtil(uname: string){
+
+    const formData = {
+        'username': uname
+    };
+
+    try {
+        return await forgotPassword(formData);    
+
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to request Password Reset.',
+        };
+    }
+
+}
+
+export async function setPwdUtil(token: string, pass1: string, pass2: string){
+
+    const formData = {
+        'token': token,
+        "password": pass1,
+        "confirmPassword": pass2
+    };
+
+    try {
+        return await setPassword(formData);    
+
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to request Password Reset.',
+        };
+    }
+
+}
+
