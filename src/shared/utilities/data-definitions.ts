@@ -24,4 +24,18 @@ export const UserSchema = z.object({
     }),
 });
 
+export const BankSchema = z.object({
+    id: z.string(),
+    bankName: z.string({
+        invalid_type_error: 'Please enter a name.',
+    }),
+    bin: z.string({
+        invalid_type_error: 'Please enter a bin.',
+    }),
+    swiftCode: z.string({
+        invalid_type_error: 'Please enter swift code.',
+    }),
+});
+
+
 

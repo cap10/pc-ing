@@ -1,16 +1,17 @@
 'use server';
 
-import { createClerkUser } from "../repositories/main-repository";
+import { createBank, createUserClerk } from "../services/main-service";
 import { showToast } from "./commons";
-import { UserSchema } from "./data-definitions";
+import { BankSchema, UserSchema } from "./data-definitions";
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 
 const CreateUser = UserSchema.omit({id: true});
+const CreateBank = BankSchema.omit({id: true});
 
-export async function createUser(formData: FormData){
+export async function createUserUtil(formData: FormData){
 
     const validatedFields = CreateUser.safeParse({
         username: formData?.get('username'),
@@ -34,7 +35,7 @@ export async function createUser(formData: FormData){
     }
 
     try {
-        await createClerkUser(validatedFields.data);    
+        await createUserClerk(validatedFields.data);    
     } catch (err) {
         console.log(err);
         showToast('Failed to create User.', 'error');
@@ -48,5 +49,41 @@ export async function createUser(formData: FormData){
 
     revalidatePath('/dashboard/users');
     redirect('/dashboard/users');
+
+}
+
+export async function createBankUtil(formData: FormData){
+    const validatedFields = CreateBank.safeParse({
+        bankName: formData?.get('name'),
+        bin: formData?.get('bin'),
+        swiftCode: formData?.get('swiftCode')
+    });
+    // console.log(validatedFields);
+    
+
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+        console.log(validatedFields.error.flatten().fieldErrors);
+        
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create Bank.',
+        };
+    }
+
+    try {
+        await createBank(validatedFields.data);    
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to Create Bank.',
+        };
+    }
+
+    // console.log(resp);    
+
+    revalidatePath('/dashboard/banks');
+    redirect('/dashboard/banks');
 
 }

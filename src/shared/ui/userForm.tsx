@@ -2,16 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from "react";
-import { getUserRoles } from "../repositories/main-repository";
-import { createUser } from "../utilities/utils";
+import { createUserUtil } from "../utilities/utils";
 import { closeModal, showToast } from "../utilities/commons";
+import { getUserGroups } from "../services/main-service";
 
 export default function UserForm() {
 
     const [groups, setGroups] = useState(null);
     
     function getRoles(){
-        getUserRoles()
+        getUserGroups()
         .then((data) => {
             // console.log(data);
 
@@ -33,7 +33,7 @@ export default function UserForm() {
                 <div className="absolute inset-0 transition-opacity bg-black bg-opacity-50 modal-overlay"></div>
                 <div className="p-4 mx-auto animate-translate sm:max-w-xl">
                     <div className="relative overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl">
-                        <form action={createUser}>
+                        <form action={createUserUtil}>
                             <div className="bg-white">
                                 <div className="flex items-center p-4 border-b rounded-t border-gray-50">
                                     <h3 className="text-xl font-semibold text-gray-900 ">
