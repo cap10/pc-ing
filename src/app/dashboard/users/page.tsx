@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { changeUserStatus, deleteUser, getUserClerks, resetUserPassword } from "@/shared/services/main-service";
+import { resetUserPassword } from "@/shared/services/auth-service";
+import { changeUserStatus, deleteUser, getUserClerks } from "@/shared/services/main-service";
 import UserForm from "@/shared/ui/userForm";
 import { closeModal, openModal, showToast } from "@/shared/utilities/commons";
 import { useEffect, useState } from "react";

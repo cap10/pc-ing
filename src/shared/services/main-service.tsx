@@ -81,10 +81,3 @@ export const activateDeactivateBank = async(ref: string, mode: string) => {
                  await fetch(`${nextConfig.API_Endpoint}banks/deactivate/${ref}`, {method: 'PUT'});
   return await res.json();
 }
-
-
-// Password Management
-export const resetUserPassword = async(ref: string) => {
-  const res = await fetch(`${nextConfig.API_Endpoint}users/reset-password/admin/${ref}`, {method: 'PUT'});
-  return await res.json();
-}

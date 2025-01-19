@@ -1,5 +1,6 @@
 'use server';
 
+import { adminLogin, customerLogin } from "../services/auth-service";
 import { createBank, createUserClerk } from "../services/main-service";
 import { showToast } from "./commons";
 import { BankSchema, UserSchema } from "./data-definitions";
@@ -85,5 +86,25 @@ export async function createBankUtil(formData: FormData){
 
     revalidatePath('/dashboard/banks');
     redirect('/dashboard/banks');
+
+}
+
+export async function loginAuthUtil(uname: string, upwd: string, utyp: string){
+
+    const formData = {
+        'username': uname,
+        'password': upwd
+    };
+
+    try {
+        return (utyp == 'customer') ? await customerLogin(formData) : await adminLogin(formData);    
+
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to Login.',
+        };
+    }
 
 }

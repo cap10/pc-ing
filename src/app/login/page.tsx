@@ -1,5 +1,7 @@
 'use client';
 
+import { showToast } from "@/shared/utilities/commons";
+import { loginAuthUtil } from "@/shared/utilities/utils";
 import Image from "next/image"; 
 import Link from "next/link";
 
@@ -7,7 +9,50 @@ export default function Login() {
   const year = new Date().getFullYear();
 
   const login = () => {
-    document.location.href = '/dashboard';
+    const uname = document.getElementById('username');
+    const upwd = document.getElementById('password');
+
+    if(!uname?.value || !upwd?.value){
+        showToast('Username and Password Required.', 'error');
+
+        uname?.classList.remove('border-gray-300');
+        uname?.classList.add('border-red-400');
+
+        upwd?.classList.remove('border-gray-300');
+        upwd?.classList.add('border-red-400');
+
+        return;
+    }
+    else{
+        uname?.classList.remove('border-red-400');
+        upwd?.classList.remove('border-red-400');
+
+        uname?.classList.add('border-gray-300');
+        upwd?.classList.add('border-gray-300');
+    }
+
+    // console.log(uname);
+
+    loginAuthUtil(uname.value, upwd.value, 'admin')
+    .then(resp => {
+        console.log(resp);
+        
+        if(resp.status == 403){
+            showToast(resp.message, 'error');
+            return;
+        }
+
+        if(resp.accessToken){
+            document.location.href = '/dashboard';
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        showToast('Failed to Login.', 'error');
+    })
+
+
+    
   }
 
   return (
@@ -45,7 +90,7 @@ export default function Login() {
                                         </div>
 
                                         <div className="flex">
-                                            <input type="password" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" />
+                                            <input id="password" type="password" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" />
                                         </div>
                                     </div>
                                     <div className="mb-6 row">
