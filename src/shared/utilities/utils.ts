@@ -1,9 +1,9 @@
 'use server';
 
 import { adminLogin, customerLogin, forgotPassword, setPassword } from "../services/auth-service";
-import { createBank, createUserClerk } from "../services/main-service";
+import { createBank, createCorporateCustomer, createIndividualCustomer, createUserClerk } from "../services/main-service";
 import { showToast } from "./commons";
-import { BankSchema, UserSchema } from "./data-definitions";
+import { BankSchema, CorporateCustomerSchema, IndividualCustomerSchema, UserSchema } from "./data-definitions";
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -11,6 +11,8 @@ import { redirect } from 'next/navigation';
 
 const CreateUser = UserSchema.omit({id: true});
 const CreateBank = BankSchema.omit({id: true});
+const CreateIndividual = IndividualCustomerSchema.omit({id: true});
+const CreateCorporate = CorporateCustomerSchema.omit({id: true});
 
 export async function createUserUtil(formData: FormData){
 
@@ -148,4 +150,90 @@ export async function setPwdUtil(token: string, pass1: string, pass2: string){
     }
 
 }
+
+export async function createIndividualCustomerUtil(formData: FormData){
+    
+    const validatedFields = CreateIndividual.safeParse({
+        customerName: formData?.get('name'),
+        email: formData?.get('email'),
+        address: formData?.get('address'),
+        phoneNumber: formData?.get('phone'),
+        nationalId: formData?.get('nationalId'),
+        numberOfRequiredApproversPerTransaction: formData?.get('reqApprovers'),
+        username: formData?.get('username'),
+        password: formData?.get('password'),
+        accounts: formData?.get('accounts')
+    });
+    // console.log(validatedFields);
+    
+
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+        console.log(validatedFields.error.flatten().fieldErrors);
+        
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create Individual Customer.',
+        };
+    }
+
+    try {
+        await createIndividualCustomer(validatedFields.data);    
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to Create Customer.',
+        };
+    }
+
+    // console.log(resp);    
+
+    revalidatePath('/dashboard/customers/individual');
+    redirect('/dashboard/customers/individual');
+
+}
+
+export async function createCorporateCustomerUtil(formData: FormData){
+    const validatedFields = CreateCorporate.safeParse({
+        companyName: formData?.get('name'),
+        email: formData?.get('email'),
+        address: formData?.get('address'),
+        telephoneNumber: formData?.get('phone'),
+        registrationNumber: formData?.get('regNumber'),
+        numberOfRequiredApproversPerTransaction: formData?.get('reqApprovers'),
+        incorporationDate: formData?.get('incoDate'),
+        userRights: formData?.get('users'),
+        accounts: formData?.get('accounts')
+    });
+    // console.log(validatedFields);
+    
+
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+        console.log(validatedFields.error.flatten().fieldErrors);
+        
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create Corporate Customer.',
+        };
+    }
+
+    try {
+        await createCorporateCustomer(validatedFields.data);    
+    } catch (err) {
+        console.log(err);
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to Create Customer.',
+        };
+    }
+
+    // console.log(resp);    
+
+    revalidatePath('/dashboard/customers/corporate');
+    redirect('/dashboard/customers/corporate');
+
+}
+
 
