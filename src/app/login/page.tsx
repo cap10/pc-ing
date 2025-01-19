@@ -1,5 +1,6 @@
 'use client';
 
+import { setSessionData } from "@/shared/repositories/storage-repository";
 import { showToast } from "@/shared/utilities/commons";
 import { loginAuthUtil } from "@/shared/utilities/utils";
 import Image from "next/image"; 
@@ -35,14 +36,19 @@ export default function Login() {
 
     loginAuthUtil(uname.value, upwd.value, 'admin')
     .then(resp => {
-        console.log(resp);
+        // console.log(resp);
         
         if(resp.status == 403){
             showToast(resp.message, 'error');
             return;
         }
 
-        if(resp.accessToken){
+        if(resp.accessToken && !resp.customerId){
+            setSessionData('atoken', resp.accessToken);
+            setSessionData('display', resp.name);
+            setSessionData('user', resp.username);
+            setSessionData('role', resp?.group?.name);
+
             document.location.href = '/dashboard';
         }
     })

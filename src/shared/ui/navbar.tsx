@@ -1,7 +1,59 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getSessionDataByKey } from "../services/auth-service";
+import { showToast } from "../utilities/commons";
 
 export default function Navbar() {
+
+    const [userLogged, setUserLogged] = useState('user');
+    const [userRole, setUserRole] = useState('');
+
+    function doLogout(){
+        // handleLogout()
+        // .then(res => {
+        //     console.log(res);
+            
+        // })
+        // .catch(err => {
+        //     console.log(err);
+            
+        //     showToast('Failed to logout.', 'error');
+        // })
+
+        try {
+            sessionStorage.clear();
+            showToast('User Logged Out.', 'info');
+            document.location.href = userRole !== 'CUSTOMER' ? '/login' : '/';
+        } catch (err) {
+            console.log(err);
+            showToast('Failed to logout.', 'error');
+            return false;
+    
+        }
+    }
+
+    useEffect(() => {
+        const val = sessionStorage.getItem('display');
+        const val2 = sessionStorage.getItem('role');
+
+        getSessionDataByKey(val)
+            .then(resp => {
+            // console.log(resp);
+            
+                if(resp) setUserLogged(resp);
+            });
+
+        getSessionDataByKey(val2)
+            .then(resp => {
+            // console.log(resp);
+            
+                if(resp) setUserRole(resp);
+            });
+
+    }, []);
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-10 flex items-center bg-white print:hidden border-zinc-700">
@@ -34,7 +86,7 @@ export default function Navbar() {
                             <div className="relative dropdown">
                                 <button type="button" className="flex items-center px-3 py-2 h-[70px] border-x border-gray-50 dropdown-toggle " id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <Image width={250} height={250} className="border-[3px] border-gray-400 rounded-full w-9 h-9 ltr:xl:mr-2 rtl:xl:ml-2" src="/images/avatar.svg" alt="Header Avatar" />
-                                    <span className="hidden font-medium xl:block px-2">Chriss Desy</span>
+                                    <span className="hidden font-medium xl:block px-2">{userLogged}</span>
                                     <i className="hidden align-bottom fa-solid fa-chevron-down xl:block"></i>
                                 </button>
                                 <div className="absolute top-0 z-50 hidden w-40 list-none bg-white dropdown-menu dropdown-animation rounded shadow " id="profile/log">
@@ -51,7 +103,7 @@ export default function Navbar() {
                                         </div>
                                         <hr className="border-gray-50" />
                                         <div className="dropdown-item">
-                                            <Link className="block p-3 hover:bg-red-400" href="/">
+                                            <Link className="block p-3 hover:bg-red-100" onClick={doLogout} href='#'>
                                                 <i className="mr-1 align-middle mdi mdi-logout text-16"></i> Logout
                                             </Link>
                                         </div>
