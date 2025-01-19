@@ -1,3 +1,5 @@
+// 'use client';
+
 import './../globals.css'
 import Navbar from '@/shared/ui/navbar';
 import Footer from '@/shared/ui/footer';
@@ -27,7 +29,7 @@ export default function DashboardLayout({
 
                 <div className="container-fluid px-[0.625rem]">
 
-                    <div className="grid grid-cols-1 pb-6">
+                    <div className="grid grid-cols-1 pb-6" id='myBody'>
                         {children}
                     </div>
                     

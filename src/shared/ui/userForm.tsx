@@ -1,13 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { getUserRoles } from "../repositories/main-repository";
-import { createUser } from "../utilities/utils";
+import { useEffect, useState } from "react";
+import { createUserUtil } from "../utilities/utils";
+import { closeModal, showToast } from "../utilities/commons";
+import { getUserGroups } from "../services/main-service";
 
-export default async function UserForm() {
+export default function UserForm() {
 
-    const groups = await getUserRoles();
-    // console.log(groups);
+    const [groups, setGroups] = useState(null);
+    
+    function getRoles(){
+        getUserGroups()
+        .then((data) => {
+            // console.log(data);
+
+            setGroups(data);
+        })
+        .catch(err => {
+            console.log(err);
+            showToast('Faile to get User Roles.', 'error');
+        })
+    } 
+
+    useEffect(() => {
+        getRoles();
+    }, [])
 
     return (
         <div className="relative z-50 hidden modal" id="modal-userform" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -15,7 +33,7 @@ export default async function UserForm() {
                 <div className="absolute inset-0 transition-opacity bg-black bg-opacity-50 modal-overlay"></div>
                 <div className="p-4 mx-auto animate-translate sm:max-w-xl">
                     <div className="relative overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl">
-                        <form action={createUser}>
+                        <form action={createUserUtil}>
                             <div className="bg-white">
                                 <div className="flex items-center p-4 border-b rounded-t border-gray-50">
                                     <h3 className="text-xl font-semibold text-gray-900 ">
@@ -54,7 +72,7 @@ export default async function UserForm() {
                                     </div>
                                 </div>
                                 <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50">
-                                    <button type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
+                                    <button onClick={() => closeModal('modal-userform')} type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
                                         <i className="fa-regular fa-xmark-circle mr-2 mt-1"></i>
                                         Cancel
                                     </button>
