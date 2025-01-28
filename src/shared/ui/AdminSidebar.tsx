@@ -5,7 +5,7 @@ export default function AdminSidebar(){
     return (
         <div data-simplebar='init' className="h-full">
                     
-            <div className="metismenu pb-10 pt-4" id="sidebar-menu">
+            <div className="metismenu pb-10 pt-4 hidden md:block" id="sidebar-menu">
                 
                 <ul id="side-menu" className="metismenu">
                     

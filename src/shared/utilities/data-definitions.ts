@@ -90,7 +90,7 @@ export const CorporateCustomerSchema = z.object({
     registrationNumber: z.string({
         invalid_type_error: 'Please enter registration number.',
     }),
-    telephonephoneNumber: z.string({
+    telephoneNumber: z.string({
         invalid_type_error: 'Please enter phone.',
     }),
     incorporationDate: z.date({
@@ -123,7 +123,7 @@ export const CorporateCustomerSchema = z.object({
         nationalId: z.string({
             invalid_type_error: 'Please enter national id.',
         }),
-        phoneNumber: z.date({
+        phoneNumber: z.string({
             invalid_type_error: 'Please enter phone.',
         }),
     }))

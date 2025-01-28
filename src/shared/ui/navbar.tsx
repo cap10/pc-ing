@@ -60,7 +60,7 @@ export default function Navbar() {
             
             <div className="flex justify-between w-full">
                 <div className="flex items-center topbar-brand">
-                    <div className="hidden lg:block navbar-brand items-center justify-between shrink px-6 h-[70px] bg-[#fbfaff] border-b border-[#e9e9ef] shadow-none">
+                    <div className="hidden md:block navbar-brand items-center justify-between shrink px-6 h-[70px] bg-[#fbfaff] border-b border-[#e9e9ef] shadow-none">
                         <a href="#" className="flex items-center text-lg flex-shrink-0 font-bold text-white leading-[69px]">
                             <Image width={1062} height={2075} src="/images/logo-mini.png" alt="" className="inline-block align-middle w-10 md:hidden mt-3" id="mini-logo"/>
                             <Image width={280} height={60} src="/images/logo.svg" alt="" className="align-middle w-36 mt-2 hidden md:block" id="full-logo"/>

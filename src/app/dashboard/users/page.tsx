@@ -135,7 +135,7 @@ export default function Users() {
                         </button>
                     </div>
                 </div>
-                <div className="mt-5">
+                <div className="mt-5 overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-sm text-gray-700 bg-gray-200">
                             <tr className="">
@@ -195,7 +195,7 @@ export default function Users() {
                                             (<span title="Disable User" onClick={() => disableUser(u.id, false)} className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-xmark"></i></span>)}
                                         <span title="Edit User" className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-edit"></i></span>
                                         <span title="Reset User" onClick={() => confirmUser(u.id, 'modal-userreset')} className="text-blue-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-key"></i></span>
-                                        <span title="Delete User" onClick={() => confirmUser(u.id, 'modal-userdelete')} className="text-red-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-trash"></i></span>
+                                        <span title="Delete User" onClick={() => confirmUser(u.id, 'modal-userdelete')} className="text-red-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-trash-alt"></i></span>
                                     </td>
                                 </tr>
                             ))}

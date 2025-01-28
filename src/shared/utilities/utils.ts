@@ -158,13 +158,14 @@ export async function createIndividualCustomerUtil(formData: FormData){
         email: formData?.get('email'),
         address: formData?.get('address'),
         phoneNumber: formData?.get('phone'),
-        nationalId: formData?.get('nationalId'),
-        numberOfRequiredApproversPerTransaction: formData?.get('reqApprovers'),
+        nationalId: formData?.get('national'),
+        numberOfRequiredApproversPerTransaction: Number(formData?.get('reqApprovers')),
         username: formData?.get('username'),
-        password: formData?.get('password'),
-        accounts: formData?.get('accounts')
+        password: formData?.get('pwd'),
+        accounts: JSON.parse(formData?.get('accounts')?.toString())
     });
-    // console.log(validatedFields);
+
+    // console.log(validatedFields.data);
     
 
     // If form validation fails, return errors early. Otherwise, continue.
@@ -178,19 +179,17 @@ export async function createIndividualCustomerUtil(formData: FormData){
     }
 
     try {
-        await createIndividualCustomer(validatedFields.data);    
+        return await createIndividualCustomer(validatedFields.data);    
     } catch (err) {
         console.log(err);
         return {
             errors: err,
             message: 'Server Side Error. Failed to Create Customer.',
         };
-    }
+    } 
 
-    // console.log(resp);    
-
-    revalidatePath('/dashboard/customers/individual');
-    redirect('/dashboard/customers/individual');
+    // revalidatePath('/dashboard/customers/individual');
+    // redirect('/dashboard/customers/individual');
 
 }
 
@@ -201,12 +200,14 @@ export async function createCorporateCustomerUtil(formData: FormData){
         address: formData?.get('address'),
         telephoneNumber: formData?.get('phone'),
         registrationNumber: formData?.get('regNumber'),
-        numberOfRequiredApproversPerTransaction: formData?.get('reqApprovers'),
-        incorporationDate: formData?.get('incoDate'),
-        userRights: formData?.get('users'),
-        accounts: formData?.get('accounts')
+        numberOfRequiredApproversPerTransaction: Number(formData?.get('reqApprovers')),
+        incorporationDate: new Date(formData?.get('incoDate')),
+        userRights: JSON.parse(formData?.get('users')?.toString()),
+        accounts: JSON.parse(formData?.get('accounts')?.toString())
     });
     // console.log(validatedFields);
+    
+    // console.log(validatedFields.data);
     
 
     // If form validation fails, return errors early. Otherwise, continue.
@@ -220,7 +221,7 @@ export async function createCorporateCustomerUtil(formData: FormData){
     }
 
     try {
-        await createCorporateCustomer(validatedFields.data);    
+        return await createCorporateCustomer(validatedFields.data);    
     } catch (err) {
         console.log(err);
         return {
@@ -231,8 +232,8 @@ export async function createCorporateCustomerUtil(formData: FormData){
 
     // console.log(resp);    
 
-    revalidatePath('/dashboard/customers/corporate');
-    redirect('/dashboard/customers/corporate');
+    // revalidatePath('/dashboard/customers/corporate');
+    // redirect('/dashboard/customers/corporate');
 
 }
 
