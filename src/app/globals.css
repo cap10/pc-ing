@@ -29,15 +29,29 @@ body {
   background-color: #2AAAE1 !important;
 }
 
-.vertical-menu,
-.navbar-brand {
-  width: var(--tw-sidebar-width);
+@media (max-width: 768px) {
+  .vertical-menu,
+  .navbar-brand {
+    width: 0;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
 }
 
-.main-content {
-  margin-left: var(--tw-sidebar-width);
-  position: relative;
-  overflow: hidden;
+@media (min-width: 768px) {
+  .vertical-menu,
+  .navbar-brand {
+    width: var(--tw-sidebar-width);
+  }
+
+  .main-content {
+    margin-left: var(--tw-sidebar-width);
+    position: relative;
+    overflow: hidden;
+  }
 }
 
 .page-content {
