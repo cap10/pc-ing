@@ -1,7 +1,7 @@
 'use server';
 
 import { adminLogin, customerLogin, forgotPassword, setPassword } from "../services/auth-service";
-import { createBank, createCorporateCustomer, createIndividualCustomer, createUserClerk } from "../services/main-service";
+import { createBank, createCorporateCustomer, createIndividualCustomer, createUserClerk, updateUser } from "../services/main-service";
 import { showToast } from "./commons";
 import { BankSchema, CorporateCustomerSchema, IndividualCustomerSchema, UserSchema } from "./data-definitions";
 
@@ -45,6 +45,47 @@ export async function createUserUtil(formData: FormData){
         return {
             errors: err,
             message: 'Server Side Error. Failed to Create User.',
+        };
+    }
+
+    // console.log(resp);    
+
+    revalidatePath('/dashboard/users');
+    redirect('/dashboard/users');
+
+}
+
+export async function updateUserUtil(formData: FormData){
+
+    const validatedFields = CreateUser.safeParse({
+        username: formData?.get('username'),
+        name: formData?.get('name'),
+        email: formData?.get('email'),
+        phoneNumber: formData?.get('phone'),
+        nationalId: formData?.get('national'),
+        groupId: formData?.get('role'),
+    });
+    // console.log(validatedFields);
+    
+
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+        
+        showToast('Fill in all required fields.', 'info');
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create User.',
+        };
+    }
+
+    try {
+        await updateUser(formData?.get('refe'), validatedFields.data);    
+    } catch (err) {
+        console.log(err);
+        showToast('Failed to update User.', 'error');
+        return {
+            errors: err,
+            message: 'Server Side Error. Failed to update User.',
         };
     }
 

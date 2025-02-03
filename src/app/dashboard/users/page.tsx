@@ -2,9 +2,10 @@
 'use client';
 
 import { resetUserPassword } from "@/shared/services/auth-service";
-import { changeUserStatus, deleteUser, getUserClerks } from "@/shared/services/main-service";
+import { changeUserStatus, deleteUser, getUserClerks, getUserGroups } from "@/shared/services/main-service";
 import UserForm from "@/shared/ui/userForm";
 import { closeModal, openModal, showToast } from "@/shared/utilities/commons";
+import { updateUserUtil } from "@/shared/utilities/utils";
 import { useEffect, useState } from "react";
 
 // export const metadata: Metadata = {
@@ -14,7 +15,9 @@ import { useEffect, useState } from "react";
 export default function Users() {
 
     const [users, setUsers] = useState(null);
+    const [user, setUser] = useState(null);
     let userReference: string = '';
+    const [groups, setGroups] = useState(null);
 
     function getUsers(){
         getUserClerks(0, 100)
@@ -88,9 +91,46 @@ export default function Users() {
         }
     }
 
+    function loadUser(ref: string, modal: string){
+        if(ref){
+            users.forEach(r => {
+                if(r.id == ref){
+                    // console.log(r);
+
+                    setUser(r);
+                    
+                    // const acc = document.getElementById('input1');
+                    // const bank = document.getElementById('input2');
+                    // const name = document.getElementById('input3');
+
+                    // if(name && bank && acc){
+                    //     name.value = r.beneficiaryName;
+                    //     acc.value = r.accountNumber;
+                    //     bank.value = r.bank.id;
+                    // }
+                }
+            });
+            
+            openModal(modal);
+        }
+    }
+
+    function getRoles(){
+        getUserGroups()
+        .then((data) => {
+            // console.log(data);
+
+            setGroups(data);
+        })
+        .catch(err => {
+            console.log(err);
+            showToast('Faile to get User Roles.', 'error');
+        })
+    }
+
     useEffect(() => {
         getUsers();
-
+        getRoles();
     }, [])
     
     return (
@@ -193,7 +233,7 @@ export default function Users() {
                                         {!u.enabled ? 
                                             (<span title="Enable User" onClick={() => disableUser(u.id, true)} className="text-green-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-check"></i></span>) : 
                                             (<span title="Disable User" onClick={() => disableUser(u.id, false)} className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-xmark"></i></span>)}
-                                        <span title="Edit User" className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-edit"></i></span>
+                                        <span title="Edit User" onClick={() => loadUser(u.id, 'modal-edituser')} className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-edit"></i></span>
                                         <span title="Reset User" onClick={() => confirmUser(u.id, 'modal-userreset')} className="text-blue-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-key"></i></span>
                                         <span title="Delete User" onClick={() => confirmUser(u.id, 'modal-userdelete')} className="text-red-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-trash-alt"></i></span>
                                     </td>
@@ -255,7 +295,7 @@ export default function Users() {
                                     </div>
                                 </div>
                                 <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50">
-                                    <button onClick={() => closeModal('modal-userdelete')} type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
+                                    <button onClick={() => closeModal('modal-userreset')} type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
                                         <i className="fa-regular fa-xmark-circle mr-2 mt-1"></i>
                                         Cancel
                                     </button>
@@ -265,6 +305,75 @@ export default function Users() {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="relative z-50 hidden modal" id="modal-edituser" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="absolute inset-0 transition-opacity bg-black bg-opacity-50 modal-overlay"></div>
+                    <div className="p-4 mx-auto animate-translate sm:max-w-xl">
+                        <div className="relative overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl">
+                            <form action={updateUserUtil}>
+                                <div className="bg-white">
+                                    <div className="flex items-center p-4 border-b rounded-t border-gray-50">
+                                        <h3 className="text-xl font-semibold text-gray-900 ">
+                                            Update User
+                                        </h3>
+                                    </div>
+                                    {
+                                        user ? 
+                                        (
+                                            <div className="p-6 space-y-6">
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input1">Username</label>
+                                                    <input name="username" defaultValue={user?.username} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input1" placeholder="username" required/>
+                                                    <input name="refe" defaultValue={user?.id} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input01" placeholder="id" hidden/>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input2">Full Name</label>
+                                                    <input name="name" defaultValue={user?.name} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input2" placeholder="fullname" required/>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input3">National ID</label>
+                                                    <input name="national" defaultValue={user?.nationalId ?? ''} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input3" placeholder="national id" required/>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input4">Phone Number</label>
+                                                    <input name="phone" defaultValue={user?.phoneNumber ?? ''} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input4" placeholder="0700xxxxx" required/>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input5">Email</label>
+                                                    <input name="email" defaultValue={user?.email} className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="email" id="input5" placeholder="email" required/>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input6">Role</label>
+                                                    <select name="role" defaultValue={user?.group.id} className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input6" required>
+                                                        <option value="" defaultValue={""}>select...</option>
+                                                        {groups?.map((g: any) => (
+                                                            <option value={g.id} key={g.id}>{g.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        )
+                                        : (
+                                            <div></div>
+                                        )
+                                    }
+                                    <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50">
+                                        <button onClick={() => closeModal('modal-edituser')} type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
+                                            <i className="fa-regular fa-xmark-circle mr-2 mt-1"></i>
+                                            Cancel
+                                        </button>
+                                        <button type="submit" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:w-auto sm:text-sm">
+                                            Update
+                                            <i className="fa-regular fa-check-circle ml-2 mt-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
