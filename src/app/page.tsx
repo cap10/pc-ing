@@ -40,6 +40,11 @@ export default function Login() {
             
             if(resp.status == 403){
                 showToast(resp.message, 'error');
+
+                // temporarily open link
+                const elem = document.getElementById('adminRoute');
+                if(elem) elem.style.display = 'block';
+
                 return;
             }
 

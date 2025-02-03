@@ -91,7 +91,7 @@ export default function Individuals() {
                                 <th scope="col" className="px-6 py-3">
                                     Status
                                 </th>
-                                <th scope="col" className="px-6 py-3">action</th>
+                                <th scope="col" className="px-6 py-3 text-center">action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -110,8 +110,10 @@ export default function Individuals() {
                                         {u.nationalId}    
                                     </td>
                                     <td className="px-6 py-3.5">
-                                        {u.customerStatus == 'PENDING' ? 
-                                            (<span className="rounded-full bg-blue-500 text-white text-xs px-1.5 py-0.5">pending</span>) : 
+                                        {u.customerStatus == 'PENDING' ? (<span className="rounded-full bg-blue-500 text-white text-xs px-1.5 py-0.5">pending</span>) : 
+                                        u.customerStatus == 'ACTIVE' ? (<span className="rounded-full bg-green-500 text-white text-xs px-1.5 py-0.5">active</span>) : 
+                                        u.customerStatus == 'REJECTED' ? (<span className="rounded-full bg-amber-500 text-white text-xs px-1.5 py-0.5">rejected</span>) : 
+                                        u.customerStatus == 'BLOCKED' ? (<span className="rounded-full bg-red-500 text-white text-xs px-1.5 py-0.5">blocked</span>) : 
                                             (<span className="rounded-full bg-gray-500 text-white text-xs px-1.5 py-0.5">{u.customerStatus ? u.customerStatus : 'null'}</span>)}
                                     </td>
                                     <td className="text-center">

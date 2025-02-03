@@ -59,7 +59,7 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
     function approveAccount(){
         if(accReference){
 
-            const action = document.getElementById('input11');
+            const action = document.getElementById('input111');
             if(!action?.value){
                 showToast('Select approval action.', 'error');
                 return;
@@ -220,8 +220,8 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                                         <h4 className="font-semibold">You are about to change account status.</h4>
                                     </div>
                                     <div className="mb-4">
-                                        <label className="block mb-2 font-medium text-gray-600" htmlFor="input11">Action</label>
-                                        <select name="action" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input11" required>
+                                        <label className="block mb-2 font-medium text-gray-600" htmlFor="input111">Action</label>
+                                        <select name="action" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input111" required>
                                             <option value="" defaultValue={""}>select...</option>
                                             <option value="APPROVE">Approve</option>
                                             <option value="REJECT">Reject</option>

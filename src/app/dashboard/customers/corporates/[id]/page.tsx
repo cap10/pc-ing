@@ -1,6 +1,5 @@
 'use client';
 
-import { getIndividualCustomerById } from "@/shared/services/main-service";
 import CustomerAccounts from "@/shared/ui/customerAccounts";
 import CustomerBeneficiaries from "@/shared/ui/customerBeneficiary";
 import CustomerInfo from "@/shared/ui/customerInfo";
@@ -13,7 +12,7 @@ import { useEffect, useState } from "react";
 //     title: 'Individuals',
 // };
 
-export default function CustomerInfoIndi(
+export default function CustomerInfoCorpo(
     {params} : {params: Promise<{id: string}>}
 ) {
 
@@ -57,8 +56,8 @@ export default function CustomerInfoIndi(
     return (
         <main>
             <div className="md:flex items-center justify-between px-[2px] mb-5">
-                <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0" id="moduleName">Individual Customer </h4>
-                <Link href="/dashboard/customers/individuals" className="button p-1 text-white bg-color-secondary rounded-md">
+                <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0" id="moduleName">Corporate Customer </h4>
+                <Link href="/dashboard/customers/corporates" className="button p-1 text-white bg-color-secondary rounded-md">
                     <i className="fa-solid fa-arrow-left mr-2"></i>
                     View Customers
                 </Link>
@@ -79,7 +78,7 @@ export default function CustomerInfoIndi(
                 {custId ? 
                     <div>
                         <div className="myTab hidden p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="info" role="tabpanel" aria-labelledby="info-tab">
-                            <CustomerInfo typ={'Individual'} custRef={custId}></CustomerInfo>
+                            <CustomerInfo typ={'Corporate'} custRef={custId}></CustomerInfo>
                         </div>
                         <div className="myTab hidden p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
                             <CustomerAccounts custRef={custId}></CustomerAccounts>
