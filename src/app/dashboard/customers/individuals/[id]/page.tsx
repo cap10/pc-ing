@@ -4,6 +4,7 @@ import { getIndividualCustomerById } from "@/shared/services/main-service";
 import CustomerAccounts from "@/shared/ui/customerAccounts";
 import CustomerBeneficiaries from "@/shared/ui/customerBeneficiary";
 import CustomerInfo from "@/shared/ui/customerInfo";
+import CustomerUsers from "@/shared/ui/customerUsers";
 import { showToast } from "@/shared/utilities/commons";
 // import { Metadata } from "next";
 import Link from "next/link";
@@ -75,10 +76,13 @@ export default function CustomerInfoIndi(
                     <button id="beneficiary-tab" onClick={() => showTab("beneficiary")} className="font-medium px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-b-2 focus:border-b-black">
                         <i className="fa-solid fa-users-viewfinder text-slate-500"></i> Beneficiaries
                     </button>
+                    <button id="users-tab" onClick={() => showTab("users")} className="font-medium px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-b-2 focus:border-b-black">
+                        <i className="fa-solid fa-users text-slate-500"></i> Users
+                    </button>
                 </nav>                
                 {custId ? 
                     <div>
-                        <div className="myTab hidden p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="info" role="tabpanel" aria-labelledby="info-tab">
+                        <div className="myTab p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="info" role="tabpanel" aria-labelledby="info-tab">
                             <CustomerInfo typ={'Individual'} custRef={custId}></CustomerInfo>
                         </div>
                         <div className="myTab hidden p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
@@ -86,6 +90,9 @@ export default function CustomerInfoIndi(
                         </div>
                         <div className="myTab hidden p-4 mt-5 md:w-9/12 rounded-lg bg-gray-50" id="beneficiary" role="tabpanel" aria-labelledby="beneficiary-tab">
                             <CustomerBeneficiaries custRef={custId}></CustomerBeneficiaries>
+                        </div>
+                        <div className="myTab hidden p-4 mt-5 rounded-lg bg-gray-50" id="users" role="tabpanel" aria-labelledby="users-tab">
+                            <CustomerUsers typ={'INDIVIDUAL'}  custRef={custId}></CustomerUsers>
                         </div>
                     </div>
                 : <div></div>}

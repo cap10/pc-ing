@@ -1,7 +1,7 @@
 import { closeModal } from "../utilities/commons";
 
 
-export default function UserRightsForm({myFunc}) {
+export default function UserRightsForm({myFunc, enableUsername} : {myFunc: any, enableUsername: boolean}) {
 
     return (
         <div className="relative z-50 hidden modal" id="modal-addUser" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -26,6 +26,14 @@ export default function UserRightsForm({myFunc}) {
                                             <option value="INITIATOR">Initiator</option>
                                         </select>
                                     </div>
+                                    {
+                                        enableUsername ? (
+                                            <div className="mb-4">
+                                                <label className="block mb-2 font-medium text-gray-600" htmlFor="input10">Username</label>
+                                                <input name="username" className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input10" placeholder="username" required/>
+                                            </div>
+                                        ) : ('')
+}
                                     <div className="mb-4">
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input12">Name</label>
                                         <input name="name" className="w-full placeholder:text-xs border rounded border-gray-100 p-2" type="text" id="input12" placeholder="name" required/>

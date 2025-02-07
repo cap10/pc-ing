@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { customerAccountApproval, getCustomerAccounts, updateCustomerAccount } from "../services/main-service";
 import { closeModal, openModal, showToast } from "../utilities/commons";
+import AccountForm from "./accountForm";
 
 
 export default function CustomerAccounts({custRef}:{custRef: string}) {
@@ -135,6 +136,53 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
         }
     }
 
+    function createAcc(formData: FormData){
+        const name = formData?.get('name')?.toString();
+        const number = formData?.get('number')?.toString();
+        const typ = formData?.get('typ')?.toString();
+
+        if(name && number && typ){
+            // console.log(name, number, typ);
+            
+            const rec = {
+                "accountNumber": number,
+                "accountType": typ,
+                "accountName": name,
+                "customerId": custRef
+            };       
+    
+            console.log(rec);
+            
+            // createBeneficiary(rec)
+            // .then(resp => {
+            //     // console.log(resp);
+                
+            //     if(resp?.message){
+            //         showToast(resp.message, 'error');
+            //         return;
+            //     }
+            //     else if(resp?.error){
+            //         showToast(resp.error + `(${resp.status})`, 'error');
+            //         return;
+            //     }
+    
+            //     showToast('Beneficiary created successfully.', 'success');
+    
+            //     getBeneficiaries();
+    
+            //     closeModal('modal-addAcc');
+    
+            // })
+            // .catch(err => {
+            //     console.log(err);
+            //     showToast('Failed to add beneficiary.', 'error');
+            // })
+        }
+        else{
+            showToast('All fields are required.', 'error');
+        }
+    }
+
     useEffect(() => {
         getAccounts();
     }, []);
@@ -150,6 +198,11 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                     accounts ? (
                         <section>
                             <div className="mt-6 border-t border-gray-100">
+                                <div className="mt-2 text-right">
+                                    <span className="mr-3 text-color-secondary font-bold cursor-pointer text-sm" onClick={() => {openModal('modal-addAcc')}}>
+                                        <i  className="fa-solid fa-plus mr-1"></i> Add
+                                    </span>
+                                </div>
                                 <div className="mt-5 overflow-x-auto">
                                     <table className="w-full text-sm text-left text-gray-500">
                                         <thead className="text-sm text-gray-700 bg-gray-200">
@@ -291,6 +344,8 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                     </div>
                 </div>
             </div>
+
+            <AccountForm myFunc={createAcc}></AccountForm>
 
         </section>
     );

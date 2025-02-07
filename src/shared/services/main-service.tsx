@@ -47,6 +47,22 @@ export const changeUserStatus = async(ref: string, enable: boolean) => {
   return await res.json();
 };
 
+export const getCustomerUsers = async (customer: string, page: number, size: number) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}users/customers/${customer}?page=${page}&size=${size}`);
+  return await res.json();
+};
+
+export const createCustomerUser = async(data: any) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}users/customers`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+};
+
 
 // banks management
 export const getActiveBanks = async () => {
