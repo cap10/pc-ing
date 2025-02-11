@@ -122,6 +122,18 @@ export const createIndividualCustomer = async(data: any) => {
   
 };
 
+export const registerIndividualCustomer = async(data: any) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}individual-customers/register`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+  
+};
+
 export const changeIndividualCustomerStatus = async(ref: string, data: any) => {
   const response = await fetch(`${nextConfig.API_Endpoint}individual-customers/${ref}/update-status`, {
     method: 'POST',
@@ -194,8 +206,14 @@ export const getCustomerAccounts = async (customer: string) => {
   return await res.json();
 };
 
-export const customerAccountApproval = async(ref: string, mode: string) => {
-  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/approve?action=${mode}`, {method: 'PUT'});
+export const customerAccountApproval = async(ref: string, data: any) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/approve`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
   return await res.json();
 };
 
@@ -211,6 +229,32 @@ export const updateCustomerAccount = async(ref: string, data: any) => {
   });
   return await res.json();
 };
+
+export const createCustomerAccount = async(data: any, customer: string) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}customer-accounts/customers/${customer}`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+};
+
+export const activateCustomerAccount = async(ref: string) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/activate-account`, {
+    method: 'PUT'
+  });
+  return await res.json();
+};
+
+export const deactivateCustomerAccount = async(ref: string) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/deactivate`, {
+    method: 'PUT'
+  });
+  return await res.json();
+};
+
 
 // beneficiaries management
 export const getCustomerBeneficiaries = async (customer: string) => {

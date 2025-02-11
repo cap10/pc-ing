@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { customerAccountApproval, getCustomerAccounts, updateCustomerAccount } from "../services/main-service";
+import { activateCustomerAccount, createCustomerAccount, customerAccountApproval, deactivateCustomerAccount, getCustomerAccounts, updateCustomerAccount } from "../services/main-service";
 import { closeModal, openModal, showToast } from "../utilities/commons";
 import AccountForm from "./accountForm";
 
@@ -61,17 +61,32 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
         if(accReference){
 
             const action = document.getElementById('input111');
+            const remark = document.getElementById('input112');
             if(!action?.value){
                 showToast('Select approval action.', 'error');
                 return;
             }
+            if(!remark?.value){
+                showToast('Remark is required.', 'error');
+                return;
+            }
 
-            customerAccountApproval(accReference, action.value)
+            let rec = {
+                approved: action.value,
+                remarks: remark.value
+            };
+
+            customerAccountApproval(accReference, rec)
                 .then((resp) => {
-                    console.log(resp);
+                    // console.log(resp);
 
                     if(resp.error){
                         showToast(resp.error + ': ' + resp.status, 'error');
+                        
+                        return;
+                    }
+                    else if(resp.message){
+                        showToast(resp.message + ': ' + resp.status, 'error');
                         
                         return;
                     }
@@ -151,36 +166,97 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                 "customerId": custRef
             };       
     
-            console.log(rec);
+            // console.log(rec);
             
-            // createBeneficiary(rec)
-            // .then(resp => {
-            //     // console.log(resp);
+            createCustomerAccount(rec, custRef)
+            .then(resp => {
+                // console.log(resp);
                 
-            //     if(resp?.message){
-            //         showToast(resp.message, 'error');
-            //         return;
-            //     }
-            //     else if(resp?.error){
-            //         showToast(resp.error + `(${resp.status})`, 'error');
-            //         return;
-            //     }
+                if(resp?.message){
+                    showToast(resp.message, 'error');
+                    return;
+                }
+                else if(resp?.error){
+                    showToast(resp.error + `(${resp.status})`, 'error');
+                    return;
+                }
     
-            //     showToast('Beneficiary created successfully.', 'success');
+                showToast('Account created successfully.', 'success');
     
-            //     getBeneficiaries();
+                getAccounts();
     
-            //     closeModal('modal-addAcc');
+                closeModal('modal-addAcc');
     
-            // })
-            // .catch(err => {
-            //     console.log(err);
-            //     showToast('Failed to add beneficiary.', 'error');
-            // })
+            })
+            .catch(err => {
+                console.log(err);
+                showToast('Failed to add account.', 'error');
+            })
         }
         else{
             showToast('All fields are required.', 'error');
         }
+    }
+
+    function accountActivation(ref: string, mode: string){
+        if(ref && mode){
+            if (mode == 'activate'){ 
+                activateCustomerAccount(ref)
+                    .then((resp) => {
+                        // console.log(resp);
+                        if(resp.error){
+                            showToast(resp.error + ': ' + resp.status, 'error');
+                            
+                            return;
+                        }
+                        else if(resp.message){
+                            showToast(resp.message + ': ' + resp.status, 'error');
+                            
+                            return;
+                        }
+                        else if(resp?.status == 400){
+                            showToast(resp.detail + `(${resp.status})`, 'error');
+                            return;
+                        }
+
+                        showToast('Account activated successfully.', 'success');
+                        getAccounts();
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        showToast('Failed to activate account.', 'error');
+                    })
+            }
+            else{
+                deactivateCustomerAccount(ref)
+                    .then((resp) => {
+                        // console.log(resp);
+                        if(resp.error){
+                            showToast(resp.error + ': ' + resp.status, 'error');
+                            
+                            return;
+                        }
+                        else if(resp.message){
+                            showToast(resp.message + ': ' + resp.status, 'error');
+                            
+                            return;
+                        }
+                        else if(resp?.status == 400){
+                            showToast(resp.detail + `(${resp.status})`, 'error');
+                            return;
+                        }
+
+                        showToast('Account deactivated successfully.', 'success');
+                        getAccounts();
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        showToast('Failed to deactivate account.', 'error');
+                    });
+            }
+        }
+        
+        
     }
 
     useEffect(() => {
@@ -237,13 +313,21 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                                                     <td className="px-6 py-3.5">
                                                         {u.accountStatus == 'PENDING_APPROVAL' ? 
                                                             (<span className="rounded-full bg-blue-500 text-white text-xs px-1.5 py-0.5">pending</span>) : 
+                                                        u.accountStatus == 'ACTIVE' ? 
+                                                            (<span className="rounded-full bg-green-500 text-white text-xs px-1.5 py-0.5">active</span>) : 
+                                                        u.accountStatus == 'INACTIVE' ? 
+                                                            (<span className="rounded-full bg-yellow-500 text-white text-xs px-1.5 py-0.5">inactive</span>) : 
                                                             (<span className="rounded-full bg-gray-500 text-white text-xs px-1.5 py-0.5">{u.customerStatus ? u.customerStatus : 'null'}</span>)}
                                                     </td>
                                                     <td className="text-center">
                                                         {u.accountStatus == 'PENDING_APPROVAL' ? 
-                                                            (<span title="Approve Account" onClick={() => {confirmAcc(u.id, 'modal-accApprove', 'approve')}} className="text-green-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-circle-check"></i></span>) : 
-                                                            (<span title="No Action" className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-circle-half-stroke"></i></span>)}
-                                                        <span title="Edit Account" onClick={() => {confirmAcc(u.id, 'modal-editAcc', 'edit')}} className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-edit"></i></span>
+                                                            (<span title="Approve Account" onClick={() => {confirmAcc(u.id, 'modal-accApprove', 'approve')}} className="text-blue-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-circle-check"></i></span>) : 
+                                                        u.accountStatus != 'ACTIVE' ? 
+                                                            (<span title="Activate Account" onClick={() => accountActivation(u.id, 'activate')} className="text-green-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-check-square"></i></span>) : 
+                                                            (<span title="Deactivate Account" onClick={() => accountActivation(u.id, 'deactivate')} className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-xmark-circle"></i></span>)}
+                                                        
+                                                        {/* (<span title="No Action" className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-circle-half-stroke"></i></span>) */}
+                                                        {/* <span title="Edit Account" onClick={() => {confirmAcc(u.id, 'modal-editAcc', 'edit')}} className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-edit"></i></span> */}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -276,9 +360,13 @@ export default function CustomerAccounts({custRef}:{custRef: string}) {
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input111">Action</label>
                                         <select name="action" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input111" required>
                                             <option value="" defaultValue={""}>select...</option>
-                                            <option value="APPROVE">Approve</option>
-                                            <option value="REJECT">Reject</option>
+                                            <option value="true">Approve</option>
+                                            <option value="false">Reject</option>
                                         </select>
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600" htmlFor="input112">Remarks</label>
+                                        <textarea id="input112" className="block w-full mt-2 border p-2 border-gray-200 rounded focus:ring-2 focus:ring-offset-0 focus:ring-violet-500/30 focus:border-violet-200 py-1.5 " rows={3} placeholder="Type remark"></textarea>
                                     </div>
                                 </div>
                                 <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50">

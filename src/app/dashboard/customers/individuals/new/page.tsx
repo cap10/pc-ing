@@ -74,7 +74,7 @@ export default function NewIndividual() {
 
         createIndividualCustomerUtil(formData)
         .then(resp => {
-            console.log(resp);
+            // console.log(resp);
             
             if(resp?.message){
                 showToast(resp.message, 'error');
@@ -184,7 +184,7 @@ export default function NewIndividual() {
                                     </table>
                                 </div>
                             </div>
-                            <div className="col-span-12">
+                            {/* <div className="col-span-12">
                                 <div className="my-4">
                                     <h5>Login Credentials</h5>
                                     <hr />
@@ -201,7 +201,7 @@ export default function NewIndividual() {
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input8">Password</label>
                                     <input name="pwd" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="password" id="input8" placeholder="Password" required/>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50 mt-5">
                             <button type="submit" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:w-auto sm:text-sm">

@@ -1,7 +1,7 @@
 'use server';
 
 import { adminLogin, customerLogin, forgotPassword, setPassword } from "../services/auth-service";
-import { createBank, createCorporateCustomer, createIndividualCustomer, createUserClerk, updateUser } from "../services/main-service";
+import { createBank, createCorporateCustomer, createIndividualCustomer, createUserClerk, registerIndividualCustomer, updateUser } from "../services/main-service";
 import { showToast } from "./commons";
 import { BankSchema, CorporateCustomerSchema, IndividualCustomerSchema, UserSchema } from "./data-definitions";
 
@@ -201,8 +201,8 @@ export async function createIndividualCustomerUtil(formData: FormData){
         phoneNumber: formData?.get('phone'),
         nationalId: formData?.get('national'),
         numberOfRequiredApproversPerTransaction: Number(formData?.get('reqApprovers')),
-        username: formData?.get('username'),
-        password: formData?.get('pwd'),
+        // username: formData?.get('username'),
+        // password: formData?.get('pwd'),
         accounts: JSON.parse(formData?.get('accounts')?.toString())
     });
 
@@ -220,7 +220,7 @@ export async function createIndividualCustomerUtil(formData: FormData){
     }
 
     try {
-        return await createIndividualCustomer(validatedFields.data);    
+        return await registerIndividualCustomer(validatedFields.data);    
     } catch (err) {
         console.log(err);
         return {
