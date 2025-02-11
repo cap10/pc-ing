@@ -137,6 +137,10 @@ export default function Login() {
                                     </div>
                                 </div>
 
+                                <div className="mt-12 text-center">
+                                    <p className="text-gray-500">Don`t have an account? <Link href="/register" className="font-semibold text-color-secondary"> Create new</Link>. </p>
+                                </div>
+
                                 <div className="mt-12 text-center" id="adminRoute" style={{display: 'none'}}>
                                     <p className="text-gray-500">For Admin Portal <Link href="/login" className="font-semibold text-color-secondary"> click here </Link>. </p>
                                 </div>

@@ -1,23 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-
-import AccountForm from "@/shared/ui/accountForm";
-import { closeModal, openModal, showToast } from "@/shared/utilities/commons";
-import { createIndividualCustomerUtil } from "@/shared/utilities/utils";
-// import { Metadata } from "next";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { closeModal, openModal, showToast } from "../utilities/commons";
+import { individualCustomerRegistrationUtil } from "../utilities/utils";
+import AccountForm from "./accountForm";
 
-// export const metadata: Metadata = {
-//     title: 'Individuals',
-// };
-
-export default function NewIndividual() {
-
+export default function IndividualSelfRegister() {
+    
     const [myAccs, setMyAccs] = useState<any[]>([]);
-    const router = useRouter();
+    
+    function formSubmit(formData: FormData){
 
+        // console.log(formData);
+        
+            
+        formData.set('accounts', JSON.stringify(myAccs));
+
+        individualCustomerRegistrationUtil(formData)
+        .then(resp => {
+            // console.log(resp);
+            
+            if(resp?.message){
+                showToast(resp.message, 'error');
+                setMyAccs([]);
+                return;
+            }
+            else if(resp?.error){
+                showToast(resp.error + `(${resp.status})`, 'error');
+                setMyAccs([]);
+                return;
+            }
+
+            showToast('Customer registered successfully. Check your email.', 'success');
+
+            setMyAccs([]);
+
+            // router.push('/dashboard/customers/individuals');
+            setTimeout("document.location.href = '/';", 2000)
+        })
+        .catch(err => {
+            console.log(err);
+            showToast('Failed to register customer.', 'error');
+        })
+        
+        
+    }
+
+    function renderData(data: any[]){
+        let tbdy = '';
+        if(data){
+            data.forEach((u: any) => {
+                tbdy += `
+                    <tr style="border: 1px solid rgb(229 231 235);">
+                        <th scope="row" style="padding: 0.3rem 3rem;" className="font-medium text-gray-900 whitespace-nowrap">
+                            ${u.accountType}
+                        </th>
+                        <td style="padding: 0.3rem 3rem;">
+                            ${u.accountName}
+                        </td>
+                        <td style="padding: 0.3rem 3rem;">
+                            ${u.accountNumber}
+                        </td>
+                    </tr>
+                `
+            });
+        }
+
+        const elem = document.getElementById('mytbody');
+        if(elem) elem.innerHTML = tbdy;
+    }
+    
     function addAccDetail(formData: FormData){
         const name = formData?.get('name')?.toString();
         const number = formData?.get('number')?.toString();
@@ -45,110 +96,44 @@ export default function NewIndividual() {
         }
     }
 
-    function renderData(data: any[]){
-        let tbdy = '';
-        if(data){
-            data.forEach((u: any) => {
-                tbdy += `
-                    <tr style="border: 1px solid rgb(229 231 235);">
-                        <th scope="row" style="padding: 0.3rem 3rem;" className="font-medium text-gray-900 whitespace-nowrap">
-                            ${u.accountType}
-                        </th>
-                        <td style="padding: 0.3rem 3rem;">
-                            ${u.accountName}
-                        </td>
-                        <td style="padding: 0.3rem 3rem;">
-                            ${u.accountNumber}
-                        </td>
-                    </tr>
-                `
-            });
-        }
-
-        const elem = document.getElementById('mytbody');
-        if(elem) elem.innerHTML = tbdy;
-    }
-
-    function formSubmit(formData: FormData){
-        
-        formData.set('accounts', JSON.stringify(myAccs));
-
-        createIndividualCustomerUtil(formData)
-        .then(resp => {
-            // console.log(resp);
-            
-            if(resp?.message){
-                showToast(resp.message, 'error');
-                setMyAccs([]);
-                return;
-            }
-            else if(resp?.error){
-                showToast(resp.error + `(${resp.status})`, 'error');
-                setMyAccs([]);
-                return;
-            }
-
-            showToast('Customer created successfully.', 'success');
-
-            setMyAccs([]);
-
-            router.push('/dashboard/customers/individuals');
-
-        })
-        .catch(err => {
-            console.log(err);
-            showToast('Failed to create individual customer.', 'error');
-        })
-        
-        
-    }
-    
-
     return (
-        <main>
-            <div className="md:flex items-center justify-between px-[2px] mb-5">
-                <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0" id="moduleName">New Individual Customer</h4>
-                <Link href="/dashboard/customers/individuals" className="button p-1 text-white bg-color-secondary rounded-md">
-                    <i className="fa-solid fa-arrow-left mr-2"></i>
-                    Back to List
-                </Link>
-            </div>
+        <div>
             <hr />
             <section className="mt-5 pt-4">
                 <form action={formSubmit}>
                     <div className="card-body">
                         <div className="grid grid-cols-12 gap-2">
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input1">Name</label>
                                     <input name="name" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input1" placeholder="Name" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input2">Email</label>
                                     <input name="email" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="email" id="input2" placeholder="Email" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input3">Phone Number</label>
                                     <input name="phone" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input3" placeholder="Number" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
-                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input4">National ID</label>
-                                    <input name="national" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input4" placeholder="National ID" required/>
+                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input04">National ID</label>
+                                    <input name="national" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input04" placeholder="National ID" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input5">Address</label>
                                     <input name="address" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input5" placeholder="Address" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input6">Approvers per Transaction</label>
                                     <input name="reqApprovers" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="number" id="input6" placeholder="1" required/>
@@ -166,7 +151,7 @@ export default function NewIndividual() {
                                 </div>
                             </div>
                             <div className="col-span-12">
-                                <div className="mb-4">
+                                <div className="mb-4 overflow-x-auto">
                                     <table className="w-full text-sm text-left text-gray-500">
                                         <thead className="text-sm text-gray-700 bg-gray-100">
                                             <tr className="">
@@ -185,24 +170,24 @@ export default function NewIndividual() {
                                     </table>
                                 </div>
                             </div>
-                            {/* <div className="col-span-12">
+                            <div className="col-span-12">
                                 <div className="my-4">
                                     <h5>Login Credentials</h5>
                                     <hr />
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input7">Username</label>
                                     <input name="username" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input7" placeholder="Username" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 xl:col-span-4">
+                            <div className="col-span-12 md:col-span-6">
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input8">Password</label>
                                     <input name="pwd" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="password" id="input8" placeholder="Password" required/>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                         <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50 mt-5">
                             <button type="submit" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:w-auto sm:text-sm">
@@ -215,8 +200,6 @@ export default function NewIndividual() {
             </section>
 
             <AccountForm myFunc={addAccDetail}></AccountForm>
-            
-
-        </main>
+        </div>
     );
 }
