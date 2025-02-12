@@ -40,6 +40,11 @@ export default function Login() {
             
             if(resp.status == 403){
                 showToast(resp.message, 'error');
+
+                // temporarily open link
+                const elem = document.getElementById('adminRoute');
+                if(elem) elem.style.display = 'block';
+
                 return;
             }
 
@@ -130,6 +135,10 @@ export default function Login() {
 
                                     <div className="flex justify-center gap-3">
                                     </div>
+                                </div>
+
+                                <div className="mt-12 text-center">
+                                    <p className="text-gray-500">Don`t have an account? <Link href="/register" className="font-semibold text-color-secondary"> Create new</Link>. </p>
                                 </div>
 
                                 <div className="mt-12 text-center" id="adminRoute" style={{display: 'none'}}>

@@ -46,6 +46,7 @@ export default function Login() {
         if(resp.accessToken && !resp.customerId){
             setSessionData('atoken', resp.accessToken);
             setSessionData('display', resp.name);
+            setSessionData('refe', '77a75679-b559-49b8-858f-27d3c81471cc');
             setSessionData('user', resp.username);
             setSessionData('role', resp?.group?.name);
 

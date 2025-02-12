@@ -47,6 +47,22 @@ export const changeUserStatus = async(ref: string, enable: boolean) => {
   return await res.json();
 };
 
+export const getCustomerUsers = async (customer: string, page: number, size: number) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}users/customers/${customer}?page=${page}&size=${size}`);
+  return await res.json();
+};
+
+export const createCustomerUser = async(data: any) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}users/customers`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+};
+
 
 // banks management
 export const getActiveBanks = async () => {
@@ -96,6 +112,18 @@ export const getIndividualCustomerById = async (ref: string) => {
 
 export const createIndividualCustomer = async(data: any) => {
   const response = await fetch(`${nextConfig.API_Endpoint}individual-customers`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+  
+};
+
+export const registerIndividualCustomer = async(data: any) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}individual-customers/register`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
@@ -178,8 +206,14 @@ export const getCustomerAccounts = async (customer: string) => {
   return await res.json();
 };
 
-export const customerAccountApproval = async(ref: string, mode: string) => {
-  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/approve?action=${mode}`, {method: 'PUT'});
+export const customerAccountApproval = async(ref: string, data: any) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/approve`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
   return await res.json();
 };
 
@@ -195,6 +229,32 @@ export const updateCustomerAccount = async(ref: string, data: any) => {
   });
   return await res.json();
 };
+
+export const createCustomerAccount = async(data: any, customer: string) => {
+  const response = await fetch(`${nextConfig.API_Endpoint}customer-accounts/customers/${customer}`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+        'Content-type': 'application/json'
+    }
+  });
+  return await response.json();
+};
+
+export const activateCustomerAccount = async(ref: string) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/activate-account`, {
+    method: 'PUT'
+  });
+  return await res.json();
+};
+
+export const deactivateCustomerAccount = async(ref: string) => {
+  const res = await fetch(`${nextConfig.API_Endpoint}customer-accounts/${ref}/deactivate`, {
+    method: 'PUT'
+  });
+  return await res.json();
+};
+
 
 // beneficiaries management
 export const getCustomerBeneficiaries = async (customer: string) => {

@@ -57,6 +57,45 @@ export const IndividualCustomerSchema = z.object({
     numberOfRequiredApproversPerTransaction: z.number({
         invalid_type_error: 'Please enter number.',
     }),
+    // username: z.string({
+    //     invalid_type_error: 'Please enter a username.',
+    // }),
+    // password: z.string({
+    //     invalid_type_error: 'Please enter a password.',
+    // }),
+    accounts: z.array(z.object({
+        accountName: z.string({
+            invalid_type_error: 'Please enter an account name.',
+        }),
+        accountNumber: z.string({
+            invalid_type_error: 'Please enter an account number.',
+        }),
+        accountType: z.string({
+            invalid_type_error: 'Please select account type.',
+        }),
+    }))
+});
+
+export const IndividualCustomerSchema2 = z.object({
+    id: z.string(),
+    customerName: z.string({
+        invalid_type_error: 'Please enter a name.',
+    }),
+    email: z.string({
+        invalid_type_error: 'Please enter an email.',
+    }),
+    address: z.string({
+        invalid_type_error: 'Please enter address.',
+    }),
+    phoneNumber: z.string({
+        invalid_type_error: 'Please enter phone.',
+    }),
+    nationalId: z.string({
+        invalid_type_error: 'Please enter national id.',
+    }),
+    numberOfRequiredApproversPerTransaction: z.number({
+        invalid_type_error: 'Please enter number.',
+    }),
     username: z.string({
         invalid_type_error: 'Please enter a username.',
     }),
