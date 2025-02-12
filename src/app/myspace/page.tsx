@@ -1,11 +1,56 @@
-import { Metadata } from "next";
-import Link from "next/link";
+'use client';
 
-export const metadata: Metadata = {
-    title: 'Home',
-};
+import { getSessionDataByKey } from "@/shared/services/auth-service";
+import { getCustomerAccounts } from "@/shared/services/main-service";
+import { showToast } from "@/shared/utilities/commons";
+// import { Metadata } from "next";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+// export const metadata: Metadata = {
+//     title: 'Home',
+// };
 
 export default function Home() {
+
+    const [accs, setAccs] = useState(null);
+    let custRef = '';
+
+    function getAccounts(){
+        // console.log(custRef);            
+
+        if(custRef){
+            getCustomerAccounts(custRef)
+            .then(resp => {
+                console.log(resp);
+                
+                setAccs(resp);
+            })
+            .catch(err => {
+                console.log(err);
+                showToast('Failed to get Accounts.', 'error');
+            })
+        }
+        else{
+            // showToast('Customer reference not found.', 'error');
+        }
+    }
+
+    useEffect(() => {
+
+        const refe = sessionStorage.getItem('refe');
+
+        if(refe) {
+            getSessionDataByKey(refe)
+            .then(cid => {
+                // console.log(cid);
+                if(cid) custRef = cid;
+                
+                getAccounts();
+            });
+
+        }
+    }, [])
 
     return (
         
@@ -17,18 +62,22 @@ export default function Home() {
 
             <div className="grid grid-cols-3 gap-4">
 
-                <div className="card p-5 border-2 rounded-2xl border-blue-700">
-                    <div className="card-body">
-                        <h4 className="font-bold">Current Account ZWL</h4>
-                        <h6 className="text-gray-500">6837363822</h6>
-                        <div className="mt-5">
-                            <span className="text-gray-500">ZWL</span>
-                            <span className="font-bold ml-2">6852.14</span>
+                {
+                    accs?.map((u: any) => (
+                        <div className="card p-5 border-2 rounded-2xl border-blue-700" key={u.id}>
+                            <div className="card-body">
+                                <h4 className="font-bold">{u.accountName}</h4>
+                                <h6 className="text-gray-500">{u.accountNumber} ({u.accountType})</h6>
+                                <div className="mt-5">
+                                    <span className="text-gray-500">ZWL $</span>
+                                    <span className="font-bold ml-2">0.00</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    ))
+                }
 
-                <div className="card p-5 border rounded-2xl border-gray-400">
+                {/* <div className="card p-5 border rounded-2xl border-gray-400">
                     <div className="card-body">
                         <h4 className="font-bold">Personal Account ZWL</h4>
                         <h6 className="text-gray-500">6837363822</h6>
@@ -48,7 +97,7 @@ export default function Home() {
                             <span className="font-bold ml-2">6852.14</span>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
 
@@ -58,6 +107,7 @@ export default function Home() {
                     <div className="card-body">
                         <h4 className="font-bold">Recent Bill Payment</h4>                        
                         <div className="mt-5 grid grid-cols-5 gap-2">
+
                             <div className="card border border-gray-400 rounded-md p-4">
                                 <div className="card-body">
                                     <div className="mb-5">
@@ -65,11 +115,11 @@ export default function Home() {
                                             <i className="fa-solid fa-circle text-5xl"></i>
                                         </span> 
                                     </div>
-                                    <span className="font-semibold">ZESA Prepaid <br /> (ZWL)</span>
+                                    <span className="font-semibold">dummy <br /> (ZWL)</span>
                                 </div>
                             </div>
 
-                            <div className="card border border-gray-400 rounded-md p-4">
+                            {/* <div className="card border border-gray-400 rounded-md p-4">
                                 <div className="card-body">
                                     <div className="mb-5">
                                         <span className="text-gray-300">
@@ -89,7 +139,7 @@ export default function Home() {
                                     </div>
                                     <span className="font-semibold">ZESA Prepaid <br /> (ZWL)</span>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -127,7 +177,7 @@ export default function Home() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="bg-white border border-gray-200">
+                            {/* <tr className="bg-white border border-gray-200">
                                 <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
                                     1
                                 </th>
@@ -168,7 +218,7 @@ export default function Home() {
                                 <td className="px-6 py-3.5">
                                     @twitter
                                 </td>
-                            </tr>
+                            </tr> */}
                         </tbody>
                     </table>
                 </div>
