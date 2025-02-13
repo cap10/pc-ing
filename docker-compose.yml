@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  customer-web-app:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    platform: linux/amd64
+    image: cap10/myrepository:internet-banking-latest
+    ports:
+      - '3000:3000'
