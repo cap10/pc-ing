@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { getSessionDataByKey } from "@/shared/services/auth-service";
@@ -6,6 +7,7 @@ import { showToast } from "@/shared/utilities/commons";
 // import { Metadata } from "next";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 // export const metadata: Metadata = {
 //     title: 'Accounts',
@@ -56,6 +58,10 @@ export default function Accounts() {
         <main>
             <div className="md:flex items-center justify-between px-[2px] mb-5">
                 <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0">Accounts</h4>
+                <Link href="/myspace/accounts/manage" className="button p-1 text-white bg-color-secondary rounded-md">
+                    {/* <i className="fa-solid fa-arrow-left mr-2"></i> */}
+                    Manage Accounts
+                </Link>
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-4">

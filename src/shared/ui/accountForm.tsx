@@ -36,11 +36,11 @@ export default function AccountForm({myFunc}) {
                                     </div>
                                 </div>
                                 <div className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50">
-                                    <button onClick={() => closeModal('modal-addAcc')} type="button" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:w-auto sm:text-sm " data-tw-dismiss="modal">
+                                    <button onClick={() => closeModal('modal-addAcc')} type="button" className="inline-flex justify-center w-auto px-3 py-1 text-base font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm btn hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 sm:mt-0 sm:text-sm " data-tw-dismiss="modal">
                                         <i className="fa-regular fa-xmark-circle mr-2 mt-1"></i>
                                         Cancel
                                     </button>
-                                    <button type="submit" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:w-auto sm:text-sm">
+                                    <button type="submit" className="inline-flex justify-center w-auto px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:text-sm">
                                         Add
                                         <i className="fa-regular fa-check-circle ml-2 mt-1"></i>
                                     </button>
