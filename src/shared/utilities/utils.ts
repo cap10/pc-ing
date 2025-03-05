@@ -249,7 +249,7 @@ export async function individualCustomerRegistrationUtil(formData: FormData){
         accounts: JSON.parse(formData?.get('accounts')?.toString())
     });
 
-    console.log(validatedFields.data);
+    // console.log(validatedFields.data);
     
 
     // If form validation fails, return errors early. Otherwise, continue.
