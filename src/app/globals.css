@@ -237,11 +237,12 @@ table tr:first-child th:last-child {
 .metismenu a {
   margin: 0 6%;
 }
-.metismenu .mm-active a {
+.metismenu .mm-active > a {
   background-color: #2AAAE1;
   color: white;
   border-radius: 7px;
 }
+
 .metismenu .mm-active a:hover {
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
   background-color: #2AAAE1;

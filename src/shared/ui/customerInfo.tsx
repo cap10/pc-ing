@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { approveCorporateCustomer, approveIndividualCustomer, changeCorporateCustomerStatus, changeIndividualCustomerStatus, getCorporateCustomerById, getIndividualCustomerById } from "../services/main-service";
 import { closeModal, openModal, showToast } from "../utilities/commons";
 
@@ -44,6 +44,21 @@ export default function CustomerAccounts({custRef, typ}:{custRef: string, typ: s
         }
     }
 
+    function getApproveMode(){
+        const mode = document.getElementById('input11');
+        if(mode){
+            console.log(mode.value);
+            
+            const areaRea = document.getElementById('areaReason');
+            if(mode.value == 'true') {
+                areaRea.style.display = 'none';
+            }
+            else{
+                areaRea.style.display = 'block';
+            }
+        }
+    }
+
     function approveCustomer(){
         if(custRef && typ){
 
@@ -53,15 +68,15 @@ export default function CustomerAccounts({custRef, typ}:{custRef: string, typ: s
                 return;
             }
             const reason = document.getElementById('input12');
-            if(!reason?.value){
-                showToast('Type a reason for approval action.', 'error');
+            if(!reason?.value && action.value == 'false'){
+                showToast('Type a reason for reject action.', 'error');
                 return;
             }
 
             const data = {
                 "customerId": custRef,
                 "approved": action?.value,
-                "reason": reason.value
+                "reason": reason.value ? reason.value : 'approved'
             };
 
             // console.log(data);
@@ -360,13 +375,13 @@ export default function CustomerAccounts({custRef, typ}:{custRef: string, typ: s
                                     </div>
                                     <div className="mb-4">
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input11">Action</label>
-                                        <select name="approved" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input11" required>
+                                        <select name="approved" onChange={getApproveMode} className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input11" required>
                                             <option value="" defaultValue={""}>select...</option>
                                             <option value="true">Approve</option>
                                             <option value="false">Reject</option>
                                         </select>
                                     </div>
-                                    <div className="mb-4">
+                                    <div className="mb-4" id="areaReason">
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input12">Reason</label>
                                         <textarea id="input12" className="block w-full mt-2 border p-2 border-gray-200 rounded focus:ring-2 focus:ring-offset-0 focus:ring-violet-500/30 focus:border-violet-200 py-1.5 " rows={3} placeholder="Type reason"></textarea>
                                     </div>
