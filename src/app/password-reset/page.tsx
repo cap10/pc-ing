@@ -4,16 +4,16 @@ import { showToast } from "@/shared/utilities/commons";
 import { forgotPwdUtil, setPwdUtil } from "@/shared/utilities/utils";
 import Image from "next/image"; 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function Home({searchParams} : {searchParams: Promise<{ [key: string]: string | string[] | undefined }>}) {
+export default function PasswordReset({searchParams} : {searchParams: Promise<{ [key: string]: string | string[] | undefined }>}) {
     
     const year = new Date().getFullYear();
     const [token, setToken] = useState('');
 
     (searchParams).then(r=> {
         // console.log(r.token);
-        if(r.token) setToken(r.token);
+        if(r.token) setToken(r.token.toString());
     });
 
     const fgtPwd = () => {

@@ -300,6 +300,7 @@ export default function CustomerUsers({custRef, typ}:{custRef: string, typ: stri
                                                             (<span title="Enable User" onClick={() => disableUser(u.id, true)} className="text-green-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-check"></i></span>) : 
                                                             (<span title="Disable User" onClick={() => disableUser(u.id, false)} className="text-gray-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-user-xmark"></i></span>)}
                                                         <span title="Reset User" onClick={() => confirmUser(u.id, 'modal-userreset', 'reset')} className="text-blue-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-key"></i></span>
+                                                        <br />
                                                         <span title="Edit User" onClick={() => {confirmUser(u.id, 'modal-editUser', 'edit')}} className="text-yellow-500 px-1 py-0.5 cursor-pointer"><i className="fa-solid fa-edit"></i></span>
                                                         <span title="Delete User" onClick={() => {confirmUser(u.id, 'modal-userDelete', 'delete')}} className="text-red-500 px-1 py-0.5 cursor-pointer"><i className="fa-regular fa-trash-alt"></i></span>
                                                     </td>

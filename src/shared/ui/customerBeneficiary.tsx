@@ -205,7 +205,7 @@ export default function CustomerBeneficiaries({custRef}:{custRef: string}) {
     useEffect(() => {
         getBeneficiaries();
         getBanks();
-        getAccounts();
+        // getAccounts();
     }, []);
 
     return (
@@ -313,7 +313,7 @@ export default function CustomerBeneficiaries({custRef}:{custRef: string}) {
                                         </h3>
                                     </div>
                                     <div className="p-6 space-y-6">
-                                        <div className="mb-4">
+                                        {/* <div className="mb-4">
                                             <label className="block mb-2 font-medium text-gray-600" htmlFor="input31">Customer Account</label>
                                             <select name="account" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input31" required>
                                                 <option value="" defaultValue={""}>select...</option>
@@ -321,7 +321,7 @@ export default function CustomerBeneficiaries({custRef}:{custRef: string}) {
                                                     <option value={u.accountNumber} key={u.id}>{`${u.accountNumber} (${u.accountType})`}</option>
                                                 ))}
                                             </select>
-                                        </div>
+                                        </div> */}
                                         <div className="mb-4">
                                             <label className="block mb-2 font-medium text-gray-600" htmlFor="input30">Bank</label>
                                             <select name="bank" className="w-full disabled:text-gray-600 border rounded border-gray-100 p-2" id="input30" required>
@@ -330,6 +330,10 @@ export default function CustomerBeneficiaries({custRef}:{custRef: string}) {
                                                     <option value={u.id} key={u.id}>{u.bankName}</option>
                                                 ))}
                                             </select>
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block mb-2 font-medium text-gray-600" htmlFor="input31">Beneficiary Account</label>
+                                            <input type="text" name="account" className="w-full placeholder:text-xs border rounded border-gray-100 p-2" id="input31" placeholder="account" required />
                                         </div>
                                         <div className="mb-4">
                                             <label className="block mb-2 font-medium text-gray-600" htmlFor="input10">Beneficiary Name</label>
