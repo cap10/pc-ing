@@ -3,15 +3,30 @@ import { useState } from "react";
 import { closeModal, openModal, showToast } from "../utilities/commons";
 import { individualCustomerRegistrationUtil } from "../utilities/utils";
 import AccountForm from "./accountForm";
+import {useFormik} from "formik";
+import * as Yup from 'yup';
+import {loginAxiosClient} from "@/endpoints/loginApi";
+
+const createCustomerValidationSchema = Yup.object({
+    customerName: Yup.string().required('customer name required'),
+    email: Yup.string().email("invalid email").required('email required'),
+    address: Yup.string().required('address required'),
+    phoneNumber:Yup.string()
+        .min(9, 'Phone number must have at least 9 digits').max(12, 'Mobile number cannot exceed 12 digits')
+        .matches(/^\d+$/, 'Phone number must contain only digits').required('phone number required'),
+    nationalId: Yup.string().required('nationalId required'),
+    numberOfRequiredApproversPerTransaction: Yup.string().required('Approvers required'),
+
+});
 
 export default function IndividualSelfRegister() {
     
     const [myAccs, setMyAccs] = useState<any[]>([]);
     let myModeCount = 1;
     const myModeTitles = [
-        'Tell us your name.', 'What is your National Identity Number?',
+        'Tell us your name.',
         'Let us update your contact details.', 'What is your approval level?',
-        'Add your account details.', 'Create your account login details.', 'All set. Click Save.'
+        'All set. Click Save.'
     ];
     
     function formSubmit(formData: FormData){
@@ -47,7 +62,6 @@ export default function IndividualSelfRegister() {
             console.log(err);
             showToast('Failed to register customer.', 'error');
         })
-        
         
     }
 
@@ -123,10 +137,58 @@ export default function IndividualSelfRegister() {
         }
     }
 
+
+    const createCustomerForm = useFormik({
+        async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
+
+            const payload =  {
+
+                customerName: values.customerName,
+                email: values.email,
+                address: values.address,
+                phoneNumber: values.phoneNumber,
+                nationalId: values.nationalId,
+                numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
+                accounts:[
+                    {
+                        accountType: "CUSTOMER",
+                        description: values.description,
+                    }
+                ]
+            }
+
+            try {
+
+                const {data}  =  await loginAxiosClient.post(`v1/individual-customers`, payload);
+
+                if (data != null) {
+                    showToast('Customer created successfully.visit your email for account activation', 'success');
+
+                } else {
+                    showToast('Failed to create customer', 'error');
+                }
+            }catch(err:any){
+                showToast('Failed to create customer', 'error');
+
+            }
+        },
+
+        initialValues: {
+            customerName: '',
+            email: '',
+            address:  '',
+            phoneNumber:  '',
+            nationalId:  '',
+            numberOfRequiredApproversPerTransaction:  '',
+        },
+        validationSchema: createCustomerValidationSchema,
+    });
+
+
     return (
         <div>
-            <hr />
-            <section className="mt-5 pt-4">
+            <hr/>
+            {/*<section className="mt-5 pt-4">
                 <form action={formSubmit}>
                     <div className="card-body">
                         <div className="grid grid-cols-12 gap-2">
@@ -137,17 +199,22 @@ export default function IndividualSelfRegister() {
                             </div>
                             <div className="col-span-12" id="area-1">
                                 <div className="mb-4">
-                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input1">Name</label>
-                                    <input name="name" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input1" placeholder="Name" required/>
+                                    <label className="block mb-2 font-medium text-gray-600"
+                                           htmlFor="input1">Name</label>
+                                    <input name="name"
+                                           className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2"
+                                           type="text" id="input1" placeholder="Name" required/>
                                 </div>
-                            </div>
-                            <div className="col-span-12" id="area-2" style={{display: 'none'}}>
                                 <div className="mb-4">
-                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input04">National ID</label>
-                                    <input name="national" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="text" id="input04" placeholder="National ID" required/>
+                                    <label className="block mb-2 font-medium text-gray-600" htmlFor="input04">National
+                                        ID</label>
+                                    <input name="national"
+                                           className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2"
+                                           type="text" id="input04" placeholder="National ID" required/>
                                 </div>
                             </div>
-                            <div className="col-span-12" id="area-3" style={{display: 'none'}}>
+
+                            <div className="col-span-12" id="area-2" style={{display: 'none'}}>
                                 <div className="col-span-12 md:col-span-6">
                                     <div className="mb-4">
                                         <label className="block mb-2 font-medium text-gray-600" htmlFor="input2">Email</label>
@@ -167,7 +234,7 @@ export default function IndividualSelfRegister() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-span-12" id="area-4" style={{display: 'none'}}>
+                            <div className="col-span-12" id="area-3" style={{display: 'none'}}>
                                 <div className="mb-4">
                                     <label className="block mb-2 font-medium text-gray-600" htmlFor="input6">Approvers per Transaction</label>
                                     <input name="reqApprovers" className="w-full placeholder:text-xs border rounded-md border-gray-200 p-2" type="number" id="input6" placeholder="1" required/>
@@ -227,7 +294,7 @@ export default function IndividualSelfRegister() {
                                 </div>
                             </div>
                         </div>
-                        <div id="area-7" className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50 mt-5" style={{display: 'none'}}>
+                        <div id="area-4" className="inline-block text-center gap-3 p-3 w-full space-x-2 border-t rounded-b border-gray-50 mt-5" style={{display: 'none'}}>
                             <button type="submit" className="inline-flex justify-center w-full px-3 py-1 text-base font-medium text-white bg-color-secondary border border-transparent rounded-md shadow-sm btn focus:outline-none focus:ring-2 sm:w-auto sm:text-sm">
                                 Save
                                 <i className="fa-regular fa-check-circle ml-2 mt-1"></i>
@@ -241,9 +308,148 @@ export default function IndividualSelfRegister() {
                         </div>
                     </div>
                 </form>
-            </section>
+            </section>*/}
+            <section className="mt-5 pt-4">
+                <form onSubmit={createCustomerForm.handleSubmit}>
+                    <div className="card-body">
+                        <div className="grid grid-cols-12 gap-2">
+                            <div className="col-span-12">
+                                <div className="">
+                                    <h5 id="theText" className="text-black font-bold">Create your Account</h5>
+                                </div>
+                            </div>
+                            <div className="col-span-12">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">Full Name</label>
+                                        <input name="customerName"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.customerName && createCustomerForm.touched.customerName
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="text" id="customerName" placeholder="John Doe" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.customerName}/>
+                                        {createCustomerForm.errors.customerName && createCustomerForm.touched.customerName && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.customerName}</div>
+                                        )}
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">Email</label>
+                                        <input name="email"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.email && createCustomerForm.touched.email
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="email" id="email" placeholder="customer@gmail.com" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.email}/>
+                                        {createCustomerForm.errors.email && createCustomerForm.touched.email && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.email}</div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">Phone Number</label>
+                                        <input name="phoneNumber"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.phoneNumber && createCustomerForm.touched.phoneNumber
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="text" id="phoneNumber" placeholder="0777777777" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.phoneNumber}/>
+                                        {createCustomerForm.errors.phoneNumber && createCustomerForm.touched.phoneNumber && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.phoneNumber}</div>
+                                        )}
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">National ID</label>
+                                        <input name="nationalId"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.nationalId && createCustomerForm.touched.nationalId
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="text" id="nationalId" placeholder="23-345455X45" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.nationalId}/>
+                                        {createCustomerForm.errors.nationalId && createCustomerForm.touched.nationalId && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.nationalId}</div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">No. of Approvers</label>
+                                        <input name="numberOfRequiredApproversPerTransaction"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.numberOfRequiredApproversPerTransaction && createCustomerForm.touched.numberOfRequiredApproversPerTransaction
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="number" id="numberOfRequiredApproversPerTransaction"
+                                               placeholder="0" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.numberOfRequiredApproversPerTransaction}/>
+                                        {createCustomerForm.errors.numberOfRequiredApproversPerTransaction && createCustomerForm.touched.numberOfRequiredApproversPerTransaction && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.numberOfRequiredApproversPerTransaction}</div>
+                                        )}
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-600"
+                                               htmlFor="input1">Address</label>
+                                        <input name="address"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   createCustomerForm.errors.address && createCustomerForm.touched.address
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="text" id="address" placeholder="23 R Mugabe,  Harare" required
+                                               onChange={createCustomerForm.handleChange}
+                                               onBlur={createCustomerForm.handleBlur}
+                                               value={createCustomerForm.values.address}/>
+                                        {createCustomerForm.errors.address && createCustomerForm.touched.address && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.address}</div>
+                                        )}
+                                    </div>
+                                </div>
 
-            <AccountForm myFunc={addAccDetail}></AccountForm>
+                                <div className="mb-3">
+                                    <button
+                                        className="w-full py-2 text-white bg-blue-600 rounded-md font-bold hover:bg-blue-700 disabled:opacity-50"
+                                        disabled={createCustomerForm.isSubmitting}
+                                        type="submit"
+                                    >
+                                        {createCustomerForm.isSubmitting ? "Processing..." : "Submit"}
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </section>
         </div>
     );
 }

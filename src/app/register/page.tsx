@@ -19,6 +19,7 @@ export default function Register() {
         const btnArea = document.getElementById('btnArea');
         const indiArea = document.getElementById('individualArea');
         const corpoArea = document.getElementById('corporateArea');
+        const agentArea = document.getElementById('agentArea');
 
         if(typ?.value){
 
@@ -49,7 +50,7 @@ export default function Register() {
             <div className="h-screen">
                 <div className="relative z-50 col-span-12">
                     <div className="w-full bg-white md:p-12 place-content-center">
-                        <div className="flex h-[100vh] flex-col w-80 lg:w-96 m-auto">
+                        <div className="flex h-[100vh] flex-col m-auto">
                             <div className="mx-auto">
                                 <a href="#" className="">
                                     <Image width={828} height={315} src="/images/logo.svg" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
@@ -67,8 +68,9 @@ export default function Register() {
                                         <label className="block mb-2 font-medium text-gray-700">Choose Account Type</label>
                                         <select className="w-full disabled:text-gray-600 border rounded border-gray-200 p-2" id="accType" required>
                                             <option value="" defaultValue={""}>select...</option>
-                                            <option value="CORPORATE">Corporate</option>
-                                            <option value="INDIVIDUAL">Individual</option>
+                                            <option value="CUSTOMER">Customer</option>
+                                            <option value="BUSINESS">Business</option>
+                                            <option value="AGENT">Agent</option>
                                         </select>
                                     </div>
                                     <div className="mb-3" id="btnArea">
