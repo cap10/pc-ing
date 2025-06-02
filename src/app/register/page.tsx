@@ -19,7 +19,6 @@ export default function Register() {
         const btnArea = document.getElementById('btnArea');
         const indiArea = document.getElementById('individualArea');
         const corpoArea = document.getElementById('corporateArea');
-        const agentArea = document.getElementById('agentArea');
 
         if(typ?.value){
 
@@ -50,7 +49,7 @@ export default function Register() {
             <div className="h-screen">
                 <div className="relative z-50 col-span-12">
                     <div className="w-full bg-white md:p-12 place-content-center">
-                        <div className="flex h-[100vh] flex-col m-auto">
+                        <div className="flex h-[100vh] flex-col w-10/12 lg:w-8/12 m-auto">
                             <div className="mx-auto">
                                 <a href="#" className="">
                                     <Image width={828} height={315} src="/images/logo.svg" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
