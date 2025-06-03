@@ -137,7 +137,7 @@ export default function Login() {
                                     </div>
                                 </div>
 
-                                <div className="mt-12 text-center">
+                                <div className="mt-3 text-center">
                                     <p className="text-gray-500">Don`t have an account? <Link href="/register" className="font-semibold text-color-secondary"> Create new</Link>. </p>
                                 </div>
 

@@ -112,17 +112,22 @@ export default function Login() {
 
                                     </div>
                                     <div className="mb-3">
-                                        <button className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"  disabled={loginForm.isSubmitting}
-                                                type="submit">{loginForm.isSubmitting ? "Processing..." : "Log In"}</button>
+                                        <button
+                                            className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"
+                                            disabled={loginForm.isSubmitting}
+                                            type="submit">{loginForm.isSubmitting ? "Processing..." : "Log In"}</button>
                                     </div>
                                 </form>
+                                <div className="mt-3 text-center">
+                                    <p className="text-gray-500">Don`t have an account? <Link href="/register"
+                                                                                              className="font-semibold text-color-secondary"> Create
+                                        new</Link>. </p>
+                                </div>
 
                             </div>
-
-
                             <div className="text-center mt-8">
                                 <p className="relative text-gray-500">
-                                  © {year} IBanking.
+                                    © {year} IBanking.
                                 </p>
                             </div>
                         </div>

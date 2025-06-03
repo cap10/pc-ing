@@ -26,11 +26,13 @@ export default function Register() {
 
             // console.log(typ.value, typ.value == 'CORPORATE');
 
+            if(typ.value == 'AGENT'){
+                if(agentArea) agentArea.style.display = 'block';
+            }
+
             if(typ.value == 'BUSINESS'){
                 if(corpoArea) corpoArea.style.display = 'block';
             }
-            else if(typ.value == 'AGENT'){
-                if(agentArea.style.display == 'block');            }
 
             else if(typ.value == 'CUSTOMER')
                 if(indiArea) indiArea.style.display = 'block';
@@ -54,7 +56,7 @@ export default function Register() {
             <div className="h-screen">
                 <div className="relative z-50 col-span-12">
                     <div className="w-full bg-white md:p-12 place-content-center">
-                        <div className="flex h-[100vh] flex-col w-8/12 lg:w-8/12 m-auto">
+                        <div className="flex h-[100vh] flex-col w-8/12 lg:w-6/12 m-auto">
                             <div className="mx-auto">
                                 <a href="#" className="">
                                     <Image width={828} height={315} src="/images/logo.svg" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
@@ -88,7 +90,7 @@ export default function Register() {
                                     <div className="mb-3 hidden" id="corporateArea">
                                         <CorporateSelfRegister></CorporateSelfRegister>
                                     </div>
-                                    <div className="mb-3 hidden" id="corporateArea">
+                                    <div className="mb-3 hidden" id="agentArea">
                                         <AgentSelfRegister></AgentSelfRegister>
                                     </div>
                                 </main>

@@ -22,12 +22,12 @@ import {
     FaLock
 } from 'react-icons/fa';
 
-export default function IndividualSelfRegister() {
+export default function AgentSelfRegister() {
 
     const [myAccs, setMyAccs] = useState<any[]>([]);
     const router = useRouter();
     const [step, setStep] = useState(1);
-    let myModeCount = 1;
+    const [canProceed, setCanProceed] = useState(false);
 
     // Step 1 validation schema
     const step1ValidationSchema = Yup.object().shape({
@@ -37,7 +37,7 @@ export default function IndividualSelfRegister() {
         phoneNumber: Yup.string()
             .matches(/^[0-9]+$/, "Must be only digits")
             .min(9, 'Phone number must have at least 9 digits')
-            .max(10, 'Mobile number cannot exceed 12 digits')
+            .max(12, 'Mobile number cannot exceed 12 digits')
             .required('Phone number required'),
         nationalId: Yup.string().required('National ID required'),
         numberOfRequiredApproversPerTransaction: Yup.string().required('Approvers number required'),
@@ -48,7 +48,7 @@ export default function IndividualSelfRegister() {
         username: Yup.string().required('Username required'),
         password: Yup.string()
             .required('Password required')
-            .min(8, 'Password must be at least 8 characters')
+            .min(12, 'Password must be at least 12 characters')
             .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
             .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
             .matches(/\d/, 'Password must contain at least one number'),
@@ -56,9 +56,6 @@ export default function IndividualSelfRegister() {
             .required('Please confirm password')
             .oneOf([Yup.ref('password')], 'Passwords do not match'),
     });
-
-    // Combined validation schema
-    const validationSchema = step === 1 ? step1ValidationSchema : step1ValidationSchema.concat(step2ValidationSchema);
 
     const formik = useFormik({
         initialValues: {
@@ -73,8 +70,11 @@ export default function IndividualSelfRegister() {
             confirmPassword: '',
             description: ''
         },
-        validationSchema,
+        validationSchema: step === 1 ? step1ValidationSchema : step1ValidationSchema.concat(step2ValidationSchema),
         onSubmit: async (values, { resetForm }) => {
+            // Only submit when on step 2 and submit button is clicked
+            if (step !== 2) return;
+
             const payload = {
                 customerName: values.customerName,
                 email: values.email,
@@ -95,11 +95,9 @@ export default function IndividualSelfRegister() {
                 const { data } = await loginAxiosClient.post('v1/individual-customers', payload);
 
                 if (data) {
-                    showToast('Customer created successfully. Visit your email for account activation', 'success');
+                    showToast('Agent created successfully. Visit your email for account activation', 'success');
                     resetForm();
                     await router.push('/login');
-                } else {
-                    showToast(data?.message || 'An error occurred', 'error');
                 }
             } catch (err: any) {
                 showToast(err?.response?.data?.message || 'Registration failed', 'error');
@@ -107,31 +105,44 @@ export default function IndividualSelfRegister() {
         }
     });
 
-    // Update validation when step changes
-    useEffect(() => {
-        formik.validateForm();
-    }, [step]);
-
-    const goToNextStep = async () => {
-        // Validate only step 1 fields before proceeding
+    // Validate current step before allowing proceed
+    const validateCurrentStep = async () => {
+        const errors = await formik.validateForm();
         const step1Fields = [
             'customerName', 'email', 'address',
             'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction'
         ];
 
-        const errors = await formik.validateForm();
-        const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
-
-        if (step1Errors.length === 0) {
-            setStep(2);
+        if (step === 1) {
+            const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
+            if (step1Errors.length === 0) {
+                setStep(2);
+            }
         }
     };
 
+    // Only enable proceed if current step is valid
+    useEffect(() => {
+        const checkStepValidity = async () => {
+            const errors = await formik.validateForm();
+            const currentStepFields = step === 1 ? [
+                'customerName', 'email', 'address',
+                'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction'
+            ] : ['password', 'confirmPassword'];
+
+            const hasErrors = currentStepFields.some(field => errors[field]);
+            setCanProceed(!hasErrors);
+        };
+
+        checkStepValidity();
+    }, [formik.values, step]);
+
     const goToPreviousStep = () => {
-        setStep(1);
+        if (step > 1) {
+            setStep(1);
+        }
     };
 
-    // Prevent non-numeric input for phone number
     const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
         formik.setFieldValue('phoneNumber', value);
@@ -272,7 +283,6 @@ export default function IndividualSelfRegister() {
                             </div>
                         </div>
 
-
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 flex items-center">
                                 <FaUserShield className="mr-2"/> No. of Approvers*
@@ -330,13 +340,14 @@ export default function IndividualSelfRegister() {
                                 <div className="text-red-500 text-sm mt-1">{formik.errors.address}</div>
                             )}
                         </div>
+
                     </div>
                 )}
 
                 {step === 2 && (
                     <div className="space-y-4">
-                        <h1 className="text-xl font-bold text-center mb-8">Create Login Credentials</h1>
 
+                        <h1 className="text-xl font-bold text-center mb-8">Create Login Credentials</h1>
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 flex items-center">
                                 <FaUserAlt className="mr-2"/> Username*
@@ -362,7 +373,6 @@ export default function IndividualSelfRegister() {
                                 <div className="text-red-500 text-sm mt-1">{formik.errors.username}</div>
                             )}
                         </div>
-
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 flex items-center">
                                 <FaLock className="mr-2"/> Password*
@@ -388,7 +398,7 @@ export default function IndividualSelfRegister() {
                                 <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
                             )}
                             <p className="text-xs text-gray-500 mt-1 ml-2">
-                                Password must be at least 8 characters with uppercase, lowercase letters and a number
+                                Password must be at least 12 characters with uppercase, lowercase letters, number and a special character
                             </p>
                         </div>
 
@@ -428,7 +438,7 @@ export default function IndividualSelfRegister() {
                         className={`py-2 px-6 rounded-md font-medium ${
                             step === 1
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-gray-500 text-white hover:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-500'
+                                : 'bg-gray-500 text-white hover:bg-gray-600'
                         }`}
                     >
                         Previous
@@ -437,8 +447,8 @@ export default function IndividualSelfRegister() {
                     {step < 2 ? (
                         <button
                             type="button"
-                            onClick={goToNextStep}
-                            disabled={formik.isSubmitting}
+                            onClick={validateCurrentStep}
+                            disabled={!canProceed || formik.isSubmitting}
                             className="py-2 px-6 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50"
                         >
                             Next
@@ -446,22 +456,14 @@ export default function IndividualSelfRegister() {
                     ) : (
                         <button
                             type="submit"
-                            disabled={formik.isSubmitting || !formik.isValid}
+                            disabled={!canProceed || formik.isSubmitting}
                             className="py-2 px-6 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 disabled:opacity-50"
                         >
-                            {formik.isSubmitting ? (
-                                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </span>
-                            ) : "Submit"}
+                            {formik.isSubmitting ? 'Processing...' : 'Submit'}
                         </button>
                     )}
                 </div>
             </form>
         </div>
     );
-}
+};
