@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import IndividualSelfRegister from "@/shared/ui/individualSelfReg";
 import CorporateSelfRegister from "@/shared/ui/corporateSelfReg";
+import AgentSelfRegister from "@/shared/ui/agentSelfReg";
 // import { Metadata } from "next";
 
 // export const metadata: Metadata = {
@@ -19,15 +20,19 @@ export default function Register() {
         const btnArea = document.getElementById('btnArea');
         const indiArea = document.getElementById('individualArea');
         const corpoArea = document.getElementById('corporateArea');
+        const agentArea = document.getElementById('agentArea');
 
         if(typ?.value){
 
             // console.log(typ.value, typ.value == 'CORPORATE');
 
-            if(typ.value == 'CORPORATE'){
+            if(typ.value == 'BUSINESS'){
                 if(corpoArea) corpoArea.style.display = 'block';
             }
-            else if(typ.value == 'INDIVIDUAL')
+            else if(typ.value == 'AGENT'){
+                if(agentArea.style.display == 'block');            }
+
+            else if(typ.value == 'CUSTOMER')
                 if(indiArea) indiArea.style.display = 'block';
             else showToast('Unrecognized customer type', 'warn');
 
@@ -49,7 +54,7 @@ export default function Register() {
             <div className="h-screen">
                 <div className="relative z-50 col-span-12">
                     <div className="w-full bg-white md:p-12 place-content-center">
-                        <div className="flex h-[100vh] flex-col w-10/12 lg:w-8/12 m-auto">
+                        <div className="flex h-[100vh] flex-col w-8/12 lg:w-8/12 m-auto">
                             <div className="mx-auto">
                                 <a href="#" className="">
                                     <Image width={828} height={315} src="/images/logo.svg" alt="" className="" /> <span className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
@@ -82,6 +87,9 @@ export default function Register() {
                                     </div>
                                     <div className="mb-3 hidden" id="corporateArea">
                                         <CorporateSelfRegister></CorporateSelfRegister>
+                                    </div>
+                                    <div className="mb-3 hidden" id="corporateArea">
+                                        <AgentSelfRegister></AgentSelfRegister>
                                     </div>
                                 </main>
 

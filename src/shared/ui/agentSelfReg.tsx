@@ -6,7 +6,6 @@ import AccountForm from "./accountForm";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {loginAxiosClient} from "@/endpoints/loginApi";
-import {router} from "next/client";
 import {useRouter} from "next/navigation";
 
 const createCustomerValidationSchema = Yup.object({
@@ -21,8 +20,8 @@ const createCustomerValidationSchema = Yup.object({
 
 });
 
-export default function IndividualSelfRegister() {
-    
+export default function AgentSelfRegister() {
+
     const [myAccs, setMyAccs] = useState<any[]>([]);
     const router = useRouter();
     let myModeCount = 1;
@@ -31,18 +30,18 @@ export default function IndividualSelfRegister() {
         'Let us update your contact details.', 'What is your approval level?',
         'All set. Click Save.'
     ];
-    
+
     function formSubmit(formData: FormData){
 
         // console.log(formData);
-        
-            
+
+
         formData.set('accounts', JSON.stringify(myAccs));
 
         individualCustomerRegistrationUtil(formData)
         .then(resp => {
             // console.log(resp);
-            
+
             if(resp?.message){
                 showToast(resp.message, 'error');
                 setMyAccs([]);
@@ -65,7 +64,7 @@ export default function IndividualSelfRegister() {
             console.log(err);
             showToast('Failed to register customer.', 'error');
         })
-        
+
     }
 
     function renderData(data: any[]){
@@ -91,7 +90,7 @@ export default function IndividualSelfRegister() {
         const elem = document.getElementById('mytbody');
         if(elem) elem.innerHTML = tbdy;
     }
-    
+
     function addAccDetail(formData: FormData){
         const name = formData?.get('name')?.toString();
         const number = formData?.get('number')?.toString();
@@ -99,17 +98,16 @@ export default function IndividualSelfRegister() {
 
         if(name && number && typ){
             // console.log(name, number, typ);
-            
+
             const rec = {
                 "accountNumber": number,
                 "accountType": typ,
                 "accountName": name
-            };        
+            };
 
-            
             myAccs.push(rec);
             setMyAccs(myAccs);
-            
+
             renderData(myAccs);
 
             closeModal('modal-addAcc');
@@ -140,8 +138,7 @@ export default function IndividualSelfRegister() {
         }
     }
 
-
-    const createCustomerForm = useFormik({
+    const createAgentForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
 
             const payload =  {
@@ -154,7 +151,7 @@ export default function IndividualSelfRegister() {
                 numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
                 accounts:[
                     {
-                        accountType: "CUSTOMER",
+                        accountType: "AGENT",
                         description: values.description,
                     }
                 ]
@@ -165,14 +162,14 @@ export default function IndividualSelfRegister() {
                 const {data}  =  await loginAxiosClient.post(`v1/individual-customers`, payload);
 
                 if (data != null) {
-                    showToast('Customer created successfully.visit your email for account activation', 'success');
+                    showToast('Agent created successfully.visit your email for account activation', 'success');
                     await router.push('/login');
 
                 } else {
-                    showToast(data?.message, 'error');
+                    showToast('Failed to create agent', 'error');
                 }
             }catch(err:any){
-                showToast(err?.response?.data?.message, 'error');
+                showToast('Failed to create agent', 'error');
 
             }
         },
@@ -193,7 +190,7 @@ export default function IndividualSelfRegister() {
         <div>
             <hr/>
             <section className="mt-5 pt-4">
-                <form onSubmit={createCustomerForm.handleSubmit}>
+                <form onSubmit={createAgentForm.handleSubmit}>
                     <div className="card-body">
                         <div className="grid grid-cols-12 gap-2">
                             <div className="col-span-12">
@@ -208,17 +205,17 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">Full Name</label>
                                         <input name="customerName"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.customerName && createCustomerForm.touched.customerName
+                                                   createAgentForm.errors.customerName && createAgentForm.touched.customerName
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="text" id="customerName" placeholder="John Doe" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.customerName}/>
-                                        {createCustomerForm.errors.customerName && createCustomerForm.touched.customerName && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.customerName}/>
+                                        {createAgentForm.errors.customerName && createAgentForm.touched.customerName && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.customerName}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.customerName}</div>
                                         )}
                                     </div>
                                     <div className="mb-4">
@@ -226,17 +223,17 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">Email</label>
                                         <input name="email"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.email && createCustomerForm.touched.email
+                                                   createAgentForm.errors.email && createAgentForm.touched.email
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="email" id="email" placeholder="customer@gmail.com" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.email}/>
-                                        {createCustomerForm.errors.email && createCustomerForm.touched.email && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.email}/>
+                                        {createAgentForm.errors.email && createAgentForm.touched.email && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.email}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.email}</div>
                                         )}
                                     </div>
                                 </div>
@@ -246,17 +243,17 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">Phone Number</label>
                                         <input name="phoneNumber"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.phoneNumber && createCustomerForm.touched.phoneNumber
+                                                   createAgentForm.errors.phoneNumber && createAgentForm.touched.phoneNumber
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="text" id="phoneNumber" placeholder="0777777777" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.phoneNumber}/>
-                                        {createCustomerForm.errors.phoneNumber && createCustomerForm.touched.phoneNumber && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.phoneNumber}/>
+                                        {createAgentForm.errors.phoneNumber && createAgentForm.touched.phoneNumber && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.phoneNumber}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.phoneNumber}</div>
                                         )}
                                     </div>
                                     <div className="mb-4">
@@ -264,17 +261,17 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">National ID</label>
                                         <input name="nationalId"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.nationalId && createCustomerForm.touched.nationalId
+                                                   createAgentForm.errors.nationalId && createAgentForm.touched.nationalId
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="text" id="nationalId" placeholder="23-345455X45" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.nationalId}/>
-                                        {createCustomerForm.errors.nationalId && createCustomerForm.touched.nationalId && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.nationalId}/>
+                                        {createAgentForm.errors.nationalId && createAgentForm.touched.nationalId && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.nationalId}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.nationalId}</div>
                                         )}
                                     </div>
                                 </div>
@@ -284,18 +281,18 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">No. of Approvers</label>
                                         <input name="numberOfRequiredApproversPerTransaction"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.numberOfRequiredApproversPerTransaction && createCustomerForm.touched.numberOfRequiredApproversPerTransaction
+                                                   createAgentForm.errors.numberOfRequiredApproversPerTransaction && createAgentForm.touched.numberOfRequiredApproversPerTransaction
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="number" id="numberOfRequiredApproversPerTransaction"
                                                placeholder="0" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.numberOfRequiredApproversPerTransaction}/>
-                                        {createCustomerForm.errors.numberOfRequiredApproversPerTransaction && createCustomerForm.touched.numberOfRequiredApproversPerTransaction && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.numberOfRequiredApproversPerTransaction}/>
+                                        {createAgentForm.errors.numberOfRequiredApproversPerTransaction && createAgentForm.touched.numberOfRequiredApproversPerTransaction && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.numberOfRequiredApproversPerTransaction}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.numberOfRequiredApproversPerTransaction}</div>
                                         )}
                                     </div>
                                     <div className="mb-4">
@@ -303,17 +300,17 @@ export default function IndividualSelfRegister() {
                                                htmlFor="input1">Address</label>
                                         <input name="address"
                                                className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
-                                                   createCustomerForm.errors.address && createCustomerForm.touched.address
+                                                   createAgentForm.errors.address && createAgentForm.touched.address
                                                        ? "border-red-500"
                                                        : "border-gray-300"
                                                }`}
                                                type="text" id="address" placeholder="23 R Mugabe,  Harare" required
-                                               onChange={createCustomerForm.handleChange}
-                                               onBlur={createCustomerForm.handleBlur}
-                                               value={createCustomerForm.values.address}/>
-                                        {createCustomerForm.errors.address && createCustomerForm.touched.address && (
+                                               onChange={createAgentForm.handleChange}
+                                               onBlur={createAgentForm.handleBlur}
+                                               value={createAgentForm.values.address}/>
+                                        {createAgentForm.errors.address && createAgentForm.touched.address && (
                                             <div
-                                                className="text-red-500 text-sm mt-1">{createCustomerForm.errors.address}</div>
+                                                className="text-red-500 text-sm mt-1">{createAgentForm.errors.address}</div>
                                         )}
                                     </div>
                                 </div>
@@ -321,10 +318,10 @@ export default function IndividualSelfRegister() {
                                 <div className="mb-3">
                                     <button
                                         className="w-full py-2 text-white bg-blue-600 rounded-md font-bold hover:bg-blue-700 disabled:opacity-50"
-                                        disabled={createCustomerForm.isSubmitting}
+                                        disabled={createAgentForm.isSubmitting}
                                         type="submit"
                                     >
-                                        {createCustomerForm.isSubmitting ? "Processing..." : "Submit"}
+                                        {createAgentForm.isSubmitting ? "Processing..." : "Submit"}
                                     </button>
                                 </div>
 

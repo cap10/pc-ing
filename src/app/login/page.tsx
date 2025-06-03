@@ -5,62 +5,54 @@ import { showToast } from "@/shared/utilities/commons";
 import { loginAuthUtil } from "@/shared/utilities/utils";
 import Image from "next/image"; 
 import Link from "next/link";
+import * as Yup from "yup";
+import {useFormik} from "formik";
+import {loginAxiosClient} from "@/endpoints/loginApi";
+import {useRouter} from "next/navigation";
+
+
+const loginValidationSchema = Yup.object({
+    username: Yup.string().required('username required'),
+    password: Yup.string().required('password required'),
+});
 
 export default function Login() {
   const year = new Date().getFullYear();
-
-  const login = () => {
-    const uname = document.getElementById('username');
-    const upwd = document.getElementById('password');
-
-    if(!uname?.value || !upwd?.value){
-        showToast('Username and Password Required.', 'error');
-
-        uname?.classList.remove('border-gray-300');
-        uname?.classList.add('border-red-400');
-
-        upwd?.classList.remove('border-gray-300');
-        upwd?.classList.add('border-red-400');
-
-        return;
-    }
-    else{
-        uname?.classList.remove('border-red-400');
-        upwd?.classList.remove('border-red-400');
-
-        uname?.classList.add('border-gray-300');
-        upwd?.classList.add('border-gray-300');
-    }
-
-    // console.log(uname);
-
-    loginAuthUtil(uname.value, upwd.value, 'admin')
-    .then(resp => {
-        // console.log(resp);
-        
-        if(resp.status == 403){
-            showToast(resp.message, 'error');
-            return;
-        }
-
-        if(resp.accessToken && !resp.customerId){
-            setSessionData('atoken', resp.accessToken);
-            setSessionData('display', resp.name);
-            setSessionData('refe', '77a75679-b559-49b8-858f-27d3c81471cc');
-            setSessionData('user', resp.username);
-            setSessionData('role', resp?.group?.name);
-
-            document.location.href = '/dashboard';
-        }
-    })
-    .catch(err => {
-        console.log(err);
-        showToast('Failed to Login.', 'error');
-    })
+    const router = useRouter();
 
 
-    
-  }
+    const loginForm = useFormik({
+        async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
+
+            const payload =  {
+                username: values.username,
+                password: values.password,
+            }
+
+            try {
+
+                const {data}  =  await loginAxiosClient.post(`v1/authenticate`, payload);
+
+                if (data != null) {
+                    showToast('Customer created successfully.visit your email for account activation', 'success');
+                    //await router.push('/login');
+
+                } else {
+                    showToast("Login failed", 'error');
+                }
+            }catch(err:any){
+                showToast(err?.response?.data?.message, 'error');
+
+            }
+        },
+
+        initialValues: {
+            username: '',
+            password: '',
+        },
+        validationSchema: loginValidationSchema,
+    });
+
 
   return (
     <section className="group">
@@ -81,41 +73,50 @@ export default function Login() {
                                     <p className="mt-2 mb-4 text-gray-500">Sign in to continue.</p>
                                 </div>
 
-                                <form className="pt-2" action="#">
+                                <form className="pt-2" onSubmit={loginForm.handleSubmit} action="#">
                                     <div className="mb-4">
                                         <label className="block mb-2 font-medium text-gray-700">Username</label>
-                                        <input type="text" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" id="username" placeholder="Enter username" />
+                                        <input name="username"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   loginForm.errors.username && loginForm.touched.username
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="text" id="username" placeholder="Username" required
+                                               onChange={loginForm.handleChange}
+                                               onBlur={loginForm.handleBlur}
+                                               value={loginForm.values.username}/>
+                                        {loginForm.errors.username && loginForm.touched.username && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{loginForm.errors.username}</div>
+                                        )}
                                     </div>
-                                    <div className="mb-3">
-                                        <div className="flex">
-                                            <div className="flex-auto">
-                                                <label className="block mb-2 font-medium text-gray-600">Password</label>
-                                            </div>
-                                            <div className="flex-auto text-right">
-                                                <Link href="/password-reset" className="text-color-secondary font-bold">Forgot password?</Link>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex">
-                                            <input id="password" type="password" className="w-full py-1.5 border border-gray-300 rounded-md pl-3 text-gray-800 font-semibold placeholder:font-normal" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" />
-                                        </div>
+                                    <div className="mb-4">
+                                        <label className="block mb-2 font-medium text-gray-700">Password</label>
+                                        <input name="password"
+                                               className={`w-full placeholder:text-xs border rounded-md border-gray-200 p-2 ${
+                                                   loginForm.errors.password && loginForm.touched.password
+                                                       ? "border-red-500"
+                                                       : "border-gray-300"
+                                               }`}
+                                               type="password" id="password" placeholder="Password" required
+                                               onChange={loginForm.handleChange}
+                                               onBlur={loginForm.handleBlur}
+                                               value={loginForm.values.password}/>
+                                        {loginForm.errors.password && loginForm.touched.password && (
+                                            <div
+                                                className="text-red-500 text-sm mt-1">{loginForm.errors.password}</div>
+                                        )}
                                     </div>
                                     <div className="mb-6 row">
-                                       
 
                                     </div>
                                     <div className="mb-3">
-                                        <button onClick={login} className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600" type="button">Log In</button>
+                                        <button className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"  disabled={loginForm.isSubmitting}
+                                                type="submit">{loginForm.isSubmitting ? "Processing..." : "Log In"}</button>
                                     </div>
                                 </form>
 
-                                <div className="pt-2 mt-5 text-center">
-                                    <div>
-                                    </div>
-
-                                    <div className="flex justify-center gap-3">
-                                    </div>
-                                </div>
                             </div>
 
 
