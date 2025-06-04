@@ -135,6 +135,30 @@ export default function CorporateSelfRegister() {
     });
 
 // Validate current step before allowing proceed
+   /* const validateCurrentStep = async () => {
+        const errors = await formik.validateForm();
+
+        if (step === 1) {
+            const step1Fields = [
+                'companyName', 'email', 'address',
+                'incorporationDate', 'registrationNumber', 'telephoneNumber',
+                'numberOfRequiredApproversPerTransaction'
+            ];
+            const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
+            if (step1Errors.length === 0) {
+                setStep(2);
+            }
+        } else if (step === 2) {
+            const step2Fields = [
+                'name', 'userRight', 'nationalId',
+                'phoneNumber', 'userEmail'
+            ];
+            const step2Errors = Object.keys(errors).filter(key => step2Fields.includes(key));
+            if (step2Errors.length === 0) {
+                setStep(3);
+            }
+        }
+    };*/
     const validateCurrentStep = async () => {
         const errors = await formik.validateForm();
 
@@ -158,6 +182,7 @@ export default function CorporateSelfRegister() {
                 setStep(3);
             }
         }
+        // Remove any submission logic from here
     };
 
 // Only enable proceed if current step is valid
@@ -201,7 +226,6 @@ export default function CorporateSelfRegister() {
         formik.setFieldValue('phoneNumber', value);
     };
 
-// ... (keep the same JSX return code)
 
     return (
         <div className="max-w-4xl mx-auto p-4">
@@ -697,7 +721,7 @@ export default function CorporateSelfRegister() {
 
                     {step < 3 ? (
                         <button
-                            type="button"
+                            type="button" // Important: use type="button" to prevent form submission
                             onClick={validateCurrentStep}
                             disabled={!canProceed || formik.isSubmitting}
                             className="py-2 px-6 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50"
@@ -706,7 +730,7 @@ export default function CorporateSelfRegister() {
                         </button>
                     ) : (
                         <button
-                            type="submit"
+                            type="submit" // Only the submit button should have type="submit"
                             disabled={!canProceed || formik.isSubmitting}
                             className="py-2 px-6 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 disabled:opacity-50"
                         >
