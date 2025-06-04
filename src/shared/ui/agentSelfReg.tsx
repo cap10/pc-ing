@@ -19,15 +19,17 @@ import {
     FaCheckCircle,
     FaHome,
     FaUserAlt,
-    FaLock
+    FaLock, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 
 export default function AgentSelfRegister() {
 
-    const [myAccs, setMyAccs] = useState<any[]>([]);
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [canProceed, setCanProceed] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
     // Step 1 validation schema
     const step1ValidationSchema = Yup.object().shape({
@@ -383,22 +385,30 @@ export default function AgentSelfRegister() {
                                 </div>
                                 <input
                                     name="password"
-                                    className={`w-full pl-10 p-2 border rounded-md ${
+                                    className={`w-full pl-10 pr-10 p-2 border rounded-md ${
                                         formik.errors.password && formik.touched.password
                                             ? "border-red-500"
                                             : "border-gray-300"
                                     }`}
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.password}
                                 />
+                                <div
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEyeSlash className="text-gray-400"/> :
+                                        <FaEye className="text-gray-400"/>}
+                                </div>
                             </div>
                             {formik.errors.password && formik.touched.password && (
                                 <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
                             )}
                             <p className="text-xs text-gray-500 mt-1 ml-2">
-                                Password must be at least 12 characters with uppercase, lowercase letters, number and a special character
+                                Password must be at least 12 characters with uppercase, lowercase letters, number and a
+                                special character
                             </p>
                         </div>
 
@@ -412,16 +422,23 @@ export default function AgentSelfRegister() {
                                 </div>
                                 <input
                                     name="confirmPassword"
-                                    className={`w-full pl-10 p-2 border rounded-md ${
+                                    className={`w-full pl-10 pr-10 p-2 border rounded-md ${
                                         formik.errors.confirmPassword && formik.touched.confirmPassword
                                             ? "border-red-500"
                                             : "border-gray-300"
                                     }`}
-                                    type="password"
+                                    type={showConfirmPassword ? "text" : "password"}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.confirmPassword}
                                 />
+                                <div
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    {showConfirmPassword ? <FaEyeSlash className="text-gray-400"/> :
+                                        <FaEye className="text-gray-400"/>}
+                                </div>
                             </div>
                             {formik.errors.confirmPassword && formik.touched.confirmPassword && (
                                 <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
