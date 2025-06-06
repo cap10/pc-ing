@@ -10,6 +10,7 @@ import {loginAxiosClient} from "@/endpoints/loginApi";
 import * as Yup from "yup";
 import {router} from "next/client";
 import {useRouter} from "next/navigation";
+import {useAuth} from "@/contexts/auth";
 
 const loginValidationSchema = Yup.object({
     username: Yup.string().required('username required'),
@@ -17,82 +18,9 @@ const loginValidationSchema = Yup.object({
 });
 
 export default function Login() {
+    const { authenticate } = useAuth();
     const year = new Date().getFullYear();
     const router = useRouter();
-
-
-    const login = () => {
-        const uname = document.getElementById('username');
-        const upwd = document.getElementById('password');
-
-        if(!uname?.value || !upwd?.value){
-            showToast('Username and Password Required.', 'error');
-
-            uname?.classList.remove('border-gray-300');
-            uname?.classList.add('border-red-400');
-
-            upwd?.classList.remove('border-gray-300');
-            upwd?.classList.add('border-red-400');
-
-            return;
-        }
-        else{
-            uname?.classList.remove('border-red-400');
-            upwd?.classList.remove('border-red-400');
-
-            uname?.classList.add('border-gray-300');
-            upwd?.classList.add('border-gray-300');
-        }
-
-        // console.log(uname);
-
-        loginAuthUtil(uname.value, upwd.value, 'customer')
-        .then(resp => {
-            console.log(resp);
-            
-            if(resp.status == 403){
-                showToast(resp.message, 'error');
-
-                // temporarily open link
-                const elem = document.getElementById('adminRoute');
-                if(elem) elem.style.display = 'block';
-
-                return;
-            }
-
-            if(!resp.customerId){
-                showToast('No customer reference found.', 'error');
-                
-                return;
-            }
-
-            if(resp?.group?.name !== 'CUSTOMER'){
-                showToast('User Role is not valid for this portal.', 'error');
-
-                const elem = document.getElementById('adminRoute');
-                if(elem) elem.style.display = 'block';
-                
-                return;
-            }
-
-            if(resp.accessToken){
-                setSessionData('atoken', resp.accessToken);
-                setSessionData('display', resp.name);
-                setSessionData('refe', resp.customerId);
-                setSessionData('user', resp.username);
-                setSessionData('role', resp?.group?.name);
-
-                document.location.href = '/myspace';
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            showToast('Failed to Login.', 'error');
-        })
-
-
-        
-    }
 
     const loginForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
@@ -106,13 +34,19 @@ export default function Login() {
 
                 const {data}  =  await loginAxiosClient.post(`v1/authenticate/customers`, payload);
 
-                if (data != null) {
+                if (data.accessToken) {
+
+console.log("Tokemn=", data.accessToken);
+console.log("CustomerID", data.customerId)
+                    await localStorage.setItem('token', data.accessToken);
+                    await localStorage.setItem('organisationId', data.customerId);
                     showToast('Login successfull', 'success');
-                    setSessionData('atoken', data?.accessToken);
-                    setSessionData('display', data.name);
-                    setSessionData('refe', data.customerId);
-                    setSessionData('user', data.username);
-                    setSessionData('role', data?.group?.name);
+                    //await authenticate(data?.accessToken);
+                    await setSessionData('atoken', data?.accessToken);
+                    await setSessionData('display', data.name);
+                    await setSessionData('refe', data.customerId);
+                    await setSessionData('user', data.username);
+                    await setSessionData('role', data?.group?.name);
                     await router.push('/myspace');
 
                 } else {

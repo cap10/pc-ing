@@ -17,9 +17,10 @@ import {
     FaCheckCircle,
     FaHome,
     FaUserAlt,
-    FaLock, FaEye, FaEyeSlash, FaCalendarCheck, FaCalendarAlt, FaBuilding
+    FaLock, FaEye, FaEyeSlash, FaCalendarCheck, FaCalendarAlt, FaBuilding, FaRoad, FaLocationArrow
 } from 'react-icons/fa';
 import {useRouter} from "next/navigation";
+import {FaMapLocation} from "react-icons/fa6";
 
 
 export default function CorporateSelfRegister() {
@@ -38,6 +39,9 @@ export default function CorporateSelfRegister() {
         incorporationDate: Yup.string().required('Incorp date required'),
         registrationNumber: Yup.string().required('Reg No required'),
         telephoneNumber: Yup.string().required('Telephone required'),
+        street: Yup.string().required('Street required'),
+        suburb: Yup.string().required('Suburb required'),
+        city: Yup.string().required('City required'),
         numberOfRequiredApproversPerTransaction: Yup.string().required('Approvers number required'),
     });
 
@@ -85,6 +89,9 @@ export default function CorporateSelfRegister() {
             username: '',
             password: '',
             confirmPassword: '',
+            street: '',
+            suburb: '',
+            city: '',
         },
         validationSchema:
             step === 1 ? step1ValidationSchema :
@@ -97,12 +104,11 @@ export default function CorporateSelfRegister() {
             const payload = {
                 companyName: values.companyName,
                 email: values.email,
-                address: values.address,
                 incorporationDate: values.incorporationDate,
                 registrationNumber: values.registrationNumber,
                 telephoneNumber: values.telephoneNumber,
                 numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
-                userRight: [
+                userRights: [
                     {
                         name: values.name,
                         userRight: values.userRight,
@@ -111,6 +117,13 @@ export default function CorporateSelfRegister() {
                         email: values.userEmail
                     }
                 ],
+                address:[
+                    {
+                        street: values.street,
+                        suburb: values.suburb,
+                        city: values.city,
+
+                }],
                 accounts: [
                     {
                         accountType: "BUSINESS",
@@ -166,7 +179,7 @@ export default function CorporateSelfRegister() {
             const step1Fields = [
                 'companyName', 'email', 'address',
                 'incorporationDate', 'registrationNumber', 'telephoneNumber',
-                'numberOfRequiredApproversPerTransaction'
+                'numberOfRequiredApproversPerTransaction', 'street', 'suburb', 'city'
             ];
             const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
             if (step1Errors.length === 0) {
@@ -428,31 +441,96 @@ export default function CorporateSelfRegister() {
                                     )}
                             </div>
                         </div>
+                        <br/>
+                        <h1 className="  mt-6 text-xl font-bold text-center mb-8">Address Details</h1>
+                        <hr/>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaRoad className="mr-2"/> Street*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaRoad className="text-gray-400"/>
+                                    </div>
+                                    <input
+                                        name="street"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.street && formik.touched.street
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.street}
+                                    />
+                                </div>
+                                {formik.errors.street && formik.touched.street && (
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.street}</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaLocationArrow className="mr-2"/> Suburb*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaLocationArrow className="text-gray-400"/>
+                                    </div>
+                                    <input
+                                        name="suburb"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.suburb &&
+                                            formik.touched.suburb
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.suburb}
+                                    />
+                                </div>
+                                {formik.errors.suburb &&
+                                    formik.touched.suburb && (
+                                        <div className="text-red-500 text-sm mt-1">
+                                            {formik.errors.suburb}
+                                        </div>
+                                    )}
+                            </div>
+                        </div>
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 flex items-center">
-                                <FaHome className="mr-2"/> Address*
+                                <FaMapLocation className="mr-2"/> City*
                             </label>
                             <div className="relative">
                                 <div
                                     className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaHome className="text-gray-400"/>
+                                    <FaMapLocation className="text-gray-400"/>
                                 </div>
                                 <input
-                                    name="address"
+                                    name="city"
                                     className={`w-full pl-10 p-2 border rounded-md ${
-                                        formik.errors.address && formik.touched.address
+                                        formik.errors.city &&
+                                        formik.touched.city
                                             ? "border-red-500"
                                             : "border-gray-300"
                                     }`}
-                                    type="text" placeholder="123 Street"
+                                    type="text"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.address}
+                                    value={formik.values.city}
                                 />
                             </div>
-                            {formik.errors.address && formik.touched.address && (
-                                <div className="text-red-500 text-sm mt-1">{formik.errors.address}</div>
-                            )}
+                            {formik.errors.city &&
+                                formik.touched.city && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                        {formik.errors.city}
+                                    </div>
+                                )}
                         </div>
 
                     </div>

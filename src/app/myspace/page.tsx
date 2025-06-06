@@ -1,73 +1,74 @@
 'use client';
 
-import { getSessionDataByKey } from "@/shared/services/auth-service";
-import { getCustomerAccounts } from "@/shared/services/main-service";
-import { showToast } from "@/shared/utilities/commons";
-// import { Metadata } from "next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-// export const metadata: Metadata = {
-//     title: 'Home',
-// };
+import {axiosClient} from "@/endpoints/api";
+import Image from "next/image";
+import {showToast} from "@/shared/utilities/commons";
 
 export default function Home() {
 
-    const [accs, setAccs] = useState(null);
-    let custRef = '';
+    const [accounts,  setAccounts] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
 
-    function getAccounts(){
-        // console.log(custRef);            
+    let customerId:any;
 
-        if(custRef){
-            getCustomerAccounts(custRef)
-            .then(resp => {
-                console.log(resp);
-                
-                setAccs(resp);
-            })
-            .catch(err => {
-                console.log(err);
-                showToast('Failed to get Accounts.', 'error');
-            })
-        }
-        else{
-            // showToast('Customer reference not found.', 'error');
-        }
+    if ( typeof window !== 'undefined') {
+        // Perform localStorage action
+        customerId = localStorage.getItem('organisationId');
     }
 
     useEffect(() => {
-
-        const refe = sessionStorage.getItem('refe');
-
-        if(refe) {
-            getSessionDataByKey(refe)
-            .then(cid => {
-                // console.log(cid);
-                if(cid) custRef = cid;
-                
-                getAccounts();
+        //get customers
+        axiosClient.get(`v1/customer-accounts/customers?customerId=${customerId}`)
+            .then((res:any) =>{
+                // _isMounted.current = false;
+                setAccounts(res.data);
+                setLoading(false);
+            })
+            .catch((err:any) => {
+                setLoading(false);
+                showToast("Failed to fetch accounts", 'error');
             });
 
-        }
-    }, [])
+    }, []);
 
     return (
-        
+
         <main>
             <div className="md:flex items-center justify-between px-[2px] mb-5">
                 <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0">Dashboard</h4>
-                <Link href={'/myspace/transfers'} type="button" className="p-1 text-white bg-color-primary rounded-md">Transfer Money</Link>
+                <Link href={'/myspace/transfers'} type="button" className="p-1 text-white bg-color-primary rounded-md">Transfer
+                    Money</Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 mb-4">
 
                 {
-                    accs?.map((u: any) => (
-                        <div className="card p-5 border-2 rounded-2xl border-blue-700" key={u.id}>
+                    accounts?.map((account: any) => (
+                        <div className="card p-5 border-2 rounded-2xl border-blue-700" key={account?.id}>
                             <div className="card-body">
-                                <h4 className="font-bold">{u.accountName}</h4>
-                                <h6 className="text-gray-500">{u.accountNumber} ({u.accountType})</h6>
+                                <div className="grid grid-cols-2 mb-4">
+                                    <div>
+                                        <Image width={100} height={200} src="/images/logo-mini.png" alt=""
+                                               className="inline-block w-5 align-middle" id="mini-logo"/>
+                                    </div>
+                                    <div className="text-right pt-2">
+                                        {account?.accountStatus == 'PENDING_APPROVAL' ?
+                                            (<span
+                                                className="rounded-full bg-blue-200 text-blue-600 font-bold text-xs px-1.5 py-0.5"> pending </span>) :
+                                            account?.accountStatus == 'ACTIVE' ?
+                                                (<span
+                                                    className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">active</span>) :
+                                                account?.accountStatus == 'INACTIVE' ?
+                                                    (<span
+                                                        className="rounded-full bg-yellow-200 text-yellow-600 text-xs px-1.5 py-0.5">inactive</span>) :
+                                                    (<span
+                                                        className="rounded-full bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5">{account?.customerStatus ? account?.customerStatus : 'null'}</span>)}
+                                    </div>
+                                </div>
+                                <h4 className="font-bold">{account?.accountName}</h4>
+                                <h6 className="text-gray-500">{account?.accountNumber} ({account?.accountType})</h6>
                                 <div className="mt-5">
                                     <span className="text-gray-500">ZWL $</span>
                                     <span className="font-bold ml-2">0.00</span>
@@ -77,35 +78,13 @@ export default function Home() {
                     ))
                 }
 
-                {/* <div className="card p-5 border rounded-2xl border-gray-400">
-                    <div className="card-body">
-                        <h4 className="font-bold">Personal Account ZWL</h4>
-                        <h6 className="text-gray-500">6837363822</h6>
-                        <div className="mt-5">
-                            <span className="text-gray-500">ZWL</span>
-                            <span className="font-bold ml-2">6852.14</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="card p-5 border rounded-2xl border-gray-400">
-                    <div className="card-body">
-                        <h4 className="font-bold">Savings Account ZWL</h4>
-                        <h6 className="text-gray-500">6837363822</h6>
-                        <div className="mt-5">
-                            <span className="text-gray-500">ZWL</span>
-                            <span className="font-bold ml-2">6852.14</span>
-                        </div>
-                    </div>
-                </div> */}
-
             </div>
 
             <div className="grid grid-cols-3 gap-4 mt-5">
 
                 <div className="card p-5 border rounded-2xl border-gray-400 col-span-2">
                     <div className="card-body">
-                        <h4 className="font-bold">Recent Bill Payment</h4>                        
+                        <h4 className="font-bold">Recent Bill Payment</h4>
                         <div className="mt-5 grid grid-cols-5 gap-2">
 
                             <div className="card border border-gray-400 rounded-md p-4">
@@ -113,9 +92,9 @@ export default function Home() {
                                     <div className="mb-5">
                                         <span className="text-gray-300">
                                             <i className="fa-solid fa-circle text-5xl"></i>
-                                        </span> 
+                                        </span>
                                     </div>
-                                    <span className="font-semibold">dummy <br /> (ZWL)</span>
+                                    <span className="font-semibold">dummy <br/> (ZWL)</span>
                                 </div>
                             </div>
 
@@ -161,23 +140,23 @@ export default function Home() {
                 <div className="mt-5">
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-sm text-gray-700 bg-gray-200">
-                            <tr className="">
-                                <th scope="col" className="px-6 py-3">
-                                    #
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    First Name
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Last Name
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Username
-                                </th>
-                            </tr>
+                        <tr className="">
+                            <th scope="col" className="px-6 py-3">
+                                #
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                First Name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Last Name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Username
+                            </th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {/* <tr className="bg-white border border-gray-200">
+                        {/* <tr className="bg-white border border-gray-200">
                                 <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
                                     1
                                 </th>
@@ -225,6 +204,6 @@ export default function Home() {
             </section>
 
         </main>
-        
+
     );
 }

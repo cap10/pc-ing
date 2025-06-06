@@ -1,58 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { getSessionDataByKey } from "@/shared/services/auth-service";
-import { getCustomerAccounts } from "@/shared/services/main-service";
-import { showToast } from "@/shared/utilities/commons";
-// import { Metadata } from "next";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {axiosClient} from "@/endpoints/api";
+import {showToast} from "@/shared/utilities/commons";
 
-// export const metadata: Metadata = {
-//     title: 'Accounts',
-// };
-  
+
 export default function Accounts() {
 
     const [accs, setAccs] = useState(null);
-    let custRef = '';
+    const [accounts,  setAccounts] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
 
-    function getAccounts(){
-        // console.log(custRef);            
+    let customerId:any;
 
-        if(custRef){
-            getCustomerAccounts(custRef)
-            .then(resp => {
-                console.log(resp);
-                
-                setAccs(resp);
-            })
-            .catch(err => {
-                console.log(err);
-                showToast('Failed to get Accounts.', 'error');
-            })
-        }
-        else{
-            // showToast('Customer reference not found.', 'error');
-        }
+    if ( typeof window !== 'undefined') {
+        // Perform localStorage action
+        customerId = sessionStorage.getItem('refe');
     }
 
     useEffect(() => {
-
-        const refe = sessionStorage.getItem('refe');
-
-        if(refe) {
-            getSessionDataByKey(refe)
-            .then(cid => {
-                // console.log(cid);
-                if(cid) custRef = cid;
-                
-                getAccounts();
+        //get customers
+        axiosClient.get(`v1/customer-accounts/customers?customerId${customerId}`)
+            .then((res:any) =>{
+                // _isMounted.current = false;
+                setAccounts(res.data);
+                setLoading(false);
+            })
+            .catch((err:any) => {
+                setLoading(false);
+                showToast("Failed to fetch accounts", 'error');
             });
 
-        }
-    }, [])
+    }, []);
 
     return (
         <main>
@@ -64,7 +46,7 @@ export default function Accounts() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-4">
+            {/*<div className="grid grid-cols-3 gap-4 mb-4">
 
                 {
                     accs?.map((u: any) => (
@@ -95,6 +77,43 @@ export default function Accounts() {
                     ))
                 }
 
+            </div>*/}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+
+                {
+                    accounts?.map((account: any) => (
+                        <div className="card p-5 border-2 rounded-2xl border-blue-700" key={account?.id}>
+                            <div className="card-body">
+                                <div className="grid grid-cols-2 mb-4">
+                                    <div>
+                                        <Image width={100} height={200} src="/images/logo-mini.png" alt=""
+                                               className="inline-block w-5 align-middle" id="mini-logo"/>
+                                    </div>
+                                    <div className="text-right pt-2">
+                                        {account?.accountStatus == 'PENDING_APPROVAL' ?
+                                            (<span
+                                                className="rounded-full bg-blue-200 text-blue-600 font-bold text-xs px-1.5 py-0.5"> pending </span>) :
+                                            account?.accountStatus == 'ACTIVE' ?
+                                                (<span
+                                                    className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">active</span>) :
+                                                account?.accountStatus == 'INACTIVE' ?
+                                                    (<span
+                                                        className="rounded-full bg-yellow-200 text-yellow-600 text-xs px-1.5 py-0.5">inactive</span>) :
+                                                    (<span
+                                                        className="rounded-full bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5">{account?.customerStatus ? account?.customerStatus : 'null'}</span>)}
+                                    </div>
+                                </div>
+                                <h4 className="font-bold">{account?.accountName}</h4>
+                                <h6 className="text-gray-500">{account?.accountNumber} ({account?.accountType})</h6>
+                                <div className="mt-5">
+                                    <span className="text-gray-500">ZWL $</span>
+                                    <span className="font-bold ml-2">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+
             </div>
 
             <hr className="mt-5"/>
@@ -104,26 +123,26 @@ export default function Accounts() {
                 <div className="mt-5">
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-sm text-gray-700 bg-gray-200">
-                            <tr className="">
-                                <th scope="col" className="px-6 py-3">
-                                    Transaction Date
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Beneficiary
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Description
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Amount
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Status
-                                </th>
-                            </tr>
+                        <tr className="">
+                            <th scope="col" className="px-6 py-3">
+                                Transaction Date
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Beneficiary
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Description
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Amount
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Status
+                            </th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {/* <tr className="bg-white border border-gray-200">
+                        {/* <tr className="bg-white border border-gray-200">
                                 <th scope="row" className="px-6 py-3.5 font-medium text-gray-900 whitespace-nowrap">
                                     1
                                 </th>

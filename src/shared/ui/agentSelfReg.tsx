@@ -19,11 +19,13 @@ import {
     FaCheckCircle,
     FaHome,
     FaUserAlt,
-    FaLock, FaEye, FaEyeSlash
+    FaLock, FaEyeSlash, FaEye, FaRoad, FaLocationArrow,
 } from 'react-icons/fa';
+import {FaMapLocation, FaMapLocationDot} from "react-icons/fa6";
 
-export default function AgentSelfRegister() {
+export default function agentSelfRegister() {
 
+    const [myAccs, setMyAccs] = useState<any[]>([]);
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [canProceed, setCanProceed] = useState(false);
@@ -33,9 +35,12 @@ export default function AgentSelfRegister() {
 
     // Step 1 validation schema
     const step1ValidationSchema = Yup.object().shape({
-        customerName: Yup.string().required('Customer name required'),
+        firstName: Yup.string().required('First name required'),
+        lastName: Yup.string().required('Last name required'),
         email: Yup.string().email("Invalid email").required('Email required'),
-        address: Yup.string().required('Address required'),
+        street: Yup.string().required('Street required'),
+        suburb: Yup.string().required('Suburb required'),
+        city: Yup.string().required('City required'),
         phoneNumber: Yup.string()
             .matches(/^[0-9]+$/, "Must be only digits")
             .min(9, 'Phone number must have at least 9 digits')
@@ -61,9 +66,12 @@ export default function AgentSelfRegister() {
 
     const formik = useFormik({
         initialValues: {
-            customerName: '',
+            firstName: '',
+            lastName: '',
+            street: '',
+            suburb: '',
+            city: '',
             email: '',
-            address: '',
             username: '',
             phoneNumber: '',
             nationalId: '',
@@ -78,9 +86,16 @@ export default function AgentSelfRegister() {
             if (step !== 2) return;
 
             const payload = {
-                customerName: values.customerName,
+                firstName: values.firstName,
+                lastName: values.lastName,
                 email: values.email,
-                address: values.address,
+                address:[
+                    {
+                        street: values.street,
+                        suburb: values.suburb,
+                        city: values.city
+                    }
+                ],
                 phoneNumber: values.phoneNumber,
                 nationalId: values.nationalId,
                 numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
@@ -112,7 +127,7 @@ export default function AgentSelfRegister() {
         const errors = await formik.validateForm();
         const step1Fields = [
             'customerName', 'email', 'address',
-            'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction'
+            'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction','street', 'suburb','city'
         ];
 
         if (step === 1) {
@@ -159,7 +174,7 @@ export default function AgentSelfRegister() {
                 <div className="flex mb-8">
                     <div className={`flex-1 border-t-4 pt-1 ${step >= 1 ? 'border-blue-600' : 'border-gray-300'}`}>
                         <p className={`text-sm font-medium ${step >= 1 ? 'text-blue-600' : 'text-gray-500'}`}>
-                            Step 1: Customer Details
+                            Step 1: Agent Details
                         </p>
                     </div>
                     <div className={`flex-1 border-t-4 pt-1 ${step >= 2 ? 'border-blue-600' : 'border-gray-300'}`}>
@@ -171,11 +186,11 @@ export default function AgentSelfRegister() {
 
                 {step === 1 && (
                     <div className="space-y-4">
-                        <h1 className="text-xl font-bold text-center mb-8">Enter Personal Details</h1>
+                        <h1 className="text-xl font-bold text-center mb-8">Enter Agent Details</h1>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block mb-1 font-medium text-gray-700 flex items-center">
-                                    <FaUser className="mr-2"/> Full Name*
+                                    <FaUser className="mr-2"/> First Name*
                                 </label>
                                 <div className="relative">
                                     <div
@@ -183,22 +198,53 @@ export default function AgentSelfRegister() {
                                         <FaUser className="text-gray-400"/>
                                     </div>
                                     <input
-                                        name="customerName"
+                                        name="firstName"
                                         className={`w-full pl-10 p-2 border rounded-md ${
-                                            formik.errors.customerName && formik.touched.customerName
+                                            formik.errors.firstName && formik.touched.firstName
                                                 ? "border-red-500"
                                                 : "border-gray-300"
                                         }`}
                                         type="text"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        value={formik.values.customerName}
+                                        value={formik.values.firstName}
                                     />
                                 </div>
-                                {formik.errors.customerName && formik.touched.customerName && (
-                                    <div className="text-red-500 text-sm mt-1">{formik.errors.customerName}</div>
+                                {formik.errors.firstName && formik.touched.firstName && (
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.firstName}</div>
                                 )}
                             </div>
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaUser className="mr-2"/> Last Name*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaUser className="text-gray-400"/>
+                                    </div>
+                                    <input
+                                        name="lastName"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.lastName && formik.touched.lastName
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.lastName}
+                                    />
+                                </div>
+                                {formik.errors.lastName && formik.touched.lastName && (
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.lastName}</div>
+                                )}
+                            </div>
+
+
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                             <div>
                                 <label className="block mb-1 font-medium text-gray-700 flex items-center">
@@ -226,9 +272,6 @@ export default function AgentSelfRegister() {
                                     <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
                                 )}
                             </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block mb-1 font-medium text-gray-700 flex items-center">
                                     <FaPhone className="mr-2"/> Phone Number*
@@ -257,6 +300,9 @@ export default function AgentSelfRegister() {
                                 )}
                             </div>
 
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block mb-1 font-medium text-gray-700 flex items-center">
                                     <FaIdCard className="mr-2"/> National ID*
@@ -283,65 +329,130 @@ export default function AgentSelfRegister() {
                                     <div className="text-red-500 text-sm mt-1">{formik.errors.nationalId}</div>
                                 )}
                             </div>
-                        </div>
-
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700 flex items-center">
-                                <FaUserShield className="mr-2"/> No. of Approvers*
-                            </label>
-                            <div className="relative">
-                                <div
-                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaUserShield className="text-gray-400"/>
-                                </div>
-                                <input
-                                    name="numberOfRequiredApproversPerTransaction"
-                                    className={`w-full pl-10 p-2 border rounded-md ${
-                                        formik.errors.numberOfRequiredApproversPerTransaction &&
-                                        formik.touched.numberOfRequiredApproversPerTransaction
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                    type="number"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.numberOfRequiredApproversPerTransaction}
-                                />
-                            </div>
-                            {formik.errors.numberOfRequiredApproversPerTransaction &&
-                                formik.touched.numberOfRequiredApproversPerTransaction && (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {formik.errors.numberOfRequiredApproversPerTransaction}
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaUserShield className="mr-2"/> No. of Approvers*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaUserShield className="text-gray-400"/>
                                     </div>
-                                )}
+                                    <input
+                                        name="numberOfRequiredApproversPerTransaction"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.numberOfRequiredApproversPerTransaction &&
+                                            formik.touched.numberOfRequiredApproversPerTransaction
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="number"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.numberOfRequiredApproversPerTransaction}
+                                    />
+                                </div>
+                                {formik.errors.numberOfRequiredApproversPerTransaction &&
+                                    formik.touched.numberOfRequiredApproversPerTransaction && (
+                                        <div className="text-red-500 text-sm mt-1">
+                                            {formik.errors.numberOfRequiredApproversPerTransaction}
+                                        </div>
+                                    )}
+                            </div>
                         </div>
+                        <br/>
 
+                        <h1 className="  mt-6 text-xl font-bold text-center mb-8">Address Details</h1>
+                        <hr/>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaRoad className="mr-2"/> Street*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaRoad className="text-gray-400"/>
+                                    </div>
+                                    <input
+                                        name="street"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.street && formik.touched.street
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.street}
+                                    />
+                                </div>
+                                {formik.errors.street && formik.touched.street && (
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.street}</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block mb-1 font-medium text-gray-700 flex items-center">
+                                    <FaLocationArrow className="mr-2"/> Suburb*
+                                </label>
+                                <div className="relative">
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaLocationArrow className="text-gray-400"/>
+                                    </div>
+                                    <input
+                                        name="suburb"
+                                        className={`w-full pl-10 p-2 border rounded-md ${
+                                            formik.errors.suburb &&
+                                            formik.touched.suburb
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.suburb}
+                                    />
+                                </div>
+                                {formik.errors.suburb &&
+                                    formik.touched.suburb && (
+                                        <div className="text-red-500 text-sm mt-1">
+                                            {formik.errors.suburb}
+                                        </div>
+                                    )}
+                            </div>
+                        </div>
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 flex items-center">
-                                <FaHome className="mr-2"/> Address*
+                                <FaMapLocation className="mr-2"/> City*
                             </label>
                             <div className="relative">
                                 <div
                                     className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaHome className="text-gray-400"/>
+                                    <FaMapLocation className="text-gray-400"/>
                                 </div>
                                 <input
-                                    name="address"
+                                    name="city"
                                     className={`w-full pl-10 p-2 border rounded-md ${
-                                        formik.errors.address && formik.touched.address
+                                        formik.errors.city &&
+                                        formik.touched.city
                                             ? "border-red-500"
                                             : "border-gray-300"
                                     }`}
                                     type="text"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.address}
+                                    value={formik.values.city}
                                 />
                             </div>
-                            {formik.errors.address && formik.touched.address && (
-                                <div className="text-red-500 text-sm mt-1">{formik.errors.address}</div>
-                            )}
+                            {formik.errors.city &&
+                                formik.touched.city && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                        {formik.errors.city}
+                                    </div>
+                                )}
                         </div>
+
 
                     </div>
                 )}
