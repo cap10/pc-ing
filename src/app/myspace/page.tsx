@@ -9,6 +9,7 @@ import {showToast} from "@/shared/utilities/commons";
 export default function Home() {
 
     const [accounts,  setAccounts] = useState<any>([]);
+    const [balances,  setBalances] = useState<any>([]);
     const [loading, setLoading] = useState(false);
 
     let customerId:any;
@@ -24,6 +25,18 @@ export default function Home() {
             .then((res:any) =>{
                 // _isMounted.current = false;
                 setAccounts(res.data);
+                setLoading(false);
+            })
+            .catch((err:any) => {
+                setLoading(false);
+                showToast("Failed to fetch accounts", 'error');
+            });
+
+        //get balances
+        axiosClient.get(`v1/customer-accounts/${customerId}/balance`)
+            .then((res:any) =>{
+                // _isMounted.current = false;
+                setBalances(res.data);
                 setLoading(false);
             })
             .catch((err:any) => {

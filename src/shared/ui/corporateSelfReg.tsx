@@ -66,6 +66,7 @@ export default function CorporateSelfRegister() {
             .min(12, 'Password must be at least 12 characters')
             .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
             .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            .matches(/[!@#$%^&*()_+\-=\[\]{}|;':"\\|.,?]/, 'Password must contain at least one special character')
             .matches(/\d/, 'Password must contain at least one number'),
         confirmPassword: Yup.string()
             .required('Please confirm password')

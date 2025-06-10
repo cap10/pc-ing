@@ -5,7 +5,8 @@ import Cookies from 'js-cookie';
 export const getToken = (): string => <string>Cookies.get("access_token");
 
 export const getAuthHeaders = () => {
-    const token = getToken();
+    //const token = getToken();
+    const token = sessionStorage.getItem('token');
     if (!token) throw new Error('No authentication token found');
 
     return { Authorization: `Bearer ${token}` };
@@ -17,7 +18,8 @@ export const axiosClient = Axios.create({
 });
 
 axiosClient.interceptors.request.use((config) => {
-    const token = getToken();
+    //const token = getToken();
+    const token = sessionStorage.getItem('token');
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;

@@ -10,7 +10,7 @@ import {useFormik} from "formik";
 import {loginAxiosClient} from "@/endpoints/loginApi";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/contexts/auth";
-
+import {AuthGuardService} from "@/contexts/authGuard";
 
 const loginValidationSchema = Yup.object({
     username: Yup.string().required('username required'),
@@ -18,7 +18,7 @@ const loginValidationSchema = Yup.object({
 });
 
 export default function Login() {
-    const { authenticate } = useAuth();
+    const { login } = useAuth();
   const year = new Date().getFullYear();
     const router = useRouter();
 
@@ -36,10 +36,11 @@ export default function Login() {
                 const {data}  =  await loginAxiosClient.post(`v1/authenticate/customers`, payload);
 
                 if (data.accessToken != null) {
-                    await authenticate(data.accessToken);
+
+                    await sessionStorage.setItem('token', data.accessToken);
+                    await sessionStorage.setItem('customerId', data.customerId);
+                    await login(data.accessToken, data.customerId);
                     showToast('Login successfull', 'success');
-                    await localStorage.setItem('token', data.accessToken);
-                    await localStorage.setItem('organisationId', data.customerId);
                     setSessionData('atoken', data.accessToken);
                     setSessionData('display', data.name);
                     setSessionData('refe', data.customerId);
