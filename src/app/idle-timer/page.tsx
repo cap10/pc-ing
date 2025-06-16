@@ -1,8 +1,8 @@
+'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
-import { useRouter } from 'next/router';
+import {useRouter} from "next/navigation";
 import Cookies from 'js-cookie';
-import {useAuth} from "@/contexts/auth";
 
 // Constants for better maintainability
 const TIMEOUT = 5 * 60 * 1000; // 5 minutes
@@ -10,17 +10,17 @@ const PROMPT_TIMEOUT = 30 * 1000; // 30 seconds
 
 export default function IdleTimerContainer() {
     const router = useRouter();
-    const { logout } = useAuth();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [remainingSeconds, setRemainingSeconds] = useState(0);
 
     // Memoized logout function to prevent unnecessary recreations
-    const logoutFunction = useCallback(() => {
+    /*const logoutFunction = useCallback(() => {
         Cookies.remove('access_token');
         localStorage.clear();
         logout();
         router.push('/login');
-    }, [logout, router]);
+    }, [logout, router]);*/
 
     // Event handlers
     const handlePrompt = useCallback(() => {
@@ -28,10 +28,10 @@ export default function IdleTimerContainer() {
         setRemainingSeconds(Math.floor(PROMPT_TIMEOUT / 1000));
     }, []);
 
-    const handleIdle = useCallback(() => {
+   /* const handleIdle = useCallback(() => {
         setIsModalOpen(false);
         logoutFunction();
-    }, [logoutFunction]);
+    }, [logoutFunction]);*/
 
     const handleActive = useCallback(() => {
         setIsModalOpen(false);
@@ -40,14 +40,14 @@ export default function IdleTimerContainer() {
     const handleStillHere = useCallback(() => {
         setIsModalOpen(false);
         reset();
-    }, [reset]);
+    }, []);
 
     // Initialize idle timer
     const { getRemainingTime, isPrompted, reset } = useIdleTimer({
         timeout: TIMEOUT,
         promptTimeout: PROMPT_TIMEOUT,
         onPrompt: handlePrompt,
-        onIdle: handleIdle,
+        //onIdle: handleIdle,
         onActive: handleActive,
         crossTab: true,
         debounce: 500 // Add debounce to prevent rapid firing

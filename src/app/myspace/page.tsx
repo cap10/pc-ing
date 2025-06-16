@@ -5,18 +5,20 @@ import { useEffect, useState } from "react";
 import {axiosClient} from "@/endpoints/api";
 import Image from "next/image";
 import {showToast} from "@/shared/utilities/commons";
+import {setSessionData} from "@/shared/repositories/storage-repository";
 
 export default function Home() {
 
     const [accounts,  setAccounts] = useState<any>([]);
-    const [balances,  setBalances] = useState<any>([]);
+    const [accountBalances, setAccountBalances] = useState<Record<string, number>>({});
+    //const [accountBalances, setAccountBalances] = useState<any>();
     const [loading, setLoading] = useState(false);
 
     let customerId:any;
 
     if ( typeof window !== 'undefined') {
         // Perform localStorage action
-        customerId = localStorage.getItem('organisationId');
+        customerId = sessionStorage.getItem('customerId');
     }
 
     useEffect(() => {
@@ -28,23 +30,45 @@ export default function Home() {
                 setLoading(false);
             })
             .catch((err:any) => {
-                setLoading(false);
-                showToast("Failed to fetch accounts", 'error');
-            });
 
-        //get balances
-        axiosClient.get(`v1/customer-accounts/${customerId}/balance`)
-            .then((res:any) =>{
-                // _isMounted.current = false;
-                setBalances(res.data);
-                setLoading(false);
-            })
-            .catch((err:any) => {
-                setLoading(false);
                 showToast("Failed to fetch accounts", 'error');
             });
 
     }, []);
+
+    /*const getBalance = async (accountNumber: any) => {
+
+        try {
+            const response = await axiosClient.get(`v1/customer-accounts/${accountNumber}/balance`)
+            if (response != null) {
+
+                setAccountBalances(response?.data?.balance);
+                console.log("Account Balance", response?.data?.balance);
+
+            } else {
+                showToast("Failed to fetch balance", 'error');
+            }
+        } catch (err: any) {
+            showToast(err?.response?.data?.message, 'error');
+        }
+    }*/
+
+    const getBalance = async (accountNumber: string) => {
+        try {
+            const response = await axiosClient.get(`v1/customer-accounts/${accountNumber}/balance`);
+            if (response.data) {
+                setAccountBalances(prev => ({
+                    ...prev,
+                    [accountNumber]: response.data.balance
+                }));
+                console.log("Account Balance", response.data.balance);
+            } else {
+                showToast("Failed to fetch balance", 'error');
+            }
+        } catch (err: any) {
+            showToast(err?.response?.data?.message || "Error fetching balance", 'error');
+        }
+    };
 
     return (
 
@@ -56,96 +80,60 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-4">
-
-                {
-                    accounts?.map((account: any) => (
-                        <div className="card p-5 border-2 rounded-2xl border-blue-700" key={account?.id}>
-                            <div className="card-body">
-                                <div className="grid grid-cols-2 mb-4">
-                                    <div>
-                                        <Image width={100} height={200} src="/images/logo-mini.png" alt=""
-                                               className="inline-block w-5 align-middle" id="mini-logo"/>
-                                    </div>
-                                    <div className="text-right pt-2">
-                                        {account?.accountStatus == 'PENDING_APPROVAL' ?
-                                            (<span
-                                                className="rounded-full bg-blue-200 text-blue-600 font-bold text-xs px-1.5 py-0.5"> pending </span>) :
-                                            account?.accountStatus == 'ACTIVE' ?
-                                                (<span
-                                                    className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">active</span>) :
-                                                account?.accountStatus == 'INACTIVE' ?
-                                                    (<span
-                                                        className="rounded-full bg-yellow-200 text-yellow-600 text-xs px-1.5 py-0.5">inactive</span>) :
-                                                    (<span
-                                                        className="rounded-full bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5">{account?.customerStatus ? account?.customerStatus : 'null'}</span>)}
-                                    </div>
+                {accounts?.map((account: any) => (
+                    <div className="card p-5 rounded-2xl border-2 border-cyan-500" key={account?.id}>
+                        <div className="card-body">
+                            <div className="grid grid-cols-2 mb-4">
+                                <div>
+                                    <Image
+                                        width={100}
+                                        height={200}
+                                        src="/images/logo-mini.png"
+                                        alt=""
+                                        className="inline-block w-5 align-middle"
+                                        id="mini-logo"
+                                    />
                                 </div>
-                                <h4 className="font-bold">{account?.accountName}</h4>
-                                <h6 className="text-gray-500">{account?.accountNumber} ({account?.accountType})</h6>
-                                <div className="mt-5">
-                                    <span className="text-gray-500">ZWL $</span>
-                                    <span className="font-bold ml-2">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                }
-
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 mt-5">
-
-                <div className="card p-5 border rounded-2xl border-gray-400 col-span-2">
-                    <div className="card-body">
-                        <h4 className="font-bold">Recent Bill Payment</h4>
-                        <div className="mt-5 grid grid-cols-5 gap-2">
-
-                            <div className="card border border-gray-400 rounded-md p-4">
-                                <div className="card-body">
-                                    <div className="mb-5">
-                                        <span className="text-gray-300">
-                                            <i className="fa-solid fa-circle text-5xl"></i>
-                                        </span>
-                                    </div>
-                                    <span className="font-semibold">dummy <br/> (ZWL)</span>
+                                <div className="text-right pt-2">
+                                    {account?.accountStatus == 'PENDING_APPROVAL' ? (
+                                        <span
+                                            className="rounded-md bg-amber-100 text-amber-600 font-bold text-xs p-2"> Pending
+              </span>
+                                    ) : account?.accountStatus == 'ACTIVE' ? (
+                                        <span
+                                            className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">
+                active
+              </span>
+                                    ) : account?.accountStatus == 'INACTIVE' ? (
+                                        <span
+                                            className="rounded-full bg-yellow-200 text-yellow-600 text-xs px-1.5 py-0.5">
+                inactive
+              </span>
+                                    ) : (
+                                        <span className="rounded-full bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5">
+                {account?.customerStatus ? account?.customerStatus : 'null'}
+              </span>
+                                    )}
                                 </div>
                             </div>
-
-                            {/* <div className="card border border-gray-400 rounded-md p-4">
-                                <div className="card-body">
-                                    <div className="mb-5">
-                                        <span className="text-gray-300">
-                                            <i className="fa-solid fa-circle text-5xl"></i>
-                                        </span> 
-                                    </div>
-                                    <span className="font-semibold">Buy Airtime <br /> (ZWL)</span>
-                                </div>
+                            <h4 className="font-bold m-2">{account?.accountName.split('-')[1]}</h4>
+                            <h6 className="text-gray-500">
+                                {account?.accountNumber}
+                            </h6>
+                            <div className="mt-5">
+          <span
+              className="text-cyan-500 cursor-pointer hover:underline"
+              onClick={() => getBalance(account.accountNumber)} // Pass accountNumber here
+          >
+            Get Balance
+          </span>
+                                <span className="font-bold ml-6">
+          {(accountBalances[account.accountNumber]?.toFixed(2)) ?? "565,7"}
+        </span>
                             </div>
-
-                            <div className="card border border-gray-400 rounded-md p-4">
-                                <div className="card-body">
-                                    <div className="mb-5">
-                                        <span className="text-gray-300">
-                                            <i className="fa-solid fa-circle text-5xl"></i>
-                                        </span> 
-                                    </div>
-                                    <span className="font-semibold">ZESA Prepaid <br /> (ZWL)</span>
-                                </div>
-                            </div> */}
                         </div>
                     </div>
-                </div>
-
-                <div className="card p-5 border rounded-2xl border-gray-400">
-                    <div className="card-body">
-                        <h6 className="text-gray-500">Interbank Exchange Rate</h6>
-                        <h4 className="font-bold">ZWL 800 : 1 USD</h4>
-                        <div className="mt-5">
-                            <em>#chart</em>
-                        </div>
-                    </div>
-                </div>
-
+                ))}
             </div>
 
             <section className="mt-5 pt-4">

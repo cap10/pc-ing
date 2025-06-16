@@ -25,8 +25,8 @@ export async function createUserUtil(formData: FormData){
         nationalId: formData?.get('national'),
         groupId: formData?.get('role'),
     });
+
     // console.log(validatedFields);
-    
 
     // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {

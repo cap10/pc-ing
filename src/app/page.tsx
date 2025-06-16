@@ -10,7 +10,6 @@ import {loginAxiosClient} from "@/endpoints/loginApi";
 import * as Yup from "yup";
 import {router} from "next/client";
 import {useRouter} from "next/navigation";
-import {useAuth} from "@/contexts/auth";
 
 const loginValidationSchema = Yup.object({
     username: Yup.string().required('username required'),
@@ -18,7 +17,7 @@ const loginValidationSchema = Yup.object({
 });
 
 export default function Login() {
-    const { authenticate } = useAuth();
+
     const year = new Date().getFullYear();
     const router = useRouter();
 
@@ -36,8 +35,8 @@ export default function Login() {
 
                 if (data.accessToken) {
 
-                    await localStorage.setItem('token', data.accessToken);
-                    await localStorage.setItem('organisationId', data.customerId);
+                    await sessionStorage.setItem('token', data.accessToken);
+                    await sessionStorage.setItem('customerId', data.customerId);
                     showToast('Login successfull', 'success');
                     //await authenticate(data?.accessToken);
                     await setSessionData('atoken', data?.accessToken);

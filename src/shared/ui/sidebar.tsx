@@ -88,41 +88,39 @@ export default function Sidebar(){
                     </li>
 
                     <li>
-                        <Link href="/myspace/transfers"
+                        <a href="#" aria-expanded="false"
+                           className="flex py-2.5 px-6 text-sm font-medium text-gray-600 transition-all duration-150 ease-linear nav-menu cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" transform="rotate(45 0 0)" fill="none"
+                                 viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round"
+                                      d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                            <span data-key="t-auth" className="ml-3">Transfers</span>
+                        </a>
+                        <ul>
+                            <li>
+                                <Link className="pl-[52.8px] pr-6 py-[6.4px] block text-[13.5px] font-medium text-gray-600 transition-all duration-150 ease-linear" href="/myspace/zipit">ZIPIT</Link>
+                            </li>
+                            <li>
+                                <Link className="pl-[52.8px] pr-6 py-[6.4px] block text-[13.5px] font-medium text-gray-600 transition-all duration-150 ease-linear" href="/myspace/rtgs">RTGS</Link>
+                            </li>
+                            <li>
+                                <Link className="pl-[52.8px] pr-6 py-[6.4px] block text-[13.5px] font-medium text-gray-600 transition-all duration-150 ease-linear" href="/myspace/internal">INTERNAL</Link>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                    <li>
+                        <Link href="/myspace/categories"
                               className="flex py-2.5 px-6 text-sm font-medium text-gray-600 transition-all duration-150 ease-linear hover:text-color-secondary">
                             <svg xmlns="http://www.w3.org/2000/svg" transform="rotate(45 0 0)" fill="none"
                                  viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                                 <path strokeLinecap="round" strokeLinejoin="round"
                                       d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                             </svg>
-                            <span className="ml-3"> Transfers</span>
+                            <span className="ml-3"> Categories</span>
                         </Link>
-                    </li>
-
-                    <li>
-                        <a href="#" aria-expanded="false"
-                           className="flex py-2.5 px-6 text-sm font-medium text-gray-600 transition-all duration-150 ease-linear nav-menu cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                 stroke="currentColor" className="size-5">
-                                <path strokeLinecap="round" strokeLinejoin="round"
-                                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
-                            </svg>
-                            <span data-key="t-auth1" className="ml-3">Products</span>
-                        </a>
-                        <ul>
-                            <li>
-                                <Link href="/myspace/products"
-                                      className="pl-[52.8px] pr-6 py-[6.4px] block text-[13.5px] font-medium text-gray-600 transition-all duration-150 ease-linear">
-                                     View Products
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/myspace/categories"
-                                      className="pl-[52.8px] pr-6 py-[6.4px] block text-[13.5px] font-medium text-gray-600 transition-all duration-150 ease-linear">
-                                    Categories
-                                </Link>
-                            </li>
-                        </ul>
                     </li>
 
                     <hr className="my-4"/>

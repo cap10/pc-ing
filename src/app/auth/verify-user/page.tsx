@@ -9,6 +9,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {useFormik} from "formik";
 import {loginAxiosClient} from "@/endpoints/loginApi";
 
+
 export default function VerifyUser() {
 
     const searchParams = useSearchParams();
@@ -27,7 +28,7 @@ export default function VerifyUser() {
                 const { data } = await loginAxiosClient.post('v1/users/verify', payload);
                 if (data != null ) {
                     showToast('User Account verified', 'success');
-                    await router.push('/login');
+                    router.push('/login');
                 }
             } catch (err:any) {
                 if (err.response.status === 400 || err.response.status === 401) {
@@ -75,7 +76,7 @@ export default function VerifyUser() {
 
                                         <div className="mb-3">
                                             <button
-                                                className="w-full py-2 text-white bg-blue-600 rounded-md font-bold hover:bg-blue-700 disabled:opacity-50"
+                                                className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"
                                                 disabled={SetPasswordForm.isSubmitting}
                                                 type="submit"
                                             >
