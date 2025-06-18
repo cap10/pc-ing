@@ -1,14 +1,12 @@
 'use client';
 
-import { setSessionData } from "@/shared/repositories/storage-repository";
-import { showToast } from "@/shared/utilities/commons";
-import { loginAuthUtil } from "@/shared/utilities/utils";
-import Image from "next/image"; 
+import {setSessionData} from "@/shared/repositories/storage-repository";
+import {showToast} from "@/shared/utilities/commons";
+import Image from "next/image";
 import Link from "next/link";
 import {useFormik} from "formik";
 import {loginAxiosClient} from "@/endpoints/loginApi";
 import * as Yup from "yup";
-import {router} from "next/client";
 import {useRouter} from "next/navigation";
 
 const loginValidationSchema = Yup.object({
@@ -37,13 +35,13 @@ export default function Login() {
 
                     await sessionStorage.setItem('token', data.accessToken);
                     await sessionStorage.setItem('customerId', data.customerId);
+                    //await login(data.accessToken, data.customerId);
                     showToast('Login successfull', 'success');
-                    //await authenticate(data?.accessToken);
-                    await setSessionData('atoken', data?.accessToken);
-                    await setSessionData('display', data.name);
-                    await setSessionData('refe', data.customerId);
-                    await setSessionData('user', data.username);
-                    await setSessionData('role', data?.group?.name);
+                    setSessionData('atoken', data.accessToken);
+                    setSessionData('display', data.name);
+                    setSessionData('refe', data.customerId);
+                    setSessionData('user', data.username);
+                    setSessionData('role', data?.group?.name);
                     await router.push('/myspace');
 
                 } else {
@@ -65,93 +63,128 @@ export default function Login() {
 
   return (
 
-      <section className="min-h-screen bg-white">
-          <div className="container mx-auto px-4">
+      <section className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col min-h-screen">
-                  <div className="flex-grow flex items-center justify-center py-8">
-                      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                          <div className="mx-auto">
-                              <a href="#" className="">
-                                  <Image width={828} height={315} src="/images/logo.svg" alt="" className=""/> <span
-                                  className="text-xl font-medium align-middle ltr:ml-1.5 rtl:mr-1.5 dark:text-white">Minia</span>
-                              </a>
+                  {/* Main Content */}
+                  <div className="flex-grow flex items-center justify-center py-12">
+                      <div className="w-full max-w-md">
+                          {/* Logo Section */}
+                          <div className="mx-auto mb-10 text-center">
+                              <div className="flex items-center justify-center space-x-3">
+                                  <div className="w-90 h-70 relative">
+                                      <Image
+                                          width={140}
+                                          height={90}
+                                          src="/images/logo.svg"
+                                          alt="Company Logo"
+                                          className="object-contain"
+                                      />
+                                  </div>
+                              </div>
                           </div>
 
-                          <div className="bg-white rounded-lg shadow-sm p-6">
-                              <div className="text-center mb-6">
-                                  <h5 className="font-medium text-gray-700">Administration</h5>
-                                  <p className="mt-2 text-gray-500">Sign in to continue.</p>
+                          {/* Login Card */}
+                          <div className="bg-white rounded-xl shadow-lg p-8 sm:p-10 border border-gray-100">
+                              <div className="text-center mb-8">
+                                  <h2 className="text-2xl font-bold text-gray-800">Administration</h2>
+                                  <p className="mt-2 text-gray-500">Sign in to continue</p>
                               </div>
 
-                              <form onSubmit={loginForm.handleSubmit}>
-                                  <div className="mb-4">
-                                      <label className="block mb-2 font-medium text-gray-700">Username</label>
+                              <form onSubmit={loginForm.handleSubmit} className="space-y-6">
+                                  {/* Username Field */}
+                                  <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                                          Username
+                                      </label>
                                       <input
                                           name="username"
-                                          className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
+                                          className={`w-full px-4 py-3 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                                               loginForm.errors.username && loginForm.touched.username
                                                   ? "border-red-500"
                                                   : "border-gray-300"
                                           }`}
                                           type="text"
-                                          placeholder="Username"
+                                          placeholder="Enter your username"
                                           required
                                           onChange={loginForm.handleChange}
                                           onBlur={loginForm.handleBlur}
                                           value={loginForm.values.username}
                                       />
                                       {loginForm.errors.username && loginForm.touched.username && (
-                                          <div className="text-red-500 text-sm mt-1">
+                                          <p className="mt-2 text-sm text-red-600">
                                               {loginForm.errors.username}
-                                          </div>
+                                          </p>
                                       )}
                                   </div>
 
-                                  <div className="mb-4">
-                                      <label className="block mb-2 font-medium text-gray-600">Password</label>
-
-                                      <div className="mb-1 flex-auto text-right">
-                                          <Link href="/password-reset" className="text-color-secondary font-bold">Forgot
-                                              password?</Link>
+                                  {/* Password Field */}
+                                  <div>
+                                      <div className="flex justify-between items-center mb-2">
+                                          <label className="block text-sm font-medium text-gray-700">
+                                              Password
+                                          </label>
+                                          <Link
+                                              href="/password-reset"
+                                              className="text-xs font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                          >
+                                              Forgot password?
+                                          </Link>
                                       </div>
                                       <input
                                           name="password"
-                                          className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
+                                          className={`w-full px-4 py-3 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                                               loginForm.errors.password && loginForm.touched.password
                                                   ? "border-red-500"
                                                   : "border-gray-300"
                                           }`}
                                           type="password"
-                                          placeholder="Password"
+                                          placeholder="Enter your password"
                                           required
                                           onChange={loginForm.handleChange}
                                           onBlur={loginForm.handleBlur}
                                           value={loginForm.values.password}
                                       />
                                       {loginForm.errors.password && loginForm.touched.password && (
-                                          <div className="text-red-500 text-sm mt-1">
+                                          <p className="mt-2 text-sm text-red-600">
                                               {loginForm.errors.password}
-                                          </div>
+                                          </p>
                                       )}
                                   </div>
 
-                                  <div className="mb-6">
-
-                                      <div className="mb-3">
-                                          <button
-                                              className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"
-                                              disabled={loginForm.isSubmitting}
-                                              type="submit">{loginForm.isSubmitting ? "Processing..." : "Log In"}
-                                          </button>
-                                      </div>
+                                  {/* Submit Button */}
+                                  <div>
+                                      <button
+                                          className="w-full py-3 px-4 bg-cyan-400 hover:bg-cyan-200 text-white font-medium rounded-lg shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                          disabled={loginForm.isSubmitting}
+                                          type="submit"
+                                      >
+                                          {loginForm.isSubmitting ? (
+                                              <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                           fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </span>
+                                          ) : (
+                                              "Log In"
+                                          )}
+                                      </button>
                                   </div>
                               </form>
 
-                              <div className="text-center mt-4">
-                                  <p className="text-gray-500">
+                              {/* Sign Up Link */}
+                              <div className="mt-8 text-center">
+                                  <p className="text-sm text-gray-500">
                                       Don't have an account?{" "}
-                                      <Link href="/register"
-                                            className="text-color-secondary font-bold">
+                                      <Link
+                                          href="/register"
+                                          className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                      >
                                           Create new
                                       </Link>
                                   </p>
@@ -160,9 +193,10 @@ export default function Login() {
                       </div>
                   </div>
 
-                  <div className="py-2 text-center">
-                      <p className="text-gray-500">
-                          © {new Date().getFullYear()} IBanking.
+                  {/* Footer */}
+                  <div className="py-6 text-center">
+                      <p className="text-xs text-gray-500">
+                          © {new Date().getFullYear()} IBanking. All rights reserved.
                       </p>
                   </div>
               </div>

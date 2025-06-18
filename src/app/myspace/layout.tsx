@@ -13,36 +13,31 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <section>
-        <div className="fixed bottom-0 z-10 h-screen vertical-menu top-[70px] bg-slate-50 border-gray-50 print:hidden">
-    
-            <Sidebar />
-        </div>
+      <section>
+          <div
+              className="fixed bottom-0 z-10 h-screen vertical-menu top-[70px] bg-slate-50 border-gray-50 print:hidden w-[70px] md:w-[250px] transition-all duration-300 ease-in-out">
+              <Sidebar/>
+          </div>
 
-        <IdleTimerContainer/>
-        <Navbar />
+          <IdleTimerContainer/>
+          <Navbar/>
 
-        <div className="main-content group-data-[sidebar-size=sm]:ml-[70px]">
-            <div className="min-h-screen page-content">
+          <div className="main-content ml-[70px] md:ml-[250px] transition-all duration-300 ease-in-out">
+              <div className="min-h-screen page-content">
+                  <div className="container-fluid px-[0.625rem]">
+                      <div className="grid grid-cols-1 pb-6">
+                          {children}
+                      </div>
+                      <Footer/>
+                  </div>
+              </div>
+          </div>
 
-                <div className="container-fluid px-[0.625rem]">
+          <Script type='text/javascript' src='/assets/libs/metismenujs.min.js'/>
+          <Script type='text/javascript' src='/assets/libs/popper.min.js'/>
+          <Script type='text/javascript' src='/assets/js/app.js'/>
+      </section>
 
-                    <div className="grid grid-cols-1 pb-6">
-                        {children}
-                    </div>
-                    
-                    <Footer />
 
-                </div>
-            </div>
-        </div>
-
-        <Script type='text/javascript' src='/assets/libs/metismenujs.min.js' />
-        <Script type='text/javascript' src='/assets/libs/popper.min.js' />
-        <Script type='text/javascript' src='/assets/js/app.js' />
-
-    </section>
-
-    
   )
 }

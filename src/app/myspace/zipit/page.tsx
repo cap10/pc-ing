@@ -6,6 +6,8 @@ import {showToast} from "@/shared/utilities/commons";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/navigation";
+import RequestID from "@/app/requestId/page";
+import {generateRandomString} from "../../random-generator";
 
 const preAuthValidationSchema = Yup.object({
     sourceAccountNumber: Yup.string().required('source Account required'),
@@ -81,17 +83,6 @@ export default function ZipitTransfer() {
 
     }, []);
 
-    const generateRandomString = (length = 12) => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * chars.length);
-            result += chars[randomIndex];
-        }
-
-        return result;
-    };
 
     let ZipitTransaction;
     trxnTypes.forEach(function(trxn){

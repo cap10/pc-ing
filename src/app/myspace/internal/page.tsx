@@ -6,6 +6,7 @@ import {showToast} from "@/shared/utilities/commons";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/navigation";
+import {generateRandomString} from "../../random-generator";
 
 const preAuthValidationSchema = Yup.object({
     sourceAccountNumber: Yup.string().required('source Account required'),
@@ -28,6 +29,14 @@ export default function InternalTransfer() {
     const [preAuthToken,  setPreAuthToken] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
+
+    // Helper function to show toast
+    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+        setToast({ message, type, show: true });
+        setTimeout(() => setToast(null), 5000);
+    };
 
     let customerId:any;
 
@@ -76,18 +85,6 @@ export default function InternalTransfer() {
 
     }, []);
 
-    const generateRandomString = (length = 12) => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * chars.length);
-            result += chars[randomIndex];
-        }
-
-        return result;
-    };
-
     let ZipitTransaction;
     trxnTypes.forEach(function(trxn){
 
@@ -100,6 +97,7 @@ export default function InternalTransfer() {
 
     const preAuthForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
+            setIsSubmitting(true);
 
             const randomString = generateRandomString();
             setRequestId(randomString);
@@ -119,13 +117,22 @@ export default function InternalTransfer() {
 
                 if (data?.preAuthToken != null) {
                     setPreAuthToken(data?.preAuthToken);
+                    setIsSubmitting(false);
+                    showToast("Transfer initiated successfully. Please authorize the transaction.", 'success');
 
                 } else {
-                    showToast("Zipit Transfer failed", 'error');
+                    setIsSubmitting(false);
+                    const errorMessage = data?.message || "An unexpected error occurred";
+                    showToast("Transfer initiation failed. Please try again." ||  errorMessage, 'error');
                 }
             }catch(err:any){
-                showToast(err?.response?.data?.message, 'error');
+                setIsSubmitting(false);
+                const errorMessage = err?.response?.data?.message || "An unexpected error occurred";
+                showToast(errorMessage, 'error');
 
+            }
+            finally {
+                setIsSubmitting(false);
             }
         },
 
@@ -164,143 +171,199 @@ export default function InternalTransfer() {
     };
 
     return (
-        <section className="group">
-            <div className="container-fluid">
-                <div className="md:flex items-center justify-between px-[2px] mb-5">
-                    <h4 className="text-[18px] font-medium text-gray-800 mb-sm-0 grow mb-2 md:mb-0">Internal
-                        Transfer</h4>
-                    <p className="p-1 text-color-secondary bg-color-primary rounded-md">Transfer
-                        Money</p>
-                </div>
-                <div className="h-screen">
-                    <div className="relative z-50 col-span-12">
-                        <div className="w-full bg-white md:p-12 place-content-center">
-                            <div className="flex h-[100vh] flex-col w-10/12 lg:w-8/12 m-auto">
-
-                                <form onSubmit={preAuthForm.handleSubmit}>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="mb-4">
-                                            <label className="block mb-2 font-medium text-gray-700">Source
-                                                Acc#</label>
-                                            <select
-                                                name="sourceAccountNumber"
-                                                className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
-                                                    preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                                type="text"
-                                                placeholder="001122233344"
-                                                required
-                                                onChange={preAuthForm.handleChange}
-                                                onBlur={preAuthForm.handleBlur}
-                                                value={preAuthForm.values.sourceAccountNumber}
-                                            >
-                                                <option value="" defaultValue={""}>Please Choose...</option>
-                                                {accounts?.map((account: any) => (
-                                                    <option key={account?.id}
-                                                            value={account?.accountNumber}>{account?.accountName} - {account?.accountNumber}</option>
-                                                ))}
-                                            </select>
-                                            {preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {preAuthForm.errors.sourceAccountNumber}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <label className="block mb-2 font-medium text-gray-600">Recipient
-                                                Acc#</label>
-                                            <input
-                                                name="recipientAccountNumber"
-                                                className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
-                                                    preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                                type="text"
-                                                placeholder="0011122233"
-                                                required
-                                                onChange={preAuthForm.handleChange}
-                                                onBlur={preAuthForm.handleBlur}
-                                                value={preAuthForm.values.recipientAccountNumber}
-                                            />
-                                            {preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {preAuthForm.errors.recipientAccountNumber}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                        <div className="mb-4">
-                                            <label className="block mb-2 font-medium text-gray-600">Amount</label>
-                                            <input
-                                                name="amount"
-                                                className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
-                                                    preAuthForm.errors.amount && preAuthForm.touched.amount
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                                type="number"
-                                                placeholder="0.00"
-                                                required
-                                                onChange={preAuthForm.handleChange}
-                                                onBlur={preAuthForm.handleBlur}
-                                                value={preAuthForm.values.amount}
-                                            />
-                                            {preAuthForm.errors.amount && preAuthForm.touched.amount && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {preAuthForm.errors.amount}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mb-4">
-                                            <label className="block mb-2 font-medium text-gray-600">Description</label>
-                                            <input
-                                                name="description"
-                                                className={`w-full px-3 py-2 placeholder:text-xs border rounded-md ${
-                                                    preAuthForm.errors.description && preAuthForm.touched.description
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                                type="text"
-                                                placeholder="zipit transfer"
-                                                required
-                                                onChange={preAuthForm.handleChange}
-                                                onBlur={preAuthForm.handleBlur}
-                                                value={preAuthForm.values.description}
-                                            />
-                                            {preAuthForm.errors.description && preAuthForm.touched.description && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {preAuthForm.errors.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="mb-6">
-                                        <div className="mb-3 mt-4">
-                                            <button
-                                                className="w-full py-2 text-white border-transparent shadow-md btn w-100 waves-effect waves-light shadow-violet-200 bg-color-secondary rounded-md font-bold hover:bg-blue-600"
-                                                disabled={preAuthForm.isSubmitting}
-                                                type="submit"
-                                            >
-                                                {preAuthForm.isSubmitting ? "Processing..." : "Zipit Transfer"}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
+        <section className="bg-gray-50 min-h-screen">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Enhanced Header with Icon */}
+                <div
+                    className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center space-x-3 mb-4 md:mb-0">
+                        <div className="p-2 bg-blue-100 rounded-full">
+                            <svg
+                                className="w-6 h-6 text-blue-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                />
+                            </svg>
                         </div>
+                        <div>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Internal Transfer</h2>
+                            <p className="text-sm text-gray-500">Securely transfer between accounts</p>
+                        </div>
+                    </div>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+        Transfer Money
+      </span>
+                </div>
+
+                {/* Form Container */}
+                <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                    <div className="p-6 md:p-8 lg:p-10">
+                        <form onSubmit={preAuthForm.handleSubmit} className="max-w-4xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Source Account */}
+                                <div className="mb-5">
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        Source Account
+                                    </label>
+                                    <select
+                                        name="sourceAccountNumber"
+                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        required
+                                        onChange={preAuthForm.handleChange}
+                                        onBlur={preAuthForm.handleBlur}
+                                        value={preAuthForm.values.sourceAccountNumber}
+                                    >
+                                        <option value="">Select your account...</option>
+                                        {accounts?.map((account: any) => (
+                                            <option
+                                                key={account?.id}
+                                                value={account?.accountNumber}
+                                            >
+                                                {account?.accountName} - {account?.accountNumber}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {preAuthForm.errors.sourceAccountNumber}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Recipient Account */}
+                                <div className="mb-5">
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        Recipient Account
+                                    </label>
+                                    <input
+                                        name="recipientAccountNumber"
+                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        placeholder="0011122233"
+                                        required
+                                        onChange={preAuthForm.handleChange}
+                                        onBlur={preAuthForm.handleBlur}
+                                        value={preAuthForm.values.recipientAccountNumber}
+                                    />
+                                    {preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {preAuthForm.errors.recipientAccountNumber}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Amount */}
+                                <div className="mb-5">
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        Amount
+                                    </label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-3 text-gray-500">$</span>
+                                        <input
+                                            name="amount"
+                                            className={`w-full pl-8 pr-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                preAuthForm.errors.amount && preAuthForm.touched.amount
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            }`}
+                                            type="number"
+                                            placeholder="0.00"
+                                            required
+                                            onChange={preAuthForm.handleChange}
+                                            onBlur={preAuthForm.handleBlur}
+                                            value={preAuthForm.values.amount}
+                                        />
+                                    </div>
+                                    {preAuthForm.errors.amount && preAuthForm.touched.amount && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {preAuthForm.errors.amount}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Description */}
+                                <div className="mb-5">
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        Description
+                                    </label>
+                                    <input
+                                        name="description"
+                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            preAuthForm.errors.description && preAuthForm.touched.description
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        type="text"
+                                        placeholder="e.g. Zipit transfer"
+                                        required
+                                        onChange={preAuthForm.handleChange}
+                                        onBlur={preAuthForm.handleBlur}
+                                        value={preAuthForm.values.description}
+                                    />
+                                    {preAuthForm.errors.description && preAuthForm.touched.description && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {preAuthForm.errors.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Submit Button */}
+                            <div className="mt-8">
+                                <button
+                                    className={`w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-300 text-white font-medium rounded-lg shadow-md hover:from-cyan-400 hover:to-blue-200-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all ${
+                                        preAuthForm.isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+                                    }`}
+                                    disabled={preAuthForm.isSubmitting}
+                                    type="submit"
+                                >
+                                    {preAuthForm.isSubmitting ? (
+                                        <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                       fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+                                    ) : (
+                                        "Transfer Now"
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
+
+            {isSubmitting && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500 mb-4"></div>
+                        <p className="text-gray-700">Processing your transfer...</p>
+                    </div>
+                </div>
+            )}
         </section>
-    )
-        ;
+    );
 }
