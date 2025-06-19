@@ -126,7 +126,7 @@ export default function Login() {
                                           </label>
                                           <Link
                                               href="/password-reset"
-                                              className="text-xs font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                              className="text-xs font-medium text-cyan-500 hover:text-cyan-400 transition-colors"
                                           >
                                               Forgot password?
                                           </Link>
@@ -183,7 +183,7 @@ export default function Login() {
                                       Don't have an account?{" "}
                                       <Link
                                           href="/register"
-                                          className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                          className="font-medium text-cyan-400 hover:text-cyan-400 transition-colors"
                                       >
                                           Create new
                                       </Link>

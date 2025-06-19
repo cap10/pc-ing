@@ -1,72 +1,72 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
 import {useEffect, useState} from "react";
-import { closeModal, openModal, showToast } from "../utilities/commons";
-import { createCorporateCustomerUtil } from "../utilities/utils";
-import UserRightsForm from "./userRightsForm";
-import * as Yup from "yup";
 import {useFormik} from "formik";
+import * as Yup from 'yup';
 import {loginAxiosClient} from "@/endpoints/loginApi";
-import {
-    FaUser,
-    FaEnvelope,
-    FaMapMarkerAlt,
-    FaPhone,
-    FaIdCard,
-    FaUserShield,
-    FaKey,
-    FaCheckCircle,
-    FaHome,
-    FaUserAlt,
-    FaLock, FaEye, FaEyeSlash, FaCalendarCheck, FaCalendarAlt, FaBuilding, FaRoad, FaLocationArrow
-} from 'react-icons/fa';
 import {useRouter} from "next/navigation";
+import {
+    FaEnvelope,
+    FaEye,
+    FaEyeSlash,
+    FaIdCard,
+    FaKey,
+    FaLocationArrow,
+    FaLock,
+    FaPhone,
+    FaRoad,
+    FaUser,
+    FaUserAlt,
+    FaUserShield,
+} from 'react-icons/fa';
 import {FaMapLocation} from "react-icons/fa6";
+import {ToastNotification} from "../../notification";
+import Image from "next/image";
 
+export default function IndividualSelfRegister() {
 
-export default function CorporateSelfRegister() {
-
+    const [myAccs, setMyAccs] = useState<any[]>([]);
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [canProceed, setCanProceed] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-// Step 1 validation schema (Business Details)
+    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
+
+    // Helper function to show toast
+    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+        setToast({ message, type, show: true });
+        setTimeout(() => setToast(null), 5000);
+    };
+
+
+    // Step 1 validation schema
     const step1ValidationSchema = Yup.object().shape({
-        companyName: Yup.string().required('Company name required'),
+        firstName: Yup.string().required('First name required'),
+        lastName: Yup.string().required('Last name required'),
         email: Yup.string().email("Invalid email").required('Email required'),
-        address: Yup.string().required('Address required'),
-        incorporationDate: Yup.string().required('Incorp date required'),
-        registrationNumber: Yup.string().required('Reg No required'),
-        telephoneNumber: Yup.string().required('Telephone required'),
         street: Yup.string().required('Street required'),
         suburb: Yup.string().required('Suburb required'),
         city: Yup.string().required('City required'),
-        numberOfRequiredApproversPerTransaction: Yup.string().required('Approvers number required'),
-    });
-
-// Step 2 validation schema (Contact Details)
-    const step2ValidationSchema = Yup.object().shape({
-        name: Yup.string().required('Name required'),
-        userRight: Yup.string().required('User right required'),
-        nationalId: Yup.string().required('National ID required'),
         phoneNumber: Yup.string()
             .matches(/^[0-9]+$/, "Must be only digits")
             .min(9, 'Phone number must have at least 9 digits')
             .max(12, 'Mobile number cannot exceed 12 digits')
             .required('Phone number required'),
-        userEmail: Yup.string().email("Invalid email").required('Email required'),
+        nationalId: Yup.string().required('National ID required'),
+        numberOfRequiredApproversPerTransaction: Yup.string().required('Approvers number required'),
     });
 
-// Step 3 validation schema (Login Credentials)
-    const step3ValidationSchema = Yup.object().shape({
+    // Step 2 validation schema
+    const step2ValidationSchema = Yup.object().shape({
         username: Yup.string().required('Username required'),
         password: Yup.string()
             .required('Password required')
             .min(12, 'Password must be at least 12 characters')
             .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
             .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-            .matches(/[!@#$%^&*()_+\-=\[\]{}|;':"\\|.,?]/, 'Password must contain at least one special character')
+            .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Password must contain at least one special character')
             .matches(/\d/, 'Password must contain at least one number'),
         confirmPassword: Yup.string()
             .required('Please confirm password')
@@ -75,59 +75,42 @@ export default function CorporateSelfRegister() {
 
     const formik = useFormik({
         initialValues: {
-            companyName: '',
-            email: '',
-            address: '',
-            incorporationDate: '',
-            registrationNumber: '',
-            telephoneNumber: '',
-            name: '',
-            userRight: '',
-            phoneNumber: '',
-            nationalId: '',
-            userEmail: '',
-            numberOfRequiredApproversPerTransaction: '',
-            username: '',
-            password: '',
-            confirmPassword: '',
+            firstName: '',
+            lastName: '',
             street: '',
             suburb: '',
             city: '',
+            email: '',
+            username: '',
+            phoneNumber: '',
+            nationalId: '',
+            numberOfRequiredApproversPerTransaction: '',
+            password: '',
+            confirmPassword: '',
+            description: ''
         },
-        validationSchema:
-            step === 1 ? step1ValidationSchema :
-                step === 2 ? step2ValidationSchema :
-                    step3ValidationSchema,
+        validationSchema: step === 1 ? step1ValidationSchema : step1ValidationSchema.concat(step2ValidationSchema),
         onSubmit: async (values, { resetForm }) => {
-            // Only submit when on step 3
-            if (step !== 3) return;
+            // Only submit when on step 2 and submit button is clicked
+            if (step !== 2) return;
 
             const payload = {
-                companyName: values.companyName,
+                firstName: values.firstName,
+                lastName: values.lastName,
                 email: values.email,
-                incorporationDate: values.incorporationDate,
-                registrationNumber: values.registrationNumber,
-                telephoneNumber: values.telephoneNumber,
-                numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
-                userRights: [
-                    {
-                        name: values.name,
-                        userRight: values.userRight,
-                        nationalId: values.nationalId,
-                        phoneNumber: values.phoneNumber,
-                        email: values.userEmail
-                    }
-                ],
                 address:[
                     {
                         street: values.street,
                         suburb: values.suburb,
-                        city: values.city,
-
-                }],
+                        city: values.city
+                    }
+                ],
+                phoneNumber: values.phoneNumber,
+                nationalId: values.nationalId,
+                numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
                 accounts: [
                     {
-                        accountType: "BUSINESS",
+                        accountType: "CUSTOMER",
                     }
                 ],
                 username: values.username,
@@ -135,95 +118,49 @@ export default function CorporateSelfRegister() {
             };
 
             try {
-                const { data } = await loginAxiosClient.post('v1/corporate-customers', payload);
+                setIsSubmitting(true);
+                const { data } = await loginAxiosClient.post('v1/individual-customers', payload);
 
                 if (data) {
-                    showToast('Business created successfully. Visit your email for account activation', 'success');
+                    setIsSubmitting(false);
+                    showToast('Customer created successfully. Visit your email for account activation', 'success');
                     resetForm();
                     await router.push('/login');
                 }
             } catch (err: any) {
+                setIsSubmitting(false);
                 showToast(err?.response?.data?.message || 'Registration failed', 'error');
             }
         }
     });
 
-// Validate current step before allowing proceed
-   /* const validateCurrentStep = async () => {
-        const errors = await formik.validateForm();
-
-        if (step === 1) {
-            const step1Fields = [
-                'companyName', 'email', 'address',
-                'incorporationDate', 'registrationNumber', 'telephoneNumber',
-                'numberOfRequiredApproversPerTransaction'
-            ];
-            const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
-            if (step1Errors.length === 0) {
-                setStep(2);
-            }
-        } else if (step === 2) {
-            const step2Fields = [
-                'name', 'userRight', 'nationalId',
-                'phoneNumber', 'userEmail'
-            ];
-            const step2Errors = Object.keys(errors).filter(key => step2Fields.includes(key));
-            if (step2Errors.length === 0) {
-                setStep(3);
-            }
-        }
-    };*/
+    // Validate current step before allowing proceed
     const validateCurrentStep = async () => {
         const errors = await formik.validateForm();
+        const step1Fields = [
+            'customerName', 'email', 'address',
+            'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction', 'street', 'suburb','city'
+        ];
 
         if (step === 1) {
-            const step1Fields = [
-                'companyName', 'email', 'address',
-                'incorporationDate', 'registrationNumber', 'telephoneNumber',
-                'numberOfRequiredApproversPerTransaction', 'street', 'suburb', 'city'
-            ];
             const step1Errors = Object.keys(errors).filter(key => step1Fields.includes(key));
             if (step1Errors.length === 0) {
                 setStep(2);
             }
-        } else if (step === 2) {
-            const step2Fields = [
-                'name', 'userRight', 'nationalId',
-                'phoneNumber', 'userEmail'
-            ];
-            const step2Errors = Object.keys(errors).filter(key => step2Fields.includes(key));
-            if (step2Errors.length === 0) {
-                setStep(3);
-            }
         }
-        // Remove any submission logic from here
     };
 
-// Only enable proceed if current step is valid
+    // Only enable proceed if current step is valid
     useEffect(() => {
         const checkStepValidity = async () => {
             const errors = await formik.validateForm();
+            const currentStepFields = step === 1 ? [
+                'customerName', 'email', 'address',
+                'phoneNumber', 'nationalId', 'numberOfRequiredApproversPerTransaction'
+            ] : ['password', 'confirmPassword'];
 
-            if (step === 1) {
-                const step1Fields = [
-                    'companyName', 'email', 'address',
-                    'incorporationDate', 'registrationNumber', 'telephoneNumber',
-                    'numberOfRequiredApproversPerTransaction'
-                ];
-                const hasErrors = step1Fields.some(field => errors[field]);
-                setCanProceed(!hasErrors);
-            } else if (step === 2) {
-                const step2Fields = [
-                    'name', 'userRight', 'nationalId',
-                    'phoneNumber', 'userEmail'
-                ];
-                const hasErrors = step2Fields.some(field => errors[field]);
-                setCanProceed(!hasErrors);
-            } else if (step === 3) {
-                const step3Fields = ['username', 'password', 'confirmPassword'];
-                const hasErrors = step3Fields.some(field => errors[field]);
-                setCanProceed(!hasErrors);
-            }
+            const hasErrors = currentStepFields.some(field => errors[field]);
+            setCanProceed(!hasErrors);
         };
 
         checkStepValidity();
@@ -231,7 +168,7 @@ export default function CorporateSelfRegister() {
 
     const goToPreviousStep = () => {
         if (step > 1) {
-            setStep(step - 1);
+            setStep(1);
         }
     };
 
@@ -240,69 +177,94 @@ export default function CorporateSelfRegister() {
         formik.setFieldValue('phoneNumber', value);
     };
 
-
     return (
         <div className="max-w-4xl mx-auto p-4">
+            {/* Toast Notification */}
+            {toast && (
+                <ToastNotification
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
+            <div className="flex items-center justify-center">
+                <Image
+                    width={280}
+                    height={95}
+                    src="/images/logo.svg"
+                    alt="Minia Logo"
+                    className="m-5"
+                />
+
+            </div>
+
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                {/* Header */}
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
-                    <h1 className="text-3xl font-bold text-center">Business Registration</h1>
+                    <h1 className="text-3xl font-bold text-center">Individual Registration</h1>
                     <p className="text-center text-blue-100 mt-2">
-                        Complete all steps to register your business
+                        Complete all steps to create your account
                     </p>
                 </div>
 
                 <form onSubmit={formik.handleSubmit} className="p-6">
                     {/* Progress indicator */}
-                    {/* Progress indicator - Beautiful Design */}
-                    <div className="relative mb-10">
-                        {/* Progress line with gradient */}
-                        <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-100 rounded-full -translate-y-1/2 z-0"></div>
+                    <div className="relative mb-12">
+                        {/* Progress line with subtle glow effect */}
                         <div
-                            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full -translate-y-1/2 z-10 transition-all duration-500 ease-in-out"
-                            style={{ width: `${((step - 1) / 2) * 100}%` }}
+                            className="absolute top-1/2 left-0 right-0 h-2 bg-gray-100 rounded-full -translate-y-1/2 z-0 shadow-inner"></div>
+                        <div
+                            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full -translate-y-1/2 z-10 transition-all duration-500 ease-out"
+                            style={{width: step === 1 ? '50%' : '100%'}}
                         ></div>
 
+                        {/* Steps with enhanced visual hierarchy */}
                         <div className="flex justify-between relative z-20">
-                            {[1, 2, 3].map((stepNumber) => (
+                            {[1, 2].map((stepNumber) => (
                                 <div key={stepNumber} className="flex flex-col items-center">
-                                    {/* Step circle with gradient when active */}
+                                    {/* Step circle with subtle animation */}
                                     <div
-                                        className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300 ${
+                                        className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all duration-300 ${
                                             step >= stepNumber
-                                                ? "bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200"
-                                                : "bg-white border-4 border-gray-200 text-gray-400"
+                                                ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/50 transform hover:scale-105'
+                                                : 'bg-white border-3 border-gray-200 text-gray-400'
                                         }`}
                                     >
                                         {stepNumber}
-                                    </div>
-
-                                    {/* Step label */}
-                                    <span
-                                        className={`mt-2 text-sm font-medium transition-colors duration-300 ${
-                                            step >= stepNumber ? "text-blue-600" : "text-gray-400"
-                                        }`}
-                                    >
-          {stepNumber === 1 && "Business"}
-                                        {stepNumber === 2 && "Contact"}
-                                        {stepNumber === 3 && "Login"}
-        </span>
-
-                                    {/* Optional: Add checkmark for completed steps */}
-                                    {step > stepNumber && (
-                                        <div className="absolute top-3 text-white">
+                                        {/* Checkmark for completed steps */}
+                                        {step > stepNumber && (
                                             <svg
+                                                className="absolute w-5 h-5 text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
                                             >
                                                 <path
-                                                    fillRule="evenodd"
-                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                    clipRule="evenodd"
-                                                />
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="3"
+                                                    d="M5 13l4 4L19 7"
+                                                ></path>
                                             </svg>
-                                        </div>
+                                        )}
+                                    </div>
+
+                                    {/* Step label with better typography */}
+                                    <p
+                                        className={`text-sm font-medium mt-3 transition-colors duration-300 ${
+                                            step >= stepNumber
+                                                ? 'text-blue-600 font-semibold'
+                                                : 'text-gray-500'
+                                        }`}
+                                    >
+                                        {stepNumber === 1 ? 'Agent Details' : 'Login Credentials'}
+                                    </p>
+
+                                    {/* Optional connector line for multi-step versions */}
+                                    {stepNumber < 2 && (
+                                        <div className="absolute top-6 left-1/2 w-full h-0.5 -z-10"></div>
                                     )}
                                 </div>
                             ))}
@@ -311,43 +273,74 @@ export default function CorporateSelfRegister() {
 
                     {step === 1 && (
                         <div className="space-y-6">
-                            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                                Enter Business Details
-                            </h2>
+                            <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Enter Agent Details</h2>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* First Name */}
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaBuilding className="mr-2 text-blue-600"/>
-                                            Company Name*
+                                            <FaUser className="mr-2 text-blue-600"/>
+                                            First Name*
                                         </div>
                                     </label>
                                     <div className="relative">
                                         <div
                                             className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaBuilding className="text-gray-400"/>
+                                            <FaUser className="text-gray-400"/>
                                         </div>
                                         <input
-                                            name="companyName"
+                                            name="firstName"
                                             className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.companyName && formik.touched.companyName
+                                                formik.errors.firstName && formik.touched.firstName
                                                     ? "border-red-500 focus:ring-red-200"
                                                     : "border-gray-300"
                                             }`}
                                             type="text"
-                                            placeholder="Company"
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
-                                            value={formik.values.companyName}
+                                            value={formik.values.firstName}
                                         />
                                     </div>
-                                    {formik.errors.companyName && formik.touched.companyName && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.companyName}
-                                        </div>
+                                    {formik.errors.firstName && formik.touched.firstName && (
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.firstName}</div>
                                     )}
                                 </div>
 
+                                {/* Last Name */}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">
+                                        <div className="flex items-center">
+                                            <FaUser className="mr-2 text-blue-600"/>
+                                            Last Name*
+                                        </div>
+                                    </label>
+                                    <div className="relative">
+                                        <div
+                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <FaUser className="text-gray-400"/>
+                                        </div>
+                                        <input
+                                            name="lastName"
+                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                formik.errors.lastName && formik.touched.lastName
+                                                    ? "border-red-500 focus:ring-red-200"
+                                                    : "border-gray-300"
+                                            }`}
+                                            type="text"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.lastName}
+                                        />
+                                    </div>
+                                    {formik.errors.lastName && formik.touched.lastName && (
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.lastName}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Email */}
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
@@ -368,339 +361,17 @@ export default function CorporateSelfRegister() {
                                                     : "border-gray-300"
                                             }`}
                                             type="email"
-                                            placeholder="email@gmail.com"
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={formik.values.email}
                                         />
                                     </div>
                                     {formik.errors.email && formik.touched.email && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.email}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaCalendarAlt className="mr-2 text-blue-600"/>
-                                            Incorporation Date*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaCalendarAlt className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="incorporationDate"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.incorporationDate &&
-                                                formik.touched.incorporationDate
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="date"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.incorporationDate}
-                                            maxLength={12}
-                                        />
-                                    </div>
-                                    {formik.errors.incorporationDate &&
-                                        formik.touched.incorporationDate && (
-                                            <div className="text-red-500 text-sm mt-1">
-                                                {formik.errors.incorporationDate}
-                                            </div>
-                                        )}
-                                </div>
-
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaIdCard className="mr-2 text-blue-600"/>
-                                            Registration No*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaIdCard className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="registrationNumber"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.registrationNumber &&
-                                                formik.touched.registrationNumber
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="text"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.registrationNumber}
-                                        />
-                                    </div>
-                                    {formik.errors.registrationNumber &&
-                                        formik.touched.registrationNumber && (
-                                            <div className="text-red-500 text-sm mt-1">
-                                                {formik.errors.registrationNumber}
-                                            </div>
-                                        )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaUserShield className="mr-2 text-blue-600"/>
-                                            No. of Approvers*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaUserShield className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="numberOfRequiredApproversPerTransaction"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.numberOfRequiredApproversPerTransaction &&
-                                                formik.touched.numberOfRequiredApproversPerTransaction
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="number"
-                                            placeholder="0"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.numberOfRequiredApproversPerTransaction}
-                                        />
-                                    </div>
-                                    {formik.errors.numberOfRequiredApproversPerTransaction &&
-                                        formik.touched.numberOfRequiredApproversPerTransaction && (
-                                            <div className="text-red-500 text-sm mt-1">
-                                                {formik.errors.numberOfRequiredApproversPerTransaction}
-                                            </div>
-                                        )}
-                                </div>
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaPhone className="mr-2 text-blue-600"/>
-                                            Telephone No*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaPhone className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="telephoneNumber"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.telephoneNumber && formik.touched.telephoneNumber
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="number"
-                                            placeholder="0456345"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.telephoneNumber}
-                                        />
-                                    </div>
-                                    {formik.errors.telephoneNumber && formik.touched.telephoneNumber && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.telephoneNumber}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="mt-8">
-                                <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                                    Address Details
-                                </h2>
-                                <div className="border-t border-gray-200 pt-6 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block mb-2 font-medium text-gray-700">
-                                                <div className="flex items-center">
-                                                    <FaRoad className="mr-2 text-blue-600"/>
-                                                    Street*
-                                                </div>
-                                            </label>
-                                            <div className="relative">
-                                                <div
-                                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <FaRoad className="text-gray-400"/>
-                                                </div>
-                                                <input
-                                                    name="street"
-                                                    className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                        formik.errors.street && formik.touched.street
-                                                            ? "border-red-500 focus:ring-red-200"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                    type="text"
-                                                    onChange={formik.handleChange}
-                                                    onBlur={formik.handleBlur}
-                                                    value={formik.values.street}
-                                                />
-                                            </div>
-                                            {formik.errors.street && formik.touched.street && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {formik.errors.street}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block mb-2 font-medium text-gray-700">
-                                                <div className="flex items-center">
-                                                    <FaLocationArrow className="mr-2 text-blue-600"/>
-                                                    Suburb*
-                                                </div>
-                                            </label>
-                                            <div className="relative">
-                                                <div
-                                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <FaLocationArrow className="text-gray-400"/>
-                                                </div>
-                                                <input
-                                                    name="suburb"
-                                                    className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                        formik.errors.suburb && formik.touched.suburb
-                                                            ? "border-red-500 focus:ring-red-200"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                    type="text"
-                                                    onChange={formik.handleChange}
-                                                    onBlur={formik.handleBlur}
-                                                    value={formik.values.suburb}
-                                                />
-                                            </div>
-                                            {formik.errors.suburb && formik.touched.suburb && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {formik.errors.suburb}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">
-                                            <div className="flex items-center">
-                                                <FaMapLocation className="mr-2 text-blue-600"/>
-                                                City*
-                                            </div>
-                                        </label>
-                                        <div className="relative">
-                                            <div
-                                                className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <FaMapLocation className="text-gray-400"/>
-                                            </div>
-                                            <input
-                                                name="city"
-                                                className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                    formik.errors.city && formik.touched.city
-                                                        ? "border-red-500 focus:ring-red-200"
-                                                        : "border-gray-300"
-                                                }`}
-                                                type="text"
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                value={formik.values.city}
-                                            />
-                                        </div>
-                                        {formik.errors.city && formik.touched.city && (
-                                            <div className="text-red-500 text-sm mt-1">
-                                                {formik.errors.city}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 2 && (
-                        <div className="space-y-6">
-                            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                                Contact Person Details
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaUser className="mr-2 text-blue-600"/>
-                                            Full Name*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaUser className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="name"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.name && formik.touched.name
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="text"
-                                            placeholder="John Doe"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.name}
-                                        />
-                                    </div>
-                                    {formik.errors.name && formik.touched.name && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.name}
-                                        </div>
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
                                     )}
                                 </div>
 
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <FaEnvelope className="mr-2 text-blue-600"/>
-                                            Email*
-                                        </div>
-                                    </label>
-                                    <div className="relative">
-                                        <div
-                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaEnvelope className="text-gray-400"/>
-                                        </div>
-                                        <input
-                                            name="userEmail"
-                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                formik.errors.userEmail && formik.touched.userEmail
-                                                    ? "border-red-500 focus:ring-red-200"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="email"
-                                            placeholder="email@gmail.com"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.userEmail}
-                                        />
-                                    </div>
-                                    {formik.errors.userEmail && formik.touched.userEmail && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.userEmail}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Phone Number */}
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
@@ -728,12 +399,13 @@ export default function CorporateSelfRegister() {
                                         />
                                     </div>
                                     {formik.errors.phoneNumber && formik.touched.phoneNumber && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.phoneNumber}
-                                        </div>
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.phoneNumber}</div>
                                     )}
                                 </div>
+                            </div>
 
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* National ID */}
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
@@ -760,59 +432,155 @@ export default function CorporateSelfRegister() {
                                         />
                                     </div>
                                     {formik.errors.nationalId && formik.touched.nationalId && (
-                                        <div className="text-red-500 text-sm mt-1">
-                                            {formik.errors.nationalId}
-                                        </div>
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.nationalId}</div>
                                     )}
                                 </div>
+
+                                {/* No. of Approvers */}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">
+                                        <div className="flex items-center">
+                                            <FaUserShield className="mr-2 text-blue-600"/>
+                                            No. of Approvers*
+                                        </div>
+                                    </label>
+                                    <div className="relative">
+                                        <div
+                                            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <FaUserShield className="text-gray-400"/>
+                                        </div>
+                                        <input
+                                            name="numberOfRequiredApproversPerTransaction"
+                                            className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                formik.errors.numberOfRequiredApproversPerTransaction &&
+                                                formik.touched.numberOfRequiredApproversPerTransaction
+                                                    ? "border-red-500 focus:ring-red-200"
+                                                    : "border-gray-300"
+                                            }`}
+                                            type="number"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.numberOfRequiredApproversPerTransaction}
+                                        />
+                                    </div>
+                                    {formik.errors.numberOfRequiredApproversPerTransaction &&
+                                        formik.touched.numberOfRequiredApproversPerTransaction && (
+                                            <div className="text-red-500 text-sm mt-1">
+                                                {formik.errors.numberOfRequiredApproversPerTransaction}
+                                            </div>
+                                        )}
+                                </div>
                             </div>
-                            <div>
-                                <label className="block mb-2 font-medium text-gray-700">
-                                    <div className="flex items-center">
-                                        <FaIdCard className="mr-2 text-blue-600"/>
-                                        User Rights*
+
+                            {/* Address Section */}
+                            <div className="mt-8">
+                                <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Address Details</h2>
+                                <div className="border-t border-gray-200 pt-6 space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Street */}
+                                        <div>
+                                            <label className="block mb-2 font-medium text-gray-700">
+                                                <div className="flex items-center">
+                                                    <FaRoad className="mr-2 text-blue-600"/>
+                                                    Street*
+                                                </div>
+                                            </label>
+                                            <div className="relative">
+                                                <div
+                                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <FaRoad className="text-gray-400"/>
+                                                </div>
+                                                <input
+                                                    name="street"
+                                                    className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                        formik.errors.street && formik.touched.street
+                                                            ? "border-red-500 focus:ring-red-200"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                    type="text"
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    value={formik.values.street}
+                                                />
+                                            </div>
+                                            {formik.errors.street && formik.touched.street && (
+                                                <div className="text-red-500 text-sm mt-1">{formik.errors.street}</div>
+                                            )}
+                                        </div>
+
+                                        {/* Suburb */}
+                                        <div>
+                                            <label className="block mb-2 font-medium text-gray-700">
+                                                <div className="flex items-center">
+                                                    <FaLocationArrow className="mr-2 text-blue-600"/>
+                                                    Suburb*
+                                                </div>
+                                            </label>
+                                            <div className="relative">
+                                                <div
+                                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <FaLocationArrow className="text-gray-400"/>
+                                                </div>
+                                                <input
+                                                    name="suburb"
+                                                    className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                        formik.errors.suburb && formik.touched.suburb
+                                                            ? "border-red-500 focus:ring-red-200"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                    type="text"
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    value={formik.values.suburb}
+                                                />
+                                            </div>
+                                            {formik.errors.suburb && formik.touched.suburb && (
+                                                <div className="text-red-500 text-sm mt-1">{formik.errors.suburb}</div>
+                                            )}
+                                        </div>
                                     </div>
-                                </label>
-                                <div className="relative">
-                                    <div
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <FaIdCard className="text-gray-400"/>
-                                    </div>
-                                    <select
-                                        name="userRight"
-                                        className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
-                                            formik.errors.userRight && formik.touched.userRight
-                                                ? "border-red-500 focus:ring-red-200"
-                                                : "border-gray-300"
-                                        }`}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.userRight}
-                                    >
-                                        <option value="">Choose...</option>
-                                        <option value="INITIATOR">Initiator</option>
-                                        <option value="AUTHORIZER">Authorizer</option>
-                                        <option value="BOTH">Both</option>
-                                    </select>
-                                    <div
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <FaChevronDown className="text-gray-400"/>
+
+                                    {/* City */}
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">
+                                            <div className="flex items-center">
+                                                <FaMapLocation className="mr-2 text-blue-600"/>
+                                                City*
+                                            </div>
+                                        </label>
+                                        <div className="relative">
+                                            <div
+                                                className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <FaMapLocation className="text-gray-400"/>
+                                            </div>
+                                            <input
+                                                name="city"
+                                                className={`w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                    formik.errors.city && formik.touched.city
+                                                        ? "border-red-500 focus:ring-red-200"
+                                                        : "border-gray-300"
+                                                }`}
+                                                type="text"
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.city}
+                                            />
+                                        </div>
+                                        {formik.errors.city && formik.touched.city && (
+                                            <div className="text-red-500 text-sm mt-1">{formik.errors.city}</div>
+                                        )}
                                     </div>
                                 </div>
-                                {formik.errors.userRight && formik.touched.userRight && (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {formik.errors.userRight}
-                                    </div>
-                                )}
                             </div>
                         </div>
                     )}
 
-                    {step === 3 && (
+                    {step === 2 && (
                         <div className="space-y-6">
-                            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                                Create Login Credentials
-                            </h2>
+                            <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Create Login
+                                Credentials</h2>
+
+                            {/* Username */}
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
@@ -839,11 +607,11 @@ export default function CorporateSelfRegister() {
                                     />
                                 </div>
                                 {formik.errors.username && formik.touched.username && (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {formik.errors.username}
-                                    </div>
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.username}</div>
                                 )}
                             </div>
+
+                            {/* Password */}
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
@@ -880,16 +648,15 @@ export default function CorporateSelfRegister() {
                                     </div>
                                 </div>
                                 {formik.errors.password && formik.touched.password && (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {formik.errors.password}
-                                    </div>
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
                                 )}
-                                <p className="text-xs text-gray-500 mt-2 ml-1">
-                                    Password must be at least 12 characters with uppercase, lowercase
-                                    letters, number and a special character
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Password must be at least 12 characters with uppercase, lowercase letters, number
+                                    and a special character
                                 </p>
                             </div>
 
+                            {/* Confirm Password */}
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
@@ -926,20 +693,19 @@ export default function CorporateSelfRegister() {
                                     </div>
                                 </div>
                                 {formik.errors.confirmPassword && formik.touched.confirmPassword && (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {formik.errors.confirmPassword}
-                                    </div>
+                                    <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
                                 )}
                             </div>
                         </div>
                     )}
 
+                    {/* Navigation Buttons */}
                     <div className="flex justify-between mt-10 pt-6 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={goToPreviousStep}
                             disabled={step === 1 || formik.isSubmitting}
-                            className={`py-3 px-8 rounded-lg font-medium transition-colors ${
+                            className={`py-3 px-6 rounded-lg font-medium transition-colors ${
                                 step === 1
                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -948,12 +714,12 @@ export default function CorporateSelfRegister() {
                             Previous
                         </button>
 
-                        {step < 3 ? (
+                        {step < 2 ? (
                             <button
                                 type="button"
                                 onClick={validateCurrentStep}
                                 disabled={!canProceed || formik.isSubmitting}
-                                className="py-3 px-8 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="py-3 px-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Next
                             </button>
@@ -961,7 +727,7 @@ export default function CorporateSelfRegister() {
                             <button
                                 type="submit"
                                 disabled={!canProceed || formik.isSubmitting}
-                                className="py-3 px-8 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="py-3 px-6 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {formik.isSubmitting ? (
                                     <span className="flex items-center justify-center">
@@ -995,6 +761,20 @@ export default function CorporateSelfRegister() {
                     </div>
                 </form>
             </div>
+
+            {/* Loading Overlay */}
+            {isSubmitting && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm">
+                        <div
+                            className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">Processing Registration</h3>
+                        <p className="text-gray-600 text-center">Please wait while we process your agent
+                            registration</p>
+                    </div>
+                </div>
+            )}
         </div>
+
     );
-}
+};

@@ -1,26 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
 import {useEffect, useState} from "react";
-import { closeModal, openModal, showToast } from "../utilities/commons";
-import { createCorporateCustomerUtil } from "../utilities/utils";
-import UserRightsForm from "./userRightsForm";
 import * as Yup from "yup";
 import {useFormik} from "formik";
 import {loginAxiosClient} from "@/endpoints/loginApi";
 import {
-    FaUser,
+    FaBuilding,
+    FaCalendarAlt,
     FaEnvelope,
-    FaMapMarkerAlt,
-    FaPhone,
+    FaEye,
+    FaEyeSlash,
     FaIdCard,
-    FaUserShield,
     FaKey,
-    FaCheckCircle,
-    FaHome,
+    FaLocationArrow,
+    FaLock,
+    FaPhone,
+    FaRoad,
+    FaUser,
     FaUserAlt,
-    FaLock, FaEye, FaEyeSlash, FaCalendarCheck, FaCalendarAlt, FaBuilding, FaRoad, FaLocationArrow
+    FaUserShield
 } from 'react-icons/fa';
 import {useRouter} from "next/navigation";
 import {FaMapLocation} from "react-icons/fa6";
+import {ToastNotification} from "../../notification";
+import Image from "next/image";
 
 
 export default function CorporateSelfRegister() {
@@ -30,6 +32,15 @@ export default function CorporateSelfRegister() {
     const [canProceed, setCanProceed] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
+
+    // Helper function to show toast
+    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+        setToast({ message, type, show: true });
+        setTimeout(() => setToast(null), 5000);
+    };
+
 
 // Step 1 validation schema (Business Details)
     const step1ValidationSchema = Yup.object().shape({
@@ -135,14 +146,17 @@ export default function CorporateSelfRegister() {
             };
 
             try {
+                setIsSubmitting(true);
                 const { data } = await loginAxiosClient.post('v1/corporate-customers', payload);
 
                 if (data) {
+                    setIsSubmitting(false);
                     showToast('Business created successfully. Visit your email for account activation', 'success');
                     resetForm();
                     await router.push('/login');
                 }
             } catch (err: any) {
+                setIsSubmitting(false);
                 showToast(err?.response?.data?.message || 'Registration failed', 'error');
             }
         }
@@ -242,8 +256,29 @@ export default function CorporateSelfRegister() {
 
 
     return (
-        <div className="max-w-4xl mx-auto p-4">
+        <div className="max-w-4xl mx-auto p-4 mt-3">
+            {/* Add this right at the beginning of your return */}
+            {toast && (
+                <ToastNotification
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
+            <div className="flex items-center justify-center">
+                <Image
+                    width={280}
+                    height={95}
+                    src="/images/logo.svg"
+                    alt="Minia Logo"
+                    className="m-4"
+                />
+
+            </div>
+
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
                     <h1 className="text-3xl font-bold text-center">Business Registration</h1>
                     <p className="text-center text-blue-100 mt-2">
@@ -256,10 +291,11 @@ export default function CorporateSelfRegister() {
                     {/* Progress indicator - Beautiful Design */}
                     <div className="relative mb-10">
                         {/* Progress line with gradient */}
-                        <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-100 rounded-full -translate-y-1/2 z-0"></div>
+                        <div
+                            className="absolute top-1/2 left-0 right-0 h-2 bg-gray-100 rounded-full -translate-y-1/2 z-0"></div>
                         <div
                             className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full -translate-y-1/2 z-10 transition-all duration-500 ease-in-out"
-                            style={{ width: `${((step - 1) / 2) * 100}%` }}
+                            style={{width: `${((step - 1) / 2) * 100}%`}}
                         ></div>
 
                         <div className="flex justify-between relative z-20">
@@ -995,6 +1031,18 @@ export default function CorporateSelfRegister() {
                     </div>
                 </form>
             </div>
+
+            {isSubmitting && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm">
+                        <div
+                            className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">Processing Registration</h3>
+                        <p className="text-gray-600 text-center">Please wait while we process your corporate
+                            registration</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
