@@ -113,7 +113,7 @@ export default function Data() {
                      {/* Data Icon */}
                      <div className="p-2 bg-blue-50 rounded-full">
                          <svg
-                             className="w-5 h-5 text-blue-600"
+                             className="w-5 h-5 text-cyan-400"
                              fill="none"
                              viewBox="0 0 24 24"
                              stroke="currentColor"

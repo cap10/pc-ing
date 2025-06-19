@@ -185,7 +185,7 @@ export default function InternalTransfer() {
                     <div className="flex items-center space-x-3 mb-4 md:mb-0">
                         <div className="p-2 bg-blue-100 rounded-full">
                             <svg
-                                className="w-6 h-6 text-blue-600"
+                                className="w-6 h-6 text-cyan-400"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"

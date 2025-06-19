@@ -58,7 +58,7 @@ export default function Accounts() {
                                     </div>
                                     <div className="text-right pt-2">
                                     {u.accountStatus == 'PENDING_APPROVAL' ? 
-                                            (<span className="rounded-full bg-blue-200 text-blue-600 font-bold text-xs px-1.5 py-0.5"> pending </span>) : 
+                                            (<span className="rounded-full bg-blue-200 text-cyan-400 font-bold text-xs px-1.5 py-0.5"> pending </span>) : 
                                         u.accountStatus == 'ACTIVE' ? 
                                             (<span className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">active</span>) : 
                                         u.accountStatus == 'INACTIVE' ? 
@@ -92,7 +92,7 @@ export default function Accounts() {
                                     <div className="text-right pt-2">
                                         {account?.accountStatus == 'PENDING_APPROVAL' ?
                                             (<span
-                                                className="rounded-full bg-blue-200 text-blue-600 font-bold text-xs px-1.5 py-0.5"> pending </span>) :
+                                                className="rounded-full bg-blue-200 text-cyan-400 font-bold text-xs px-1.5 py-0.5"> pending </span>) :
                                             account?.accountStatus == 'ACTIVE' ?
                                                 (<span
                                                     className="rounded-full bg-green-200 text-green-600 text-xs px-1.5 py-0.5">active</span>) :

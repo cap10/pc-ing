@@ -174,12 +174,12 @@ export default function IndividualSelfRegister() {
                 {/* Progress indicator */}
                 <div className="flex mb-8">
                     <div className={`flex-1 border-t-4 pt-1 ${step >= 1 ? 'border-blue-600' : 'border-gray-300'}`}>
-                        <p className={`text-sm font-medium ${step >= 1 ? 'text-blue-600' : 'text-gray-500'}`}>
+                        <p className={`text-sm font-medium ${step >= 1 ? 'text-cyan-400' : 'text-gray-500'}`}>
                             Step 1: Customer Details
                         </p>
                     </div>
                     <div className={`flex-1 border-t-4 pt-1 ${step >= 2 ? 'border-blue-600' : 'border-gray-300'}`}>
-                        <p className={`text-sm font-medium ${step >= 2 ? 'text-blue-600' : 'text-gray-500'}`}>
+                        <p className={`text-sm font-medium ${step >= 2 ? 'text-cyan-400' : 'text-gray-500'}`}>
                             Step 2: Login Credentials
                         </p>
                     </div>

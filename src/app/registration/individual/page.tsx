@@ -202,7 +202,7 @@ export default function IndividualSelfRegister() {
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-6 text-white">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-300 p-6 text-white">
                     <h1 className="text-3xl font-bold text-center">Individual Registration</h1>
                     <p className="text-center text-blue-100 mt-2">
                         Complete all steps to create your account
@@ -216,7 +216,7 @@ export default function IndividualSelfRegister() {
                         <div
                             className="absolute top-1/2 left-0 right-0 h-2 bg-gray-100 rounded-full -translate-y-1/2 z-0 shadow-inner"></div>
                         <div
-                            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full -translate-y-1/2 z-10 transition-all duration-500 ease-out"
+                            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-cyan-500 to-cyan-300 rounded-full -translate-y-1/2 z-10 transition-all duration-500 ease-out"
                             style={{width: step === 1 ? '50%' : '100%'}}
                         ></div>
 
@@ -228,7 +228,7 @@ export default function IndividualSelfRegister() {
                                     <div
                                         className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all duration-300 ${
                                             step >= stepNumber
-                                                ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/50 transform hover:scale-105'
+                                                ? 'bg-gradient-to-br from-cyan-500 to-cyan-300 text-white shadow-lg shadow-blue-200/50 transform hover:scale-105'
                                                 : 'bg-white border-3 border-gray-200 text-gray-400'
                                         }`}
                                     >
@@ -256,7 +256,7 @@ export default function IndividualSelfRegister() {
                                     <p
                                         className={`text-sm font-medium mt-3 transition-colors duration-300 ${
                                             step >= stepNumber
-                                                ? 'text-blue-600 font-semibold'
+                                                ? 'text-cyan-400 font-semibold'
                                                 : 'text-gray-500'
                                         }`}
                                     >
@@ -275,7 +275,7 @@ export default function IndividualSelfRegister() {
                     {step === 1 && (
                         <div className="space-y-6">
                             <BackButton
-                                className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                                className="bg-blue-50 text-cyan-400 border-blue-200 hover:bg-blue-100"
 
                             />
                             <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Enter Individual Details</h2>
@@ -285,7 +285,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaUser className="mr-2 text-blue-600"/>
+                                            <FaUser className="mr-2 text-cyan-400"/>
                                             First Name*
                                         </div>
                                     </label>
@@ -316,7 +316,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaUser className="mr-2 text-blue-600"/>
+                                            <FaUser className="mr-2 text-cyan-400"/>
                                             Last Name*
                                         </div>
                                     </label>
@@ -349,7 +349,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaEnvelope className="mr-2 text-blue-600"/>
+                                            <FaEnvelope className="mr-2 text-cyan-400"/>
                                             Email*
                                         </div>
                                     </label>
@@ -380,7 +380,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaPhone className="mr-2 text-blue-600"/>
+                                            <FaPhone className="mr-2 text-cyan-400"/>
                                             Phone Number*
                                         </div>
                                     </label>
@@ -414,7 +414,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaIdCard className="mr-2 text-blue-600"/>
+                                            <FaIdCard className="mr-2 text-cyan-400"/>
                                             National ID*
                                         </div>
                                     </label>
@@ -445,7 +445,7 @@ export default function IndividualSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaUserShield className="mr-2 text-blue-600"/>
+                                            <FaUserShield className="mr-2 text-cyan-400"/>
                                             No. of Approvers*
                                         </div>
                                     </label>
@@ -486,7 +486,7 @@ export default function IndividualSelfRegister() {
                                         <div>
                                             <label className="block mb-2 font-medium text-gray-700">
                                                 <div className="flex items-center">
-                                                    <FaRoad className="mr-2 text-blue-600"/>
+                                                    <FaRoad className="mr-2 text-cyan-400"/>
                                                     Street*
                                                 </div>
                                             </label>
@@ -517,7 +517,7 @@ export default function IndividualSelfRegister() {
                                         <div>
                                             <label className="block mb-2 font-medium text-gray-700">
                                                 <div className="flex items-center">
-                                                    <FaLocationArrow className="mr-2 text-blue-600"/>
+                                                    <FaLocationArrow className="mr-2 text-cyan-400"/>
                                                     Suburb*
                                                 </div>
                                             </label>
@@ -549,7 +549,7 @@ export default function IndividualSelfRegister() {
                                     <div>
                                         <label className="block mb-2 font-medium text-gray-700">
                                             <div className="flex items-center">
-                                                <FaMapLocation className="mr-2 text-blue-600"/>
+                                                <FaMapLocation className="mr-2 text-cyan-400"/>
                                                 City*
                                             </div>
                                         </label>
@@ -589,7 +589,7 @@ export default function IndividualSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaUserAlt className="mr-2 text-blue-600"/>
+                                        <FaUserAlt className="mr-2 text-cyan-400"/>
                                         Username*
                                     </div>
                                 </label>
@@ -620,7 +620,7 @@ export default function IndividualSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaLock className="mr-2 text-blue-600"/>
+                                        <FaLock className="mr-2 text-cyan-400"/>
                                         Password*
                                     </div>
                                 </label>
@@ -665,7 +665,7 @@ export default function IndividualSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaKey className="mr-2 text-blue-600"/>
+                                        <FaKey className="mr-2 text-cyan-400"/>
                                         Confirm Password*
                                     </div>
                                 </label>
@@ -724,7 +724,7 @@ export default function IndividualSelfRegister() {
                                 type="button"
                                 onClick={validateCurrentStep}
                                 disabled={!canProceed || formik.isSubmitting}
-                                className="py-3 px-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="py-3 px-6 bg-cyan-400 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Next
                             </button>
@@ -732,7 +732,7 @@ export default function IndividualSelfRegister() {
                             <button
                                 type="submit"
                                 disabled={!canProceed || formik.isSubmitting}
-                                className="py-3 px-6 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="py-3 px-6 bg-cyan-400 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {formik.isSubmitting ? (
                                     <span className="flex items-center justify-center">

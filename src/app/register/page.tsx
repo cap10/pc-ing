@@ -22,7 +22,7 @@ export default function Register() {
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                     <div className="grid grid-cols-1 lg:grid-cols-2">
                         {/* Left side - Decorative */}
-                        <div className="hidden lg:block bg-gradient-to-br from-blue-600 to-indigo-700 p-12 relative">
+                        <div className="hidden lg:block bg-gradient-to-br from-cyan-600 to-cyan-300 p-12 relative">
                             <div className="absolute inset-0 opacity-10"
                                  style={{backgroundImage: "url('/images/pattern.svg')", backgroundSize: 'cover'}}></div>
                             <div className="relative z-10 h-full flex flex-col justify-center text-white">
@@ -42,7 +42,7 @@ export default function Register() {
                                 <div className="mt-auto">
                                     <div className="flex items-center space-x-2 text-blue-100">
                                         <div className="w-10 h-1 bg-blue-300 rounded-full"></div>
-                                        <span>Customer Self-Registration</span>
+                                        <span className="text-white">Customer Self-Registration</span>
                                     </div>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@ export default function Register() {
                                 <div className="mb-6">
                                     <Link href='/registration/agent' passHref>
                                         <button
-                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-cyan-300 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
                                             type="button"
                                         >
                                             Agent <i className="fa-solid fa-arrow-right ml-2"></i>
@@ -86,7 +86,7 @@ export default function Register() {
                                 <div className="mb-6" >
                                     <Link href='/registration/individual' passHref>
                                         <button
-                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-cyan-300 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
                                             type="button"
                                         >
                                             Individual <i className="fa-solid fa-arrow-right ml-2"></i>
@@ -96,12 +96,23 @@ export default function Register() {
                                 <div className="mb-6">
                                     <Link href='/registration/business' passHref>
                                         <button
-                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-cyan-300 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
                                             type="button"
                                         >
                                             Corporate <i className="fa-solid fa-arrow-right ml-2"></i>
                                         </button>
                                     </Link>
+                                </div>
+                                <div className="mt-8 text-center">
+                                    <p className="text-sm text-gray-500">
+                                        Already have an account?{" "}
+                                        <Link
+                                            href="/login"
+                                            className="font-medium text-cyan-400 hover:text-cyan-400 transition-colors"
+                                        >
+                                            Login
+                                        </Link>
+                                    </p>
                                 </div>
                             </main>
 

@@ -21,7 +21,7 @@ export default function NotFoundPage() {
                             <div className="relative w-40 h-40 mx-auto">
                                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20"></div>
                                 <svg
-                                    className="w-full h-full text-blue-600"
+                                    className="w-full h-full text-cyan-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"

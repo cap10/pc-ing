@@ -279,7 +279,7 @@ export default function CorporateSelfRegister() {
                                     {/* Step label */}
                                     <span
                                         className={`mt-2 text-sm font-medium transition-colors duration-300 ${
-                                            step >= stepNumber ? "text-blue-600" : "text-gray-400"
+                                            step >= stepNumber ? "text-cyan-400" : "text-gray-400"
                                         }`}
                                     >
           {stepNumber === 1 && "Business"}
@@ -318,7 +318,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaBuilding className="mr-2 text-blue-600"/>
+                                            <FaBuilding className="mr-2 text-cyan-400"/>
                                             Company Name*
                                         </div>
                                     </label>
@@ -351,7 +351,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaEnvelope className="mr-2 text-blue-600"/>
+                                            <FaEnvelope className="mr-2 text-cyan-400"/>
                                             Email*
                                         </div>
                                     </label>
@@ -386,7 +386,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaCalendarAlt className="mr-2 text-blue-600"/>
+                                            <FaCalendarAlt className="mr-2 text-cyan-400"/>
                                             Incorporation Date*
                                         </div>
                                     </label>
@@ -421,7 +421,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaIdCard className="mr-2 text-blue-600"/>
+                                            <FaIdCard className="mr-2 text-cyan-400"/>
                                             Registration No*
                                         </div>
                                     </label>
@@ -457,7 +457,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaUserShield className="mr-2 text-blue-600"/>
+                                            <FaUserShield className="mr-2 text-cyan-400"/>
                                             No. of Approvers*
                                         </div>
                                     </label>
@@ -491,7 +491,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaPhone className="mr-2 text-blue-600"/>
+                                            <FaPhone className="mr-2 text-cyan-400"/>
                                             Telephone No*
                                         </div>
                                     </label>
@@ -531,7 +531,7 @@ export default function CorporateSelfRegister() {
                                         <div>
                                             <label className="block mb-2 font-medium text-gray-700">
                                                 <div className="flex items-center">
-                                                    <FaRoad className="mr-2 text-blue-600"/>
+                                                    <FaRoad className="mr-2 text-cyan-400"/>
                                                     Street*
                                                 </div>
                                             </label>
@@ -562,7 +562,7 @@ export default function CorporateSelfRegister() {
                                         <div>
                                             <label className="block mb-2 font-medium text-gray-700">
                                                 <div className="flex items-center">
-                                                    <FaLocationArrow className="mr-2 text-blue-600"/>
+                                                    <FaLocationArrow className="mr-2 text-cyan-400"/>
                                                     Suburb*
                                                 </div>
                                             </label>
@@ -594,7 +594,7 @@ export default function CorporateSelfRegister() {
                                     <div>
                                         <label className="block mb-2 font-medium text-gray-700">
                                             <div className="flex items-center">
-                                                <FaMapLocation className="mr-2 text-blue-600"/>
+                                                <FaMapLocation className="mr-2 text-cyan-400"/>
                                                 City*
                                             </div>
                                         </label>
@@ -636,7 +636,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaUser className="mr-2 text-blue-600"/>
+                                            <FaUser className="mr-2 text-cyan-400"/>
                                             Full Name*
                                         </div>
                                     </label>
@@ -669,7 +669,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaEnvelope className="mr-2 text-blue-600"/>
+                                            <FaEnvelope className="mr-2 text-cyan-400"/>
                                             Email*
                                         </div>
                                     </label>
@@ -704,7 +704,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaPhone className="mr-2 text-blue-600"/>
+                                            <FaPhone className="mr-2 text-cyan-400"/>
                                             Phone Number*
                                         </div>
                                     </label>
@@ -737,7 +737,7 @@ export default function CorporateSelfRegister() {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">
                                         <div className="flex items-center">
-                                            <FaIdCard className="mr-2 text-blue-600"/>
+                                            <FaIdCard className="mr-2 text-cyan-400"/>
                                             National ID*
                                         </div>
                                     </label>
@@ -769,7 +769,7 @@ export default function CorporateSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaIdCard className="mr-2 text-blue-600"/>
+                                        <FaIdCard className="mr-2 text-cyan-400"/>
                                         User Rights*
                                     </div>
                                 </label>
@@ -816,7 +816,7 @@ export default function CorporateSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaUserAlt className="mr-2 text-blue-600"/>
+                                        <FaUserAlt className="mr-2 text-cyan-400"/>
                                         Username*
                                     </div>
                                 </label>
@@ -847,7 +847,7 @@ export default function CorporateSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaLock className="mr-2 text-blue-600"/>
+                                        <FaLock className="mr-2 text-cyan-400"/>
                                         Password*
                                     </div>
                                 </label>
@@ -893,7 +893,7 @@ export default function CorporateSelfRegister() {
                             <div>
                                 <label className="block mb-2 font-medium text-gray-700">
                                     <div className="flex items-center">
-                                        <FaKey className="mr-2 text-blue-600"/>
+                                        <FaKey className="mr-2 text-cyan-400"/>
                                         Confirm Password*
                                     </div>
                                 </label>
