@@ -43,7 +43,7 @@ export const ToastNotification = ({ message, type, onClose, duration = 5000 }: T
     }[type];
 
     return (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 animate-fade-in">
             <div
                 className={`flex items-center p-4 rounded-lg border ${bgColor} shadow-lg max-w-xs md:max-w-md transition-all duration-300 ease-in-out`}
             >
@@ -55,6 +55,7 @@ export const ToastNotification = ({ message, type, onClose, duration = 5000 }: T
                         if (onClose) onClose();
                     }}
                     className="ml-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Close notification"
                 >
                     <XMarkIcon className="h-5 w-5" />
                 </button>

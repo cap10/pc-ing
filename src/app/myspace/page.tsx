@@ -76,13 +76,26 @@ export default function Home() {
         <main className="p-4 md:p-6 bg-gray-50 min-h-screen">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-                <div className="flex items-center mb-4 md:mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-cyan-400 mr-2" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                    </svg>
-                    <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+
+                <div className="flex flex-col items-center mb-4 md:mb-0">
+                    <div className="flex items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-cyan-400 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                            />
+                        </svg>
+                        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+                    </div>
+                    <div className="mt-2 h-1 w-24 bg-gradient-to-r from-blue-600 to-cyan-300 rounded-full"></div>
                 </div>
                 <Link href={''}
                       className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
@@ -94,6 +107,8 @@ export default function Home() {
                     Transfer Money
                 </Link>
             </div>
+            <br/>
+            <br/>
 
             {/* Accounts Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

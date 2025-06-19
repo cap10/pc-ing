@@ -135,19 +135,19 @@ export default function Sidebar(){
                         </a>
                         <ul className="pl-4 mt-1 space-y-1 hidden md:block">
                             <li>
-                                <Link href="/myspace/zipit"
+                                <Link href="/myspace/transfers/zipit"
                                       className="flex items-center py-2 px-4 text-sm font-medium text-gray-600 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-indigo-600 pl-11">
                                     ZIPIT
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/myspace/rtgs"
+                                <Link href="/myspace/transfers/rtgs"
                                       className="flex items-center py-2 px-4 text-sm font-medium text-gray-600 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-indigo-600 pl-11">
                                     RTGS
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/myspace/internal"
+                                <Link href="/myspace/transfers/internal"
                                       className="flex items-center py-2 px-4 text-sm font-medium text-gray-600 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-indigo-600 pl-11">
                                     INTERNAL
                                 </Link>
@@ -155,22 +155,6 @@ export default function Sidebar(){
                         </ul>
                     </li>
 
-                    {/* Categories */}
-                    <li className="group">
-                        <Link href="/myspace/categories"
-                              className="flex items-center py-2.5 px-4 text-sm font-medium text-gray-600 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-indigo-600 group-[.active]:bg-indigo-50 group-[.active]:text-indigo-600">
-                            <div
-                                className="p-1.5 rounded-lg bg-cyan-400 text-white group-hover:bg-white group-hover:text-cyan-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     strokeWidth="1.8" stroke="currentColor" className="size-5">
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                          d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z"/>
-                                </svg>
-                            </div>
-                            <span className="ml-3 hidden md:block">Categories</span>
-                        </Link>
-                    </li>
 
                     <hr className="my-4 border-gray-200 mx-4 hidden md:block"/>
 

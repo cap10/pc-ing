@@ -6,7 +6,6 @@ import {showToast} from "@/shared/utilities/commons";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/navigation";
-import {generateRandomString} from "../../random-generator";
 
 const preAuthValidationSchema = Yup.object({
     sourceAccountNumber: Yup.string().required('source Account required'),
@@ -19,24 +18,21 @@ const preAuthValidationSchema = Yup.object({
 
 });
 
+const loginValidationSchema = Yup.object({
+    username: Yup.string().required('username required'),
+    password: Yup.string().required('password required'),
+});
 
-export default function InternalTransfer() {
+export default function RTGSTransfer() {
 
     const [accounts,  setAccounts] = useState<any>([]);
     const [trxnTypes,  setTrxnTypes] = useState<any>([]);
     const [banks,  setBanks] = useState<any>([]);
     const [requestId,  setRequestId] = useState<any>(null);
     const [preAuthToken,  setPreAuthToken] = useState<any>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
-
-    // Helper function to show toast
-    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-        setToast({ message, type, show: true });
-        setTimeout(() => setToast(null), 5000);
-    };
 
     let customerId:any;
 
@@ -85,10 +81,22 @@ export default function InternalTransfer() {
 
     }, []);
 
+    const generateRandomString = (length = 12) => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * chars.length);
+            result += chars[randomIndex];
+        }
+
+        return result;
+    };
+
     let ZipitTransaction;
     trxnTypes.forEach(function(trxn){
 
-        if (trxn?.name === "Zipit Send"){
+        if (trxn?.name === "RTGS"){
             //get the and save it
             ZipitTransaction = trxn?.id;
         }
@@ -98,6 +106,7 @@ export default function InternalTransfer() {
     const preAuthForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
             setIsSubmitting(true);
+
 
             const randomString = generateRandomString();
             setRequestId(randomString);
@@ -118,21 +127,16 @@ export default function InternalTransfer() {
                 if (data?.preAuthToken != null) {
                     setPreAuthToken(data?.preAuthToken);
                     setIsSubmitting(false);
-                    showToast("Transfer initiated successfully. Please authorize the transaction.", 'success');
+
 
                 } else {
                     setIsSubmitting(false);
-                    const errorMessage = data?.message || "An unexpected error occurred";
-                    showToast("Transfer initiation failed. Please try again." ||  errorMessage, 'error');
+                    showToast("Zipit Transfer failed", 'error');
                 }
             }catch(err:any){
                 setIsSubmitting(false);
-                const errorMessage = err?.response?.data?.message || "An unexpected error occurred";
-                showToast(errorMessage, 'error');
+                showToast(err?.response?.data?.message, 'error');
 
-            }
-            finally {
-                setIsSubmitting(false);
             }
         },
 
@@ -193,7 +197,7 @@ export default function InternalTransfer() {
                             </svg>
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Internal Transfer</h2>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-800">RTGS Transfer</h2>
                             <p className="text-sm text-gray-500">Securely transfer between accounts</p>
                         </div>
                     </div>
@@ -301,7 +305,7 @@ export default function InternalTransfer() {
                                 {/* Description */}
                                 <div className="mb-5">
                                     <label className="block mb-2 text-sm font-medium text-gray-700">
-                                        Description
+                                        Narration
                                     </label>
                                     <input
                                         name="description"
@@ -359,11 +363,13 @@ export default function InternalTransfer() {
             {isSubmitting && (
                 <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500 mb-4"></div>
+                        <div
+                            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500 mb-4"></div>
                         <p className="text-gray-700">Processing your transfer...</p>
                     </div>
                 </div>
             )}
         </section>
+
     );
 }
