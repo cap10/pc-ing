@@ -148,7 +148,8 @@ export default function Login() {
                                   </div>
 
                                   {/* Password Field */}
-                                  <div>
+                                  {/* Password Field */}
+                                  <div className="relative">  {/* Added relative positioning here */}
                                       <div className="flex justify-between items-center mb-2">
                                           <label className="block text-sm font-medium text-gray-700">
                                               Password
@@ -160,29 +161,32 @@ export default function Login() {
                                               Forgot password?
                                           </Link>
                                       </div>
-                                      <input
-                                          name="password"
-                                          className={`w-full px-4 py-3 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
-                                              loginForm.errors.password && loginForm.touched.password
-                                                  ? "border-red-500"
-                                                  : "border-gray-300"
-                                          }`}
-                                          type={showPassword ? "text" : "password"}
-                                          placeholder="Enter your password"
-                                          required
-                                          onChange={loginForm.handleChange}
-                                          onBlur={loginForm.handleBlur}
-                                          value={loginForm.values.password}
-                                      />
-                                      <div
-                                          className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                                          onClick={() => setShowPassword(!showPassword)}
-                                      >
-                                          {showPassword ? (
-                                              <FaEyeSlash className="text-gray-400 hover:text-gray-600"/>
-                                          ) : (
-                                              <FaEye className="text-gray-400 hover:text-gray-600"/>
-                                          )}
+                                      <div className="relative">  {/* Another relative container for the input + icon */}
+                                          <input
+                                              name="password"
+                                              className={`w-full px-4 py-3 pr-10 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                                                  loginForm.errors.password && loginForm.touched.password
+                                                      ? "border-red-500"
+                                                      : "border-gray-300"
+                                              }`}
+                                              type={showPassword ? "text" : "password"}
+                                              placeholder="Enter your password"
+                                              required
+                                              onChange={loginForm.handleChange}
+                                              onBlur={loginForm.handleBlur}
+                                              value={loginForm.values.password}
+                                          />
+                                          <button
+                                              type="button"
+                                              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                              onClick={() => setShowPassword(!showPassword)}
+                                          >
+                                              {showPassword ? (
+                                                  <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                              ) : (
+                                                  <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                              )}
+                                          </button>
                                       </div>
                                       {loginForm.errors.password && loginForm.touched.password && (
                                           <p className="mt-2 text-sm text-red-600">
