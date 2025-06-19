@@ -21,6 +21,7 @@ import {
 import {FaMapLocation} from "react-icons/fa6";
 import {ToastNotification} from "../../notification";
 import Image from "next/image";
+import BackButton from "@/app/go-back";
 
 export default function IndividualSelfRegister() {
 
@@ -201,7 +202,7 @@ export default function IndividualSelfRegister() {
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-6 text-white">
                     <h1 className="text-3xl font-bold text-center">Individual Registration</h1>
                     <p className="text-center text-blue-100 mt-2">
                         Complete all steps to create your account
@@ -273,7 +274,11 @@ export default function IndividualSelfRegister() {
 
                     {step === 1 && (
                         <div className="space-y-6">
-                            <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Enter Agent Details</h2>
+                            <BackButton
+                                className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+
+                            />
+                            <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Enter Individual Details</h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* First Name */}

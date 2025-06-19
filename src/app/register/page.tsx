@@ -1,48 +1,15 @@
 'use client';
 
-import { showToast } from "@/shared/utilities/commons";
-import Image from "next/image"; 
-import { useEffect } from "react";
-import IndividualSelfRegister from "@/shared/ui/individualSelfReg";
-import CorporateSelfRegister from "@/shared/ui/corporateSelfReg";
-import AgentSelfRegister from "@/shared/ui/agentSelfReg";
+import Image from "next/image";
+import {useEffect} from "react";
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 
 export default function Register() {
     const year = new Date().getFullYear();
     const router = useRouter();
 
-
-    function loadAccType(){
-        const typ = document.getElementById('accType');
-        const btnArea = document.getElementById('btnArea');
-        const indiArea = document.getElementById('individualArea');
-        const corpoArea = document.getElementById('corporateArea');
-        const agentArea = document.getElementById('agentArea');
-
-        if(typ?.value){
-
-            // console.log(typ.value, typ.value == 'CORPORATE');
-
-            if(typ.value == 'AGENT'){
-                router.push('/registration/agent');
-            }
-
-            if(typ.value == 'BUSINESS'){
-                router.push('/registration/business');
-            }
-            if(typ.value == 'CUSTOMER'){
-                router.push('/registration/individual');
-            }
-
-            if(btnArea) btnArea.style.display = 'none';
-            
-        }
-        else{
-            showToast('Pick an account type to proceed', 'info');
-        }
-    }
 
     useEffect(() => {
         
@@ -105,29 +72,36 @@ export default function Register() {
                             </div>
 
                             <main className="max-w-md mx-auto">
-                                <div className="mb-6">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Choose Account
-                                        Type</label>
-                                    <select
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                        id="accType"
-                                        required
-                                    >
-                                        <option value="" defaultValue={""}>Select account type...</option>
-                                        <option value="CUSTOMER">Customer</option>
-                                        <option value="BUSINESS">Business</option>
-                                        <option value="AGENT">Agent</option>
-                                    </select>
-                                </div>
 
-                                <div className="mb-6" id="btnArea">
-                                    <button
-                                        onClick={loadAccType}
-                                        className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
-                                        type="button"
-                                    >
-                                        Proceed <i className="fa-solid fa-arrow-right ml-2"></i>
-                                    </button>
+                                <div className="mb-6">
+                                    <Link href='/registration/agent' passHref>
+                                        <button
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            type="button"
+                                        >
+                                            Agent <i className="fa-solid fa-arrow-right ml-2"></i>
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div className="mb-6" >
+                                    <Link href='/registration/individual' passHref>
+                                        <button
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            type="button"
+                                        >
+                                            Individual <i className="fa-solid fa-arrow-right ml-2"></i>
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div className="mb-6">
+                                    <Link href='/registration/business' passHref>
+                                        <button
+                                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                                            type="button"
+                                        >
+                                            Corporate <i className="fa-solid fa-arrow-right ml-2"></i>
+                                        </button>
+                                    </Link>
                                 </div>
                             </main>
 

@@ -8,6 +8,9 @@ import {useFormik} from "formik";
 import {loginAxiosClient} from "@/endpoints/loginApi";
 import * as Yup from "yup";
 import {useRouter} from "next/navigation";
+import {useState} from "react";
+import {FaEye, FaEyeSlash} from "react-icons/fa";
+import {ToastNotification} from "./notification";
 
 const loginValidationSchema = Yup.object({
     username: Yup.string().required('username required'),
@@ -18,9 +21,23 @@ export default function Login() {
 
     const year = new Date().getFullYear();
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
+
+    // Helper function to show toast
+    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+        setToast({ message, type, show: true });
+        setTimeout(() => setToast(null), 5000);
+    };
+
+
 
     const loginForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
+
+            setIsSubmitting(true);
 
             const payload =  {
                 username: values.username,
@@ -36,6 +53,7 @@ export default function Login() {
                     await sessionStorage.setItem('token', data.accessToken);
                     await sessionStorage.setItem('customerId', data.customerId);
                     //await login(data.accessToken, data.customerId);
+                    setIsSubmitting(false);
                     showToast('Login successfull', 'success');
                     setSessionData('atoken', data.accessToken);
                     setSessionData('display', data.name);
@@ -45,9 +63,11 @@ export default function Login() {
                     await router.push('/myspace');
 
                 } else {
+                    setIsSubmitting(false);
                     showToast("Login failed", 'error');
                 }
             }catch(err:any){
+                setIsSubmitting(false);
                 showToast(err?.response?.data?.message, 'error');
 
             }
@@ -64,6 +84,15 @@ export default function Login() {
   return (
 
       <section className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+
+          {/* Toast Notification */}
+          {toast && (
+              <ToastNotification
+                  message={toast.message}
+                  type={toast.type}
+                  onClose={() => setToast(null)}
+              />
+          )}
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col min-h-screen">
                   {/* Main Content */}
@@ -72,13 +101,13 @@ export default function Login() {
                           {/* Logo Section */}
                           <div className="mx-auto mb-10 text-center">
                               <div className="flex items-center justify-center space-x-3">
-                                  <div className="w-90 h-70 relative">
+                                  <div className=" relative">
                                       <Image
-                                          width={140}
+                                          width={190}
                                           height={90}
                                           src="/images/logo.svg"
                                           alt="Company Logo"
-                                          className="object-contain"
+                                          className="m-2"
                                       />
                                   </div>
                               </div>
@@ -138,13 +167,23 @@ export default function Login() {
                                                   ? "border-red-500"
                                                   : "border-gray-300"
                                           }`}
-                                          type="password"
+                                          type={showPassword ? "text" : "password"}
                                           placeholder="Enter your password"
                                           required
                                           onChange={loginForm.handleChange}
                                           onBlur={loginForm.handleBlur}
                                           value={loginForm.values.password}
                                       />
+                                      <div
+                                          className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                          onClick={() => setShowPassword(!showPassword)}
+                                      >
+                                          {showPassword ? (
+                                              <FaEyeSlash className="text-gray-400 hover:text-gray-600"/>
+                                          ) : (
+                                              <FaEye className="text-gray-400 hover:text-gray-600"/>
+                                          )}
+                                      </div>
                                       {loginForm.errors.password && loginForm.touched.password && (
                                           <p className="mt-2 text-sm text-red-600">
                                               {loginForm.errors.password}
@@ -159,7 +198,7 @@ export default function Login() {
                                           disabled={loginForm.isSubmitting}
                                           type="submit"
                                       >
-                                          {loginForm.isSubmitting ? (
+                                      {loginForm.isSubmitting ? (
                                               <span className="flex items-center justify-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
                            fill="none" viewBox="0 0 24 24">
@@ -200,6 +239,19 @@ export default function Login() {
                       </p>
                   </div>
               </div>
+
+              {/* Loading Overlay */}
+              {isSubmitting && (
+                  <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                      <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm">
+                          <div
+                              className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+                          <h3 className="text-lg font-medium text-black mb-2">Processing Verification</h3>
+                          <p className="text-gray-600 text-center">Please wait while we verify your credentials
+                              registration</p>
+                      </div>
+                  </div>
+              )}
           </div>
       </section>
 
