@@ -26,9 +26,9 @@ const BackButton = ({
         px-4 py-2.5 md:px-5 md:py-3
         text-sm md:text-base font-medium
         rounded-lg transition-all duration-300
-        bg-white text-gray-700
+        bg-cyan-400 text-white
         border border-gray-200
-        hover:bg-gray-50 hover:text-gray-900
+        hover:bg-cyan-100 hover:text-gray-900
         hover:shadow-sm hover:border-gray-300
         focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500
         ${className}

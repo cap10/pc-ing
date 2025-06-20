@@ -276,10 +276,7 @@ export default function agentSelfRegister() {
 
                     {step === 1 && (
                         <div className="space-y-6">
-                            <BackButton
-                                className="bg-blue-50 text-cyan-400 border-blue-200 hover:bg-blue-100"
-
-                            />
+                            <BackButton/>
                             <h2 className="text-xl font-bold text-center text-gray-800 mb-6">Enter Agent Details</h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
