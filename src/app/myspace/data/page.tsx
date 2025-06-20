@@ -172,16 +172,30 @@ export default function Data() {
                                  className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-white/20"
                              >
                                  <div className="bg-white/95 backdrop-blur-sm px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                     <div className="sm:flex sm:items-start">
-                                         <div
-                                             className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-cyan-100 to-blue-100 sm:mx-0 sm:size-10">
-                                             <ShieldCheckIcon aria-hidden="true" className="size-6 text-cyan-500"/>
+                                     <div
+                                         className="relative bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 px-6 pt-6 pb-4">
+                                         <div className="flex items-center space-x-4">
+                                             <div className="flex-shrink-0">
+                                                 <div
+                                                     className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg">
+                                                     <ShieldCheckIcon className="h-6 w-6 text-white"
+                                                                      aria-hidden="true"/>
+                                                 </div>
+                                             </div>
+                                             <div className="flex-1 min-w-0">
+                                                 <DialogTitle className="text-lg font-bold text-gray-900 leading-tight">
+                                                     Purchase {econetData?.name?.split(' ')[0]?.charAt(0)?.toUpperCase() + econetData?.name?.split(' ')[0]?.slice(1)} Data
+                                                 </DialogTitle>
+                                                 <p className="text-sm text-gray-600 mt-1">
+                                                     Complete your data purchase below
+                                                 </p>
+                                             </div>
                                          </div>
+                                     </div>
+                                     <div className="sm:flex sm:items-start">
+
                                          <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                             <DialogTitle as="h3"
-                                                          className="text-base sm:text-lg text-center font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">
-                                                 Purchase {econetData?.name?.split(' ')[0]?.charAt(0)?.toUpperCase() + econetData?.name?.split(' ')[0]?.slice(1)} Data
-                                             </DialogTitle>
+
                                              <div
                                                  className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mb-4"></div>
                                              <div className="mt-4 mb-3">
@@ -193,80 +207,258 @@ export default function Data() {
 
                                              <div>
                                                  <form onSubmit={preAuthForm.handleSubmit}>
-                                                 <div className="mb-4 mt-4 space-y-2">
-                                                     <label
-                                                         className="block font-medium text-gray-700 text-sm sm:text-base">
-                                                         <div className="flex items-center">
-                                                             <svg className="w-4 h-4 mr-2 text-cyan-500" fill="none"
-                                                                  stroke="currentColor" viewBox="0 0 24 24">
-                                                                 <path strokeLinecap="round" strokeLinejoin="round"
-                                                                       strokeWidth={2}
-                                                                       d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                                             </svg>
-                                                             Customer Mobile
+                                                     <div className="mb-4 mt-4 space-y-2">
+                                                         <label
+                                                             className="block font-medium text-gray-700 text-sm sm:text-base">
+                                                             <div className="flex items-center">
+                                                                 <svg className="w-4 h-4 mr-2 text-cyan-500" fill="none"
+                                                                      stroke="currentColor" viewBox="0 0 24 24">
+                                                                     <path strokeLinecap="round" strokeLinejoin="round"
+                                                                           strokeWidth={2}
+                                                                           d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                                 </svg>
+                                                                 Customer Mobile
+                                                             </div>
+                                                         </label>
+                                                         <div className="relative group">
+                                                             <div
+                                                                 className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                                 <svg
+                                                                     className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-cyan-500 transition-colors"
+                                                                     fill="none" stroke="currentColor"
+                                                                     viewBox="0 0 24 24">
+                                                                     <path strokeLinecap="round" strokeLinejoin="round"
+                                                                           strokeWidth={2}
+                                                                           d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                                 </svg>
+                                                             </div>
+                                                             <input
+                                                                 name="customerMobile"
+                                                                 className={`w-full pl-10 sm:pl-12 pr-4 py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 transform focus:scale-[1.02] ${
+                                                                     preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile
+                                                                         ? "border-red-500"
+                                                                         : "border-gray-300"
+                                                                 }`}
+                                                                 type="text"
+                                                                 placeholder="0777777777"
+                                                                 required
+                                                                 onChange={preAuthForm.handleChange}
+                                                                 onBlur={preAuthForm.handleBlur}
+                                                                 value={preAuthForm.values.customerMobile}
+                                                             />
                                                          </div>
-                                                     </label>
-                                                     <div className="relative group">
-                                                         <div
-                                                             className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                             <svg
-                                                                 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-cyan-500 transition-colors"
-                                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                 <path strokeLinecap="round" strokeLinejoin="round"
-                                                                       strokeWidth={2}
-                                                                       d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                                             </svg>
-                                                         </div>
-                                                         <input
-                                                             name="customerMobile"
-                                                             className={`w-full pl-10 sm:pl-12 pr-4 py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 transform focus:scale-[1.02] ${
-                                                                 preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile
-                                                                     ? "border-red-500"
-                                                                     : "border-gray-300"
-                                                             }`}
-                                                             type="text"
-                                                             placeholder="0777777777"
-                                                             required
-                                                             onChange={preAuthForm.handleChange}
-                                                             onBlur={preAuthForm.handleBlur}
-                                                             value={preAuthForm.values.customerMobile}
-                                                         />
+                                                         {preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile && (
+                                                             <div className="text-red-500 text-sm mt-1">
+                                                                 {preAuthForm.errors.customerMobile}
+                                                             </div>
+                                                         )}
                                                      </div>
-                                                     {preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile && (
-                                                         <div className="text-red-500 text-sm mt-1">
-                                                             {preAuthForm.errors.customerMobile}
-                                                         </div>
-                                                     )}
-                                                 </div>
 
-                                                 <div
-                                                     className="bg-gray-50 mt-4 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 rounded-lg">
-                                                     <button
-                                                         className="inline-flex w-full justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 sm:ml-3 sm:w-auto"
-                                                         disabled={preAuthForm.isSubmitting}
-                                                         type="submit"
-                                                         onClick={preAuthForm.handleSubmit}
-                                                     >
-                                                         {preAuthForm.isSubmitting ? "Processing..." : "Buy Data"}
-                                                     </button>
-                                                     <button
-                                                         type="button"
-                                                         data-autofocus
-                                                         onClick={() => setOpen(false)}
-                                                         className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300 sm:mt-0 sm:w-auto"
-                                                     >
-                                                         Cancel
-                                                     </button>
-                                                 </div>
-                                                </form>
+                                                     <div
+                                                         className="flex flex-col-reverse sm:flex-row sm:justify-end space-y-3 space-y-reverse sm:space-y-0 sm:space-x-3 pt-4">
+                                                         <button
+                                                             type="button"
+                                                             onClick={() => setOpen(false)}
+                                                             className="inline-flex justify-center items-center px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all duration-200"
+                                                         >
+                                                             Cancel
+                                                         </button>
+
+                                                         <button
+                                                             type="submit"
+                                                             disabled={preAuthForm.isSubmitting}
+                                                             className="inline-flex justify-center items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl shadow-lg hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-cyan-200 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                                         >
+                                                             {preAuthForm.isSubmitting ? (
+                                                                 <>
+                                                                     <svg
+                                                                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                                                         fill="none" viewBox="0 0 24 24">
+                                                                         <circle className="opacity-25" cx="12" cy="12"
+                                                                                 r="10" stroke="currentColor"
+                                                                                 strokeWidth="4"></circle>
+                                                                         <path className="opacity-75"
+                                                                               fill="currentColor"
+                                                                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                     </svg>
+                                                                     Processing...
+                                                                 </>
+                                                             ) : (
+                                                                 <>
+                                                                     <svg className="mr-2 h-4 w-4" fill="none"
+                                                                          stroke="currentColor" viewBox="0 0 24 24">
+                                                                         <path strokeLinecap="round"
+                                                                               strokeLinejoin="round" strokeWidth={2}
+                                                                               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                                                     </svg>
+                                                                     Purchase Data
+                                                                 </>
+                                                             )}
+                                                         </button>
+                                                     </div>
+
+
+                                                     {/* <div
+                                                         className="bg-gray-50 mt-4 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 rounded-lg">
+                                                         <button
+                                                             className="inline-flex w-full justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 sm:ml-3 sm:w-auto"
+                                                             disabled={preAuthForm.isSubmitting}
+                                                             type="submit"
+                                                             onClick={preAuthForm.handleSubmit}
+                                                         >
+                                                             {preAuthForm.isSubmitting ? "Processing..." : "Buy Data"}
+                                                         </button>
+                                                         <button
+                                                             type="button"
+                                                             data-autofocus
+                                                             onClick={() => setOpen(false)}
+                                                             className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300 sm:mt-0 sm:w-auto"
+                                                         >
+                                                             Cancel
+                                                         </button>
+                                                     </div>*/}
+                                                 </form>
+                                             </div>
                                          </div>
                                      </div>
-                                 </div>
                                  </div>
                              </DialogPanel>
                          </div>
                      </div>
                  </Dialog>
+
+                 {/*<Dialog open={open} onClose={setOpen} className="relative z-10">
+                     <DialogBackdrop
+                         transition
+                         className="fixed inset-0 bg-black/30 backdrop-blur-md transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                     />
+
+                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                             <DialogPanel
+                                 transition
+                                 className="relative transform overflow-hidden rounded-2xl bg-white/98 backdrop-blur-xl text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-white/30 ring-1 ring-black/5"
+                             >
+                                  Header Section
+                                 <div className="relative bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 px-6 pt-6 pb-4">
+                                     <div className="flex items-center space-x-4">
+                                         <div className="flex-shrink-0">
+                                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg">
+                                                 <ShieldCheckIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                             </div>
+                                         </div>
+                                         <div className="flex-1 min-w-0">
+                                             <DialogTitle className="text-lg font-bold text-gray-900 leading-tight">
+                                                 Purchase {econetData?.name?.split(' ')[0]?.charAt(0)?.toUpperCase() + econetData?.name?.split(' ')[0]?.slice(1)} Data
+                                             </DialogTitle>
+                                             <p className="text-sm text-gray-600 mt-1">
+                                                 Complete your data purchase below
+                                             </p>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                  Content Section
+                                 <div className="px-6 py-6">
+                                      Price Display
+                                     <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-100">
+                                         <div className="text-center">
+                                             <p className="text-sm text-gray-600 mb-1">Total Amount</p>
+                                             <p className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                                                 {econetData?.currency} {econetData?.productPrice}
+                                             </p>
+                                         </div>
+                                     </div>
+
+                                      Form
+                                     <form onSubmit={preAuthForm.handleSubmit} className="space-y-6">
+                                         <div>
+                                             <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                                 <div className="flex items-center space-x-2">
+                                                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-100">
+                                                         <svg className="h-3 w-3 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                         </svg>
+                                                     </div>
+                                                     <span>Customer Mobile Number</span>
+                                                 </div>
+                                             </label>
+
+                                             <div className="relative group">
+                                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                     <svg
+                                                         className="h-5 w-5 text-gray-400 group-focus-within:text-cyan-500 transition-colors duration-200"
+                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                     >
+                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                     </svg>
+                                                 </div>
+
+                                                 <input
+                                                     name="customerMobile"
+                                                     className={`w-full pl-12 pr-4 py-3.5 text-base border-2 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 focus:outline-none ${
+                                                         preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile
+                                                             ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                                                             : "border-gray-200 hover:border-gray-300"
+                                                     }`}
+                                                     type="tel"
+                                                     placeholder="e.g., 0777777777"
+                                                     required
+                                                     onChange={preAuthForm.handleChange}
+                                                     onBlur={preAuthForm.handleBlur}
+                                                     value={preAuthForm.values.customerMobile}
+                                                 />
+                                             </div>
+
+                                             {preAuthForm.errors.customerMobile && preAuthForm.touched.customerMobile && (
+                                                 <div className="mt-2 flex items-center space-x-2 text-red-600">
+                                                     <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                     </svg>
+                                                     <span className="text-sm">{preAuthForm.errors.customerMobile}</span>
+                                                 </div>
+                                             )}
+                                         </div>
+
+                                          Action Buttons
+                                         <div className="flex flex-col-reverse sm:flex-row sm:justify-end space-y-3 space-y-reverse sm:space-y-0 sm:space-x-3 pt-4">
+                                             <button
+                                                 type="button"
+                                                 onClick={() => setOpen(false)}
+                                                 className="inline-flex justify-center items-center px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all duration-200"
+                                             >
+                                                 Cancel
+                                             </button>
+
+                                             <button
+                                                 type="submit"
+                                                 disabled={preAuthForm.isSubmitting}
+                                                 className="inline-flex justify-center items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl shadow-lg hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-cyan-200 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                             >
+                                                 {preAuthForm.isSubmitting ? (
+                                                     <>
+                                                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                         </svg>
+                                                         Processing...
+                                                     </>
+                                                 ) : (
+                                                     <>
+                                                         <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                         </svg>
+                                                         Purchase Data
+                                                     </>
+                                                 )}
+                                             </button>
+                                         </div>
+                                     </form>
+                                 </div>
+                             </DialogPanel>
+                         </div>
+                     </div>
+                 </Dialog>*/}
 
                  {/* Econet Data Bundles Section */}
                  <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

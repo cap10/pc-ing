@@ -125,7 +125,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-12">
                     {accounts?.map((account) => (
                         <div
-                            className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl border-l-4 border-cyan-500  overflow-hidden transform hover:scale-105 transition-all duration-300"
+                            className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl border-l-2 border-cyan-500  overflow-hidden transform hover:scale-105 transition-all duration-300"
                             key={account?.id}
                         >
                             <div

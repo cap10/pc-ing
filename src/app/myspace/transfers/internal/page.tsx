@@ -597,15 +597,42 @@ export default function InternalTransfer() {
 
             {/* Loading Overlay */}
             {isSubmitting && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div
-                        className="bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col items-center max-w-xs sm:max-w-sm w-full mx-4 border border-white/20">
-                        <div
-                            className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-cyan-600 mb-4"></div>
-                        <h3 className="text-base sm:text-lg font-medium text-gray-800 mb-2">Processing your transfer
-                            ....</h3>
-                        <p className="text-sm sm:text-base text-gray-600 text-center">Please wait while we process your
-                            transaction</p>
+                <div className="fixed inset-0 bg-gradient-to-br from-black/40 via-slate-900/30 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 border border-white/30 relative overflow-hidden">
+
+                        {/* Animated background gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-blue-50/30 animate-pulse"></div>
+
+                        {/* Enhanced spinner with multiple rings */}
+                        <div className="relative mb-6">
+                            <div className="animate-spin rounded-full h-16 w-16 sm:h-20 sm:w-20 border-4 border-transparent border-t-cyan-500 border-r-cyan-400"></div>
+                            <div className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-blue-400 border-l-blue-300" style={{animationDirection: 'reverse', animationDuration: '2s'}}></div>
+                            <div className="absolute inset-4 animate-pulse bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"></div>
+                        </div>
+
+                        {/* Enhanced text with subtle animations */}
+                        <h3 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent mb-3 text-center">
+                            Processing your transfer
+                            <span className="inline-block animate-pulse">...</span>
+                        </h3>
+
+                        <p className="text-sm sm:text-base text-gray-600 text-center leading-relaxed mb-4">
+                            Please wait while we securely process your transaction
+                        </p>
+
+                        {/* Progress indicator */}
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
+                            <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full animate-pulse" style={{width: '70%'}}></div>
+                        </div>
+
+                        {/* Status text */}
+                        <p className="text-xs text-gray-500 text-center animate-pulse">
+                            Verifying transaction details...
+                        </p>
+
+                        {/* Decorative elements */}
+                        <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                        <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
                     </div>
                 </div>
             )}
