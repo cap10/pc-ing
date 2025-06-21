@@ -281,7 +281,7 @@ export default function InternalTransfer() {
 
                                     <div className="space-y-3 mb-6">
                                         <p className="text-sm sm:text-base text-red-700 font-medium">
-                                            We couldn't complete your data purchase.
+                                            We couldn't complete your funds transfer.
                                         </p>
 
                                         <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200">

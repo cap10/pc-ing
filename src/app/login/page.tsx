@@ -12,6 +12,8 @@ import {useRouter} from "next/navigation";
 import {ToastNotification} from "../notification";
 import {FaEye, FaEyeSlash} from "react-icons/fa";
 import {useState} from "react";
+import {Dialog, DialogBackdrop, DialogPanel, DialogTitle} from "@headlessui/react";
+import {XCircleIcon} from "@heroicons/react/16/solid";
 
 const loginValidationSchema = Yup.object({
     username: Yup.string().required('username required'),
@@ -24,6 +26,8 @@ export default function Login() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successOpen, setSuccessOpen] = useState(false);
+    const [failureOpen, setFailureOpen] = useState(false);
 
     const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
 
@@ -63,11 +67,12 @@ export default function Login() {
 
                 } else {
                     setIsSubmitting(false);
-                    showToast("Login failed", 'error');
+                    setFailureOpen(true);
+
                 }
             }catch(err:any){
                 setIsSubmitting(false);
-                showToast(err?.response?.data?.message, 'error');
+                setFailureOpen(true);
 
             }
         },
@@ -100,6 +105,78 @@ export default function Login() {
               />
           )}
 
+          {/* Failure Modal */}
+          <Dialog open={failureOpen} onClose={setFailureOpen} className="relative z-10">
+              <DialogBackdrop
+                  transition
+                  className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+              />
+
+              <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                  <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                      <DialogPanel
+                          transition
+                          className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-red-200/50"
+                      >
+                          <div className="bg-gradient-to-br from-red-50 to-rose-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                              <div className="text-center">
+                                  {/* Failure Icon with Animation */}
+                                  <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mb-4 animate-pulse shadow-lg">
+                                      <XCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+                                  </div>
+
+                                  <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-red-800 mb-2">
+                                      Login Failed
+                                  </DialogTitle>
+
+                                  <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-rose-500 mx-auto rounded-full mb-4"></div>
+
+                                  <div className="space-y-3 mb-6">
+                                      <p className="text-sm sm:text-base text-red-700 font-medium">
+                                          Incorrect credentials provided.
+                                      </p>
+
+                                      <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200">
+                                          <div className="space-y-2 text-sm">
+                                              <div className="flex justify-between">
+                                                  <span className="text-gray-600">Error Code:</span>
+                                                  <span className="font-semibold text-red-700">#ERR_401</span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                  <span className="text-gray-600">Reason:</span>
+                                                  <span className="font-semibold text-red-700">Incorrect credentials</span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                  <span className="text-gray-600">Status:</span>
+                                                  <span className="font-semibold text-red-700">Failed</span>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div className="flex space-x-3">
+                                      <button
+                                          onClick={() => setFailureOpen(false)}
+                                          className="flex-1 inline-flex justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300"
+                                      >
+                                          Cancel
+                                      </button>
+                                      <button
+                                          onClick={() => {
+                                              setFailureOpen(false);
+                                          }}
+                                          className="flex-1 inline-flex justify-center rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-red-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105"
+                                      >
+                                          Try Again
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </DialogPanel>
+                  </div>
+              </div>
+          </Dialog>
+
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="flex flex-col min-h-screen">
                   {/* Main Content */}
@@ -127,7 +204,7 @@ export default function Login() {
                                   <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Administration</h2>
                                   <p className="mt-2 text-gray-500 text-sm sm:text-base">Sign in to continue</p>
                                   <div
-                                      className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
+                                      className="w-80 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
                               </div>
 
                               <form onSubmit={loginForm.handleSubmit} className="space-y-6">
@@ -291,13 +368,42 @@ export default function Login() {
 
               {/* Loading Overlay */}
               {isSubmitting && (
-                  <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm">
-                          <div
-                              className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-cyan-600 mb-4"></div>
-                          <h3 className="text-base sm:text-lg font-medium text-black mb-2">Processing Verification</h3>
-                          <p className="text-sm sm:text-base text-gray-600 text-center">Please wait while we verify your
-                              credentials registration</p>
+                  <div className="fixed inset-0 bg-gradient-to-br from-black/40 via-slate-900/30 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                      <div className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 border border-white/30 relative overflow-hidden">
+
+                          {/* Animated background gradient */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-blue-50/30 animate-pulse"></div>
+
+                          {/* Enhanced spinner with multiple rings */}
+                          <div className="relative mb-6">
+                              <div className="animate-spin rounded-full h-16 w-16 sm:h-20 sm:w-20 border-4 border-transparent border-t-cyan-500 border-r-cyan-400"></div>
+                              <div className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-blue-400 border-l-blue-300" style={{animationDirection: 'reverse', animationDuration: '2s'}}></div>
+                              <div className="absolute inset-4 animate-pulse bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"></div>
+                          </div>
+
+                          {/* Enhanced text with subtle animations */}
+                          <h3 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent mb-3 text-center">
+                              Verifying your credentials
+                              <span className="inline-block animate-pulse">...</span>
+                          </h3>
+
+                          <p className="text-sm sm:text-base text-gray-600 text-center leading-relaxed mb-4">
+                              Please wait while we securely verify your credentials
+                          </p>
+
+                          {/* Progress indicator */}
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
+                              <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full animate-pulse" style={{width: '70%'}}></div>
+                          </div>
+
+                          {/* Status text */}
+                          <p className="text-xs text-gray-500 text-center animate-pulse">
+                              Verifying login credentials...
+                          </p>
+
+                          {/* Decorative elements */}
+                          <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                          <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
                       </div>
                   </div>
               )}

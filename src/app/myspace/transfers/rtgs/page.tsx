@@ -6,6 +6,9 @@ import {showToast} from "@/shared/utilities/commons";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/navigation";
+import {Dialog, DialogBackdrop, DialogPanel, DialogTitle} from "@headlessui/react";
+import {CheckCircleIcon, ExclamationTriangleIcon} from "@heroicons/react/24/outline";
+import {ClockIcon, XCircleIcon} from "@heroicons/react/16/solid";
 
 const preAuthValidationSchema = Yup.object({
     sourceAccountNumber: Yup.string().required('source Account required'),
@@ -32,6 +35,9 @@ export default function RTGSTransfer() {
     const [preAuthToken,  setPreAuthToken] = useState<any>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [successOpen, setSuccessOpen] = useState(false);
+    const [failureOpen, setFailureOpen] = useState(false);
+
     const router = useRouter();
 
     let customerId:any;
@@ -127,15 +133,16 @@ export default function RTGSTransfer() {
                 if (data?.preAuthToken != null) {
                     setPreAuthToken(data?.preAuthToken);
                     setIsSubmitting(false);
+                    setSuccessOpen(true);
 
 
                 } else {
                     setIsSubmitting(false);
-                    showToast("Zipit Transfer failed", 'error');
+                    setFailureOpen(true);
                 }
             }catch(err:any){
                 setIsSubmitting(false);
-                showToast(err?.response?.data?.message, 'error');
+                setFailureOpen(true);
 
             }
         },
@@ -174,6 +181,7 @@ export default function RTGSTransfer() {
         }
     };
 
+
     return (
         <section
             className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 relative overflow-hidden">
@@ -187,6 +195,166 @@ export default function RTGSTransfer() {
                     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-cyan-300/10 to-blue-300/10 rounded-full blur-2xl"></div>
             </div>
 
+            {/* Success Modal */}
+            <Dialog open={successOpen} onClose={setSuccessOpen} className="relative z-10">
+                <DialogBackdrop
+                    transition
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                />
+
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <DialogPanel
+                            transition
+                            className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-green-200/50"
+                        >
+                            <div
+                                className="bg-gradient-to-br from-green-50 to-emerald-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="text-center">
+                                    {/* Success Icon with Animation */}
+                                    <div
+                                        className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mb-4 animate-bounce shadow-lg">
+                                        <CheckCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white animate-pulse"/>
+                                    </div>
+
+                                    <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-green-800 mb-2">
+                                        Transaction Successful!
+                                    </DialogTitle>
+
+                                    <div
+                                        className="w-16 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full mb-4"></div>
+
+                                    <div className="space-y-3 mb-6">
+                                        <p className="text-sm sm:text-base text-green-700 font-medium">
+                                            Your data purchase has been completed successfully.
+                                        </p>
+
+                                        <div
+                                            className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-green-200">
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Amount:</span>
+                                                    <span className="font-semibold text-green-700">USD 789</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Status:</span>
+                                                    <span className="font-semibold text-green-700">Completed</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Reference:</span>
+                                                    <span className="font-semibold text-green-700">#TXN123456</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-xs sm:text-sm text-green-600">
+                                            You will receive a confirmation SMS shortly.
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setSuccessOpen(false)}
+                                        className="w-full inline-flex justify-center rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105"
+                                    >
+                                        <CheckCircleIcon className="w-4 h-4 mr-2"/>
+                                        Great, Thanks!
+                                    </button>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </div>
+            </Dialog>
+
+            {/* Failure Modal */}
+            <Dialog open={failureOpen} onClose={setFailureOpen} className="relative z-10">
+                <DialogBackdrop
+                    transition
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                />
+
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <DialogPanel
+                            transition
+                            className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-red-200/50"
+                        >
+                            <div className="bg-gradient-to-br from-red-50 to-rose-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="text-center">
+                                    {/* Failure Icon with Animation */}
+                                    <div
+                                        className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mb-4 animate-pulse shadow-lg">
+                                        <XCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white"/>
+                                    </div>
+
+                                    <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-red-800 mb-2">
+                                        Transaction Failed
+                                    </DialogTitle>
+
+                                    <div
+                                        className="w-16 h-1 bg-gradient-to-r from-red-500 to-rose-500 mx-auto rounded-full mb-4"></div>
+
+                                    <div className="space-y-3 mb-6">
+                                        <p className="text-sm sm:text-base text-red-700 font-medium">
+                                            We couldn't complete your rtgs transfer.
+                                        </p>
+
+                                        <div
+                                            className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200">
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Error Code:</span>
+                                                    <span className="font-semibold text-red-700">#ERR_001</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Reason:</span>
+                                                    <span
+                                                        className="font-semibold text-red-700">Insufficient Balance</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Status:</span>
+                                                    <span className="font-semibold text-red-700">Failed</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                            <div className="flex items-start">
+                                                <svg className="w-4 h-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0"
+                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                                </svg>
+                                                <p className="text-xs sm:text-sm text-amber-700">
+                                                    Please check your account balance and try again.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => setFailureOpen(false)}
+                                            className="flex-1 inline-flex justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setFailureOpen(false);
+                                                setPurchaseOpen(true);
+                                            }}
+                                            className="flex-1 inline-flex justify-center rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-red-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105"
+                                        >
+                                            Try Again
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </div>
+            </Dialog>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
                 {/* Enhanced Header with Icon */}
@@ -262,7 +430,7 @@ export default function RTGSTransfer() {
                                             value={preAuthForm.values.sourceAccountNumber}
                                         >
                                             <option value="">Select your account...</option>
-                                            {accounts?.map((account:any) => (
+                                            {accounts?.map((account: any) => (
                                                 <option
                                                     key={account?.id}
                                                     value={account?.accountNumber}
@@ -447,215 +615,56 @@ export default function RTGSTransfer() {
 
             {/* Loading Overlay */}
             {isSubmitting && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                <div
+                    className="fixed inset-0 bg-gradient-to-br from-black/40 via-slate-900/30 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div
-                        className="bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col items-center max-w-xs sm:max-w-sm w-full mx-4 border border-white/20">
+                        className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 border border-white/30 relative overflow-hidden">
+
+                        {/* Animated background gradient */}
                         <div
-                            className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-cyan-600 mb-4"></div>
-                        <h3 className="text-base sm:text-lg font-medium text-gray-800 mb-2">Processing your transfer
-                            ....</h3>
-                        <p className="text-sm sm:text-base text-gray-600 text-center">Please wait while we process your
-                            transaction</p>
+                            className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-blue-50/30 animate-pulse"></div>
+
+                        {/* Enhanced spinner with multiple rings */}
+                        <div className="relative mb-6">
+                            <div
+                                className="animate-spin rounded-full h-16 w-16 sm:h-20 sm:w-20 border-4 border-transparent border-t-cyan-500 border-r-cyan-400"></div>
+                            <div
+                                className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-blue-400 border-l-blue-300"
+                                style={{animationDirection: 'reverse', animationDuration: '2s'}}></div>
+                            <div
+                                className="absolute inset-4 animate-pulse bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"></div>
+                        </div>
+
+                        {/* Enhanced text with subtle animations */}
+                        <h3 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent mb-3 text-center">
+                            Processing your transfer
+                            <span className="inline-block animate-pulse">...</span>
+                        </h3>
+
+                        <p className="text-sm sm:text-base text-gray-600 text-center leading-relaxed mb-4">
+                            Please wait while we securely process your transaction
+                        </p>
+
+                        {/* Progress indicator */}
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
+                            <div
+                                className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full animate-pulse"
+                                style={{width: '70%'}}></div>
+                        </div>
+
+                        {/* Status text */}
+                        <p className="text-xs text-gray-500 text-center animate-pulse">
+                            Verifying transaction details...
+                        </p>
+
+                        {/* Decorative elements */}
+                        <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                        <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"
+                             style={{animationDelay: '0.5s'}}></div>
                     </div>
                 </div>
             )}
         </section>
-        /*<section className="bg-gray-50 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/!* Enhanced Header with Icon *!/}
-                <div
-                    className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                        <div className="p-2 bg-blue-100 rounded-full">
-                            <svg
-                                className="w-6 h-6 text-cyan-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-800">RTGS Transfer</h2>
-                            <p className="text-sm text-gray-500">Securely transfer between accounts</p>
-                        </div>
-                    </div>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-        Transfer Money
-      </span>
-                </div>
-
-                {/!* Form Container *!/}
-                <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-                    <div className="p-6 md:p-8 lg:p-10">
-                        <form onSubmit={preAuthForm.handleSubmit} className="max-w-4xl mx-auto">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/!* Source Account *!/}
-                                <div className="mb-5">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700">
-                                        Source Account
-                                    </label>
-                                    <select
-                                        name="sourceAccountNumber"
-                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                            preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                        required
-                                        onChange={preAuthForm.handleChange}
-                                        onBlur={preAuthForm.handleBlur}
-                                        value={preAuthForm.values.sourceAccountNumber}
-                                    >
-                                        <option value="">Select your account...</option>
-                                        {accounts?.map((account: any) => (
-                                            <option
-                                                key={account?.id}
-                                                value={account?.accountNumber}
-                                            >
-                                                {account?.accountName} - {account?.accountNumber}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {preAuthForm.errors.sourceAccountNumber && preAuthForm.touched.sourceAccountNumber && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {preAuthForm.errors.sourceAccountNumber}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/!* Recipient Account *!/}
-                                <div className="mb-5">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700">
-                                        Recipient Account
-                                    </label>
-                                    <input
-                                        name="recipientAccountNumber"
-                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                            preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                        type="text"
-                                        placeholder="0011122233"
-                                        required
-                                        onChange={preAuthForm.handleChange}
-                                        onBlur={preAuthForm.handleBlur}
-                                        value={preAuthForm.values.recipientAccountNumber}
-                                    />
-                                    {preAuthForm.errors.recipientAccountNumber && preAuthForm.touched.recipientAccountNumber && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {preAuthForm.errors.recipientAccountNumber}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/!* Amount *!/}
-                                <div className="mb-5">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700">
-                                        Amount
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-3 text-gray-500">$</span>
-                                        <input
-                                            name="amount"
-                                            className={`w-full pl-8 pr-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                                preAuthForm.errors.amount && preAuthForm.touched.amount
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                            type="number"
-                                            placeholder="0.00"
-                                            required
-                                            onChange={preAuthForm.handleChange}
-                                            onBlur={preAuthForm.handleBlur}
-                                            value={preAuthForm.values.amount}
-                                        />
-                                    </div>
-                                    {preAuthForm.errors.amount && preAuthForm.touched.amount && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {preAuthForm.errors.amount}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/!* Description *!/}
-                                <div className="mb-5">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700">
-                                        Narration
-                                    </label>
-                                    <input
-                                        name="description"
-                                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                            preAuthForm.errors.description && preAuthForm.touched.description
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                        type="text"
-                                        placeholder="e.g. Zipit transfer"
-                                        required
-                                        onChange={preAuthForm.handleChange}
-                                        onBlur={preAuthForm.handleBlur}
-                                        value={preAuthForm.values.description}
-                                    />
-                                    {preAuthForm.errors.description && preAuthForm.touched.description && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {preAuthForm.errors.description}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/!* Submit Button *!/}
-                            <div className="mt-8">
-                                <button
-                                    className={`w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-300 text-white font-medium rounded-lg shadow-md hover:from-cyan-400 hover:to-blue-200-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all ${
-                                        preAuthForm.isSubmitting ? "opacity-75 cursor-not-allowed" : ""
-                                    }`}
-                                    disabled={preAuthForm.isSubmitting}
-                                    type="submit"
-                                >
-                                    {preAuthForm.isSubmitting ? (
-                                        <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                       fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                            strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </span>
-                                    ) : (
-                                        "Transfer Now"
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-
-            {isSubmitting && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm">
-                        <div
-                            className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
-                        <h3 className="text-lg font-medium text-gray-800 mb-2">Processing your transfer ....</h3>
-                        <p className="text-gray-600 text-center">Please wait while we process your transaction</p>
-                    </div>
-                </div>
-            )}
-        </section>*/
 
     );
 }
