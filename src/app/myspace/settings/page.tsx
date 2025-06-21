@@ -17,7 +17,7 @@ import {
     Lock,
     ShieldCheck,
     CheckCircle,
-    XCircle
+    XCircle, UserCog, UserPen, SquareUser
 } from 'lucide-react';
 
 
@@ -290,7 +290,7 @@ export default function InternalTransfer() {
                     className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-white/20">
                     <div className="flex items-center space-x-4 mb-4 md:mb-0">
                         <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl shadow-lg">
-                            <User className="w-6 h-6 text-white"/>
+                            <UserCog className="w-6 h-6 text-white"/>
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -312,7 +312,7 @@ export default function InternalTransfer() {
                         <div className="bg-gradient-to-r from-cyan-100 to-blue-100  p-6 border-b border-gray-100">
                             <div className="flex items-center space-x-4">
                                 <div className="p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-lg">
-                                    <User className="h-6 w-6 text-white"/>
+                                    <UserPen className="h-6 w-6 text-white"/>
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900">Personal Information</h3>
@@ -324,11 +324,11 @@ export default function InternalTransfer() {
                         <div className="p-6">
                             {/* User Info Display */}
                             <div
-                                className="mb-6 p-4 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg border border-gray-400">
+                                className="mb-6 p-4 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg ">
                                 <div className="flex items-center space-x-4">
                                     <div
                                         className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-md">
-                                        <User className="h-5 w-5 text-white"/>
+                                        <SquareUser className="h-5 w-5 text-white"/>
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-gray-900">Petros Timbsony</h4>
