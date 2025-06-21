@@ -34,7 +34,6 @@ export default function RTGSTransfer() {
     const [requestId,  setRequestId] = useState<any>(null);
     const [preAuthToken,  setPreAuthToken] = useState<any>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [successOpen, setSuccessOpen] = useState(false);
     const [failureOpen, setFailureOpen] = useState(false);
 
@@ -53,7 +52,6 @@ export default function RTGSTransfer() {
             .then((res:any) =>{
                 // _isMounted.current = false;
                 setAccounts(res.data);
-                setLoading(false);
             })
             .catch((err:any) => {
 
@@ -65,7 +63,6 @@ export default function RTGSTransfer() {
             .then((res:any) =>{
                 // _isMounted.current = false;
                 setTrxnTypes(res.data);
-                setLoading(false);
             })
             .catch((err:any) => {
 
@@ -78,7 +75,6 @@ export default function RTGSTransfer() {
                 // _isMounted.current = false;
                 setBanks(res.data);
                 console.log("Banks", res.data);
-                setLoading(false);
             })
             .catch((err:any) => {
 
@@ -342,7 +338,7 @@ export default function RTGSTransfer() {
                                         <button
                                             onClick={() => {
                                                 setFailureOpen(false);
-                                                setPurchaseOpen(true);
+                                                
                                             }}
                                             className="flex-1 inline-flex justify-center rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-red-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105"
                                         >
