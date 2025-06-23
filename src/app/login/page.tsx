@@ -96,15 +96,6 @@ export default function Login() {
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-cyan-300/10 to-blue-300/10 rounded-full blur-2xl"></div>
           </div>
 
-          {/* Toast Notification */}
-          {toast && (
-              <ToastNotification
-                  message={toast.message}
-                  type={toast.type}
-                  onClose={() => setToast(null)}
-              />
-          )}
-
           {/* Failure Modal */}
           <Dialog open={failureOpen} onClose={setFailureOpen} className="relative z-10">
               <DialogBackdrop

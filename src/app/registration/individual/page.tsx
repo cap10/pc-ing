@@ -24,6 +24,9 @@ import {FaMapLocation} from "react-icons/fa6";
 import {ToastNotification} from "../../notification";
 
 import BackButton from "../../go-back";
+import {Dialog, DialogBackdrop, DialogPanel, DialogTitle} from "@headlessui/react";
+import {CheckCircleIcon} from "@heroicons/react/24/outline";
+import {XCircleIcon} from "@heroicons/react/16/solid";
 
 const Image = ({ width, height, src, alt, className }) => (
     <div className={`${className} bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl border border-white/20`}
@@ -41,6 +44,8 @@ export default function agentSelfRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successOpen, setSuccessOpen] = useState(false);
+    const [failureOpen, setFailureOpen] = useState(false);
 
     const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
 
@@ -120,7 +125,7 @@ export default function agentSelfRegister() {
                 numberOfRequiredApproversPerTransaction: values.numberOfRequiredApproversPerTransaction,
                 accounts: [
                     {
-                        accountType: "AGENT",
+                        accountType: "CUSTOMER",
                     }
                 ],
                 username: values.username,
@@ -133,13 +138,12 @@ export default function agentSelfRegister() {
 
                 if (data) {
                     setIsSubmitting(false);
-                    showToast('Agent created successfully. Visit your email for account activation', 'success');
-                    resetForm();
                     await router.push('/login');
+                    setSuccessOpen(true);
                 }
             } catch (err: any) {
                 setIsSubmitting(false);
-                showToast(err?.response?.data?.message || 'Registration failed', 'error');
+              setFailureOpen(true);
             }
         }
     });
@@ -190,14 +194,152 @@ export default function agentSelfRegister() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
-                {/* Toast Notification */}
-                {toast && (
-                    <ToastNotification
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => setToast(null)}
+                {/* Success Modal */}
+                <Dialog open={successOpen} onClose={setSuccessOpen} className="relative z-10">
+                    <DialogBackdrop
+                        transition
+                        className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
                     />
-                )}
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <DialogPanel
+                                transition
+                                className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-green-200/50"
+                            >
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div className="text-center">
+                                        {/* Success Icon with Animation */}
+                                        <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mb-4 animate-bounce shadow-lg">
+                                            <CheckCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white animate-pulse" />
+                                        </div>
+
+                                        <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-green-800 mb-2">
+                                            Registration Successful!
+                                        </DialogTitle>
+
+                                        <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full mb-4"></div>
+
+                                        <div className="space-y-3 mb-6">
+                                            <p className="text-sm sm:text-base text-green-700 font-medium">
+                                                Your account creation completed successfully.
+                                            </p>
+
+                                            <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-green-200">
+                                                <div className="space-y-2 text-sm">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Status:</span>
+                                                        <span className="font-semibold text-green-700">Completed</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Please check you email address to activate your account:</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-xs sm:text-sm text-green-600">
+                                                You will receive a confirmation email shortly.
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={() => setSuccessOpen(false)}
+                                            className="w-full inline-flex justify-center rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105"
+                                        >
+                                            <CheckCircleIcon className="w-4 h-4 mr-2" />
+                                            Great, Thanks!
+                                        </button>
+                                    </div>
+                                </div>
+                            </DialogPanel>
+                        </div>
+                    </div>
+                </Dialog>
+
+                {/* Failure Modal */}
+                <Dialog open={failureOpen} onClose={setFailureOpen} className="relative z-10">
+                    <DialogBackdrop
+                        transition
+                        className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                    />
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <DialogPanel
+                                transition
+                                className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-red-200/50"
+                            >
+                                <div className="bg-gradient-to-br from-red-50 to-rose-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div className="text-center">
+                                        {/* Failure Icon with Animation */}
+                                        <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mb-4 animate-pulse shadow-lg">
+                                            <XCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+                                        </div>
+
+                                        <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-red-800 mb-2">
+                                            Registration Failed
+                                        </DialogTitle>
+
+                                        <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-rose-500 mx-auto rounded-full mb-4"></div>
+
+                                        <div className="space-y-3 mb-6">
+                                            <p className="text-sm sm:text-base text-red-700 font-medium">
+                                                We couldn't complete your account registration transfer.
+                                            </p>
+
+                                            <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200">
+                                                <div className="space-y-2 text-sm">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Error Code:</span>
+                                                        <span className="font-semibold text-red-700">#ERR_001</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Status:</span>
+                                                        <span className="font-semibold text-red-700">Failed</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Reason:</span>
+                                                        <span className="font-semibold text-red-700">Details already exist</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                                <div className="flex items-start">
+                                                    <svg className="w-4 h-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                                    </svg>
+                                                    <p className="text-xs sm:text-sm text-amber-700">
+                                                        Please check your registration details and try again.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex space-x-3">
+                                            <button
+                                                onClick={() => setFailureOpen(false)}
+                                                className="flex-1 inline-flex justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setFailureOpen(false);
+
+                                                }}
+                                                className="flex-1 inline-flex justify-center rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-red-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105"
+                                            >
+                                                Try Again
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogPanel>
+                        </div>
+                    </div>
+                </Dialog>
+
 
                 {/* Logo Section */}
                 <div className="flex items-center justify-center mb-6 sm:mb-8">
@@ -796,11 +938,52 @@ export default function agentSelfRegister() {
 
                 {/* Loading Overlay */}
                 {isSubmitting && (
-                    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-xs sm:max-w-sm w-full border border-white/20">
-                            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-cyan-500 mb-4"></div>
-                            <h3 className="text-base sm:text-lg font-medium text-gray-800 mb-2">Processing Registration</h3>
-                            <p className="text-sm sm:text-base text-gray-600 text-center">Please wait while we process your agent registration</p>
+                    <div
+                        className="fixed inset-0 bg-gradient-to-br from-black/40 via-slate-900/30 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div
+                            className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 border border-white/30 relative overflow-hidden">
+
+                            {/* Animated background gradient */}
+                            <div
+                                className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-blue-50/30 animate-pulse"></div>
+
+                            {/* Enhanced spinner with multiple rings */}
+                            <div className="relative mb-6">
+                                <div
+                                    className="animate-spin rounded-full h-16 w-16 sm:h-20 sm:w-20 border-4 border-transparent border-t-cyan-500 border-r-cyan-400"></div>
+                                <div
+                                    className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-blue-400 border-l-blue-300"
+                                    style={{animationDirection: 'reverse', animationDuration: '2s'}}></div>
+                                <div
+                                    className="absolute inset-4 animate-pulse bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"></div>
+                            </div>
+
+                            {/* Enhanced text with subtle animations */}
+                            <h3 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent mb-3 text-center">
+                                Processing your registration
+                                <span className="inline-block animate-pulse">...</span>
+                            </h3>
+
+                            <p className="text-sm sm:text-base text-gray-600 text-center leading-relaxed mb-4">
+                                Please wait while we create your individual account
+                            </p>
+
+                            {/* Progress indicator */}
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
+                                <div
+                                    className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full animate-pulse"
+                                    style={{width: '70%'}}></div>
+                            </div>
+
+                            {/* Status text */}
+                            <p className="text-xs text-gray-500 text-center animate-pulse">
+                                Verifying registration details...
+                            </p>
+
+                            {/* Decorative elements */}
+                            <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                            <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"
+                                 style={{animationDelay: '0.5s'}}></div>
                         </div>
                     </div>
                 )}

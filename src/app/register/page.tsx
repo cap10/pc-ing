@@ -32,8 +32,8 @@ export default function Register() {
         },
         {
             id: 'business',
-            title: 'Corporate',
-            description: 'Business banking solutions for companies',
+            title: 'Merchant',
+            description: 'Business banking solutions for merchants',
             icon: '🏢',
             href: '/registration/business',
             gradient: 'from-cyan-500 to-indigo-600'

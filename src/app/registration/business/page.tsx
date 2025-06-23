@@ -34,13 +34,9 @@ export default function CorporateSelfRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
+    const [successOpen, setSuccessOpen] = useState(false);
+    const [failureOpen, setFailureOpen] = useState(false);
 
-    // Helper function to show toast
-    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-        setToast({ message, type, show: true });
-        setTimeout(() => setToast(null), 5000);
-    };
 
 
 // Step 1 validation schema (Business Details)
@@ -152,14 +148,13 @@ export default function CorporateSelfRegister() {
 
                 if (data) {
                     setIsSubmitting(false);
-                    showToast('Business created successfully. Visit your email for account activation', 'success');
-                    resetForm();
                     await router.push('/login');
+                    setSuccessOpen(true);
                 }
             } catch (err: any) {
                 setIsSubmitting(false);
-                showToast(err?.response?.data?.message || 'Registration failed', 'error');
-            }
+                setFailureOpen(true);
+              }
         }
     });
 
@@ -258,14 +253,6 @@ export default function CorporateSelfRegister() {
 
     return (
         <div className="max-w-4xl mx-auto p-4 mt-3">
-            {/* Add this right at the beginning of your return */}
-            {toast && (
-                <ToastNotification
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(null)}
-                />
-            )}
 
             <div className="flex items-center justify-center">
                 <Image
