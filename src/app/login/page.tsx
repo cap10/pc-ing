@@ -29,14 +29,6 @@ export default function Login() {
     const [successOpen, setSuccessOpen] = useState(false);
     const [failureOpen, setFailureOpen] = useState(false);
 
-    const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'; show: boolean} | null>(null);
-
-    // Helper function to show toast
-    const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-        setToast({ message, type, show: true });
-        setTimeout(() => setToast(null), 5000);
-    };
-
     const loginForm = useFormik({
         async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
 

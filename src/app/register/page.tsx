@@ -172,7 +172,7 @@ export default function Register() {
                                                 onMouseEnter={() => setHoveredCard(option.id)}
                                                 onMouseLeave={() => setHoveredCard(null)}
                                             >
-                                                <Link href={option.href} passHref legacyBehavior>
+                                                <Link href={option.href} passHref >
                                                     <a className={`
                                                 w-full p-4 sm:p-5 rounded-2xl
                                                 bg-gradient-to-r ${option.gradient}
