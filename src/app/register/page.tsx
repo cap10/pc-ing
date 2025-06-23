@@ -46,6 +46,7 @@ export default function Register() {
     }, [])
 
     return (
+
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
@@ -64,7 +65,6 @@ export default function Register() {
                     <div
                         className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20">
                         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-
                             {/* Left side - Decorative */}
                             <div
                                 className="relative bg-gradient-to-br from-cyan-600 via-cyan-500 to-blue-700 p-8 sm:p-12 lg:p-16">
@@ -72,9 +72,9 @@ export default function Register() {
                                 <div className="absolute inset-0 opacity-10">
                                     <div className="absolute inset-0" style={{
                                         backgroundImage: `
-                      radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
-                      radial-gradient(circle at 75% 75%, white 2px, transparent 2px)
-                    `,
+                                    radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                                    radial-gradient(circle at 75% 75%, white 2px, transparent 2px)
+                                `,
                                         backgroundSize: '60px 60px'
                                     }}></div>
                                 </div>
@@ -126,7 +126,6 @@ export default function Register() {
                             {/* Right side - Registration Form */}
                             <div className="p-6 sm:p-8 lg:p-12 xl:p-16">
                                 <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-
                                     {/* Mobile logo */}
                                     <div className="lg:hidden text-center mb-8">
                                         <div
@@ -135,16 +134,27 @@ export default function Register() {
                                         </div>
                                     </div>
 
-                                    <div className="text-center mb-8 lg:mb-12">
-
-                                            <Image
-                                                src="/images/logo.svg"
-                                                alt="IBanking Logo"
-                                                width={250}
-                                                height={120}
-                                                className="m-4"
-                                            />
-                                            <br/>
+                                    <div className="text-center mb-8 lg:mb-12 relative">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <Image
+                                                    src="/images/logo.svg"
+                                                    alt="IBanking Logo"
+                                                    width={250}
+                                                    height={120}
+                                                    className="m-4"
+                                                />
+                                            </div>
+                                            <div className="absolute right-0 top-0">
+                                                <a
+                                                    href="/login"
+                                                    className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-md text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-colors duration-200"
+                                                >
+                                                    Sign In
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <br/>
 
                                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">
                                             Create Your Account
@@ -164,29 +174,33 @@ export default function Register() {
                                             >
                                                 <Link href={option.href} passHref legacyBehavior>
                                                     <a className={`
-        w-full p-4 sm:p-5 rounded-2xl
-        bg-gradient-to-r ${option.gradient}
-        text-white font-semibold
-        shadow-lg hover:shadow-xl
-        transform transition-all duration-300 ease-out
-        hover:-translate-y-1 hover:scale-[1.02]
-        flex items-center justify-between
-        group-hover:shadow-2xl
-        ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
-        block
-      `}>
+                                                w-full p-4 sm:p-5 rounded-2xl
+                                                bg-gradient-to-r ${option.gradient}
+                                                text-white font-semibold
+                                                shadow-lg hover:shadow-xl
+                                                transform transition-all duration-300 ease-out
+                                                hover:-translate-y-1 hover:scale-[1.02]
+                                                flex items-center justify-between
+                                                group-hover:shadow-2xl
+                                                ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
+                                                block
+                                            `}>
                                                         <div className="flex items-center space-x-4">
-                                                            <div className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
+                                                            <div
+                                                                className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
                                                                 {option.icon}
                                                             </div>
                                                             <div className="text-left">
-                                                                <div className="text-lg sm:text-xl font-bold">{option.title}</div>
-                                                                <div className="text-xs sm:text-sm text-white/80 hidden sm:block">
+                                                                <div
+                                                                    className="text-lg sm:text-xl font-bold">{option.title}</div>
+                                                                <div
+                                                                    className="text-xs sm:text-sm text-white/80 hidden sm:block">
                                                                     {option.description}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                                                        <div
+                                                            className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
                                                             →
                                                         </div>
                                                     </a>
