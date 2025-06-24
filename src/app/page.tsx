@@ -212,12 +212,12 @@ export default function Login() {
                                                 />
                                             </div>
                                             <div className="absolute right-0 top-0">
-                                                <a
+                                                <Link
                                                     href="/login"
                                                     className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-md text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-colors duration-200"
                                                 >
                                                     Sign In
-                                                </a>
+                                                </Link>
                                             </div>
                                         </div>
                                         <br/>
@@ -238,38 +238,40 @@ export default function Login() {
                                                 onMouseEnter={() => setHoveredCard(option.id)}
                                                 onMouseLeave={() => setHoveredCard(null)}
                                             >
-                                                <Link href={option.href} passHref >
-                                                    <a className={`
-                                                w-full p-4 sm:p-5 rounded-2xl
-                                                bg-gradient-to-r ${option.gradient}
-                                                text-white font-semibold
-                                                shadow-lg hover:shadow-xl
-                                                transform transition-all duration-300 ease-out
-                                                hover:-translate-y-1 hover:scale-[1.02]
-                                                flex items-center justify-between
-                                                group-hover:shadow-2xl
-                                                ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
-                                                block
-                                            `}>
-                                                        <div className="flex items-center space-x-4">
-                                                            <div
-                                                                className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
-                                                                {option.icon}
-                                                            </div>
-                                                            <div className="text-left">
-                                                                <div
-                                                                    className="text-lg sm:text-xl font-bold">{option.title}</div>
-                                                                <div
-                                                                    className="text-xs sm:text-sm text-white/80 hidden sm:block">
-                                                                    {option.description}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                <Link
+                                                    href={option.href}
+                                                    passHref
+                                                    className={`
+                    w-full p-4 sm:p-5 rounded-2xl
+                    bg-gradient-to-r ${option.gradient}
+                    text-white font-semibold
+                    shadow-lg hover:shadow-xl
+                    transform transition-all duration-300 ease-out
+                    hover:-translate-y-1 hover:scale-[1.02]
+                    flex items-center justify-between
+                    group-hover:shadow-2xl
+                    ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
+                    block
+                `}
+                                                >
+                                                    <div className="flex items-center space-x-4">
                                                         <div
-                                                            className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
-                                                            →
+                                                            className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
+                                                            {option.icon}
                                                         </div>
-                                                    </a>
+                                                        <div className="text-left">
+                                                            <div
+                                                                className="text-lg sm:text-xl font-bold">{option.title}</div>
+                                                            <div
+                                                                className="text-xs sm:text-sm text-white/80 hidden sm:block">
+                                                                {option.description}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                                                        →
+                                                    </div>
                                                 </Link>
                                             </div>
                                         ))}
