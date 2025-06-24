@@ -124,7 +124,7 @@ export default function RTGSTransfer() {
 
             try {
 
-                const {data}  =  await axiosClient.post(`v1/transactions/zipit-transfer-funds/pre-auth`, payload);
+                const {data}  =  await axiosClient.post(`v1/transactions/rtgs-transfer-funds/pre-auth`, payload);
 
                 if (data?.preAuthToken != null) {
                     setPreAuthToken(data?.preAuthToken);
