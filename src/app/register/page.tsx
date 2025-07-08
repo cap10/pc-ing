@@ -1,17 +1,16 @@
 'use client';
 
 import Image from "next/image";
-import {useState,useEffect} from "react";
-import {useRouter} from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type CardId = 'agent' | 'individual' | 'business' | null;
 
 export default function Register() {
-    const year = new Date().getFullYear();
     const router = useRouter();
-
     const [hoveredCard, setHoveredCard] = useState<CardId>(null);
+    const [isNavigating, setIsNavigating] = useState(false);
 
     const registrationOptions = [
         {
@@ -40,13 +39,15 @@ export default function Register() {
         }
     ];
 
-
-    useEffect(() => {
-        
-    }, [])
+    const handleNavigation = (href: string) => {
+        setIsNavigating(true);
+        // Prefetch the route (this happens in the background)
+        router.prefetch(href);
+        // Navigate to the route
+        router.push(href);
+    };
 
     return (
-
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
@@ -146,12 +147,12 @@ export default function Register() {
                                                 />
                                             </div>
                                             <div className="absolute right-0 top-0">
-                                                <a
-                                                    href="/login"
+                                                <button
+                                                    onClick={() => handleNavigation('/login')}
                                                     className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-md text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-colors duration-200"
                                                 >
                                                     Sign In
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                         <br/>
@@ -169,42 +170,47 @@ export default function Register() {
                                             <div
                                                 key={option.id}
                                                 className="group relative"
-                                                onMouseEnter={() => setHoveredCard(option.id)}
+                                                onMouseEnter={() => {
+                                                    setHoveredCard(option.id);
+                                                    // Prefetch when user hovers over the card
+                                                    router.prefetch(option.href);
+                                                }}
                                                 onMouseLeave={() => setHoveredCard(null)}
                                             >
-                                                <Link href={option.href} passHref >
-                                                    <a className={`
-                                                w-full p-4 sm:p-5 rounded-2xl
-                                                bg-gradient-to-r ${option.gradient}
-                                                text-white font-semibold
-                                                shadow-lg hover:shadow-xl
-                                                transform transition-all duration-300 ease-out
-                                                hover:-translate-y-1 hover:scale-[1.02]
-                                                flex items-center justify-between
-                                                group-hover:shadow-2xl
-                                                ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
-                                                block
-                                            `}>
-                                                        <div className="flex items-center space-x-4">
-                                                            <div
-                                                                className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
-                                                                {option.icon}
-                                                            </div>
-                                                            <div className="text-left">
-                                                                <div
-                                                                    className="text-lg sm:text-xl font-bold">{option.title}</div>
-                                                                <div
-                                                                    className="text-xs sm:text-sm text-white/80 hidden sm:block">
-                                                                    {option.description}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                <button
+                                                    onClick={() => handleNavigation(option.href)}
+                                                    className={`
+                                                        w-full p-4 sm:p-5 rounded-2xl
+                                                        bg-gradient-to-r ${option.gradient}
+                                                        text-white font-semibold
+                                                        shadow-lg hover:shadow-xl
+                                                        transform transition-all duration-300 ease-out
+                                                        hover:-translate-y-1 hover:scale-[1.02]
+                                                        flex items-center justify-between
+                                                        group-hover:shadow-2xl
+                                                        ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
+                                                        block
+                                                    `}
+                                                >
+                                                    <div className="flex items-center space-x-4">
                                                         <div
-                                                            className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
-                                                            →
+                                                            className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
+                                                            {option.icon}
                                                         </div>
-                                                    </a>
-                                                </Link>
+                                                        <div className="text-left">
+                                                            <div
+                                                                className="text-lg sm:text-xl font-bold">{option.title}</div>
+                                                            <div
+                                                                className="text-xs sm:text-sm text-white/80 hidden sm:block">
+                                                                {option.description}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                                                        →
+                                                    </div>
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
@@ -212,12 +218,12 @@ export default function Register() {
                                     <div className="mt-8 lg:mt-12 text-center">
                                         <p className="text-sm text-gray-500">
                                             Already have an account?{" "}
-                                            <a
-                                                href="/login"
+                                            <button
+                                                onClick={() => handleNavigation('/login')}
                                                 className="font-semibold text-cyan-600 hover:text-cyan-700 transition-colors duration-200 hover:underline"
                                             >
                                                 Sign in
-                                            </a>
+                                            </button>
                                         </p>
                                     </div>
 
@@ -232,7 +238,13 @@ export default function Register() {
                     </div>
                 </div>
             </div>
-        </div>
 
+            {/* Loading overlay */}
+            {isNavigating && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+                </div>
+            )}
+        </div>
     );
 }

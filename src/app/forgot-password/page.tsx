@@ -263,7 +263,6 @@ export default function PasswordReset() {
                           <div className="px-8 py-8">
 
                               <form onSubmit={SetPasswordForm.handleSubmit} className="space-y-6">
-
                                   <div className="relative">
                                       <div className="flex justify-between items-center mb-2">
                                           <label className="block text-sm sm:text-base font-medium text-gray-700">
