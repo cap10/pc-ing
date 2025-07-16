@@ -1,663 +1,1172 @@
 'use client';
+import React, { useState } from 'react';
+import {
+    Users,
+    Truck,
+    CreditCard,
+    TrendingUp,
+    MapPin,
+    Plus,
+    Edit,
+    Trash2,
+    Search,
+    Download,
+    Eye,
+    DollarSign,
+    Activity,
+    AlertTriangle,
+    CheckCircle,
+    X
+} from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
 
-import {setSessionData} from "@/shared/repositories/storage-repository";
-import {showToast} from "@/shared/utilities/commons";
-import Image from "next/image";
-import Link from "next/link";
-import {useFormik} from "formik";
-import {loginAxiosClient} from "@/endpoints/loginApi";
-import * as Yup from "yup";
-import {useRouter} from "next/navigation";
-import {useState,useEffect} from "react";
-import {FaEye, FaEyeSlash} from "react-icons/fa";
-import {ToastNotification} from "./notification";
-import {Dialog, DialogBackdrop, DialogPanel, DialogTitle} from "@headlessui/react";
-import {XCircleIcon} from "@heroicons/react/16/solid";
-
-type CardId = 'agent' | 'individual' | 'business' | null;
-
-const loginValidationSchema = Yup.object({
-    username: Yup.string().required('username required'),
-    password: Yup.string().required('password required'),
-});
-
-export default function Login() {
-
-    const year = new Date().getFullYear();
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successOpen, setSuccessOpen] = useState(false);
-    const [failureOpen, setFailureOpen] = useState(false);
-
-    const [hoveredCard, setHoveredCard] = useState<CardId>(null);
-    const [isNavigating, setIsNavigating] = useState(false);
-
-    const registrationOptions = [
+const PICNGDashboard = () => {
+    // State for different data entities
+    const [kekeAssets, setKekeAssets] = useState([
         {
-            id: 'agent',
-            title: 'Agent',
-            description: 'Register as a banking agent to serve customers',
-            icon: '👥',
-            href: '/registration/agent',
-            gradient: 'from-cyan-500 to-blue-600'
+            id: 'KK001',
+            registrationNumber: 'ABC-123-XY',
+            aggregator: 'City Riders Coop',
+            driver: 'Ahmed Ibrahim',
+            location: 'Victoria Island',
+            status: 'Active',
+            dailyRevenue: 8500,
+            cardPaymentRatio: 0.75,
+            rebatesIssued: 425,
+            deploymentDate: '2025-06-15'
         },
         {
-            id: 'individual',
-            title: 'Individual',
-            description: 'Personal banking account for individuals',
-            icon: '👤',
-            href: '/registration/individual',
-            gradient: 'from-cyan-500 to-teal-600'
+            id: 'KK002',
+            registrationNumber: 'DEF-456-ZW',
+            aggregator: 'Metro Transport',
+            driver: 'Chidi Okafor',
+            location: 'Ikeja',
+            status: 'Active',
+            dailyRevenue: 12000,
+            cardPaymentRatio: 0.82,
+            rebatesIssued: 600,
+            deploymentDate: '2025-06-10'
         },
         {
-            id: 'business',
-            title: 'Merchant',
-            description: 'Business banking solutions for merchants',
-            icon: '🏢',
-            href: '/registration/business',
-            gradient: 'from-cyan-500 to-indigo-600'
+            id: 'KK003',
+            registrationNumber: 'GHI-789-UV',
+            aggregator: 'City Riders Coop',
+            driver: 'Fatima Hassan',
+            location: 'Surulere',
+            status: 'Maintenance',
+            dailyRevenue: 0,
+            cardPaymentRatio: 0,
+            rebatesIssued: 0,
+            deploymentDate: '2025-06-20'
         }
-    ];
+    ]);
 
-    const handleNavigation = (href: string) => {
-        setIsNavigating(true);
-        // Prefetch the route (this happens in the background)
-        router.prefetch(href);
-        // Navigate to the route
-        router.push(href);
+    const [aggregators, setAggregators] = useState([
+        {
+            id: 'AGG001',
+            name: 'City Riders Coop',
+            kekesAssigned: 15,
+            kekesDeployed: 12,
+            avgDailyCollection: 9500,
+            cardPaymentRatio: 0.78
+        },
+        {
+            id: 'AGG002',
+            name: 'Metro Transport',
+            kekesAssigned: 10,
+            kekesDeployed: 8,
+            avgDailyCollection: 11200,
+            cardPaymentRatio: 0.85
+        }
+    ]);
+
+    const [drivers, setDrivers] = useState([
+        {
+            id: 'DRV001',
+            name: 'Ahmed Ibrahim',
+            phone: '+234-801-234-5678',
+            kekeId: 'KK001',
+            licenseExpiry: '2025-12-15',
+            kycStatus: 'Complete',
+            appUsage: 'Active'
+        },
+        {
+            id: 'DRV002',
+            name: 'Chidi Okafor',
+            phone: '+234-802-345-6789',
+            kekeId: 'KK002',
+            licenseExpiry: '2025-11-20',
+            kycStatus: 'Complete',
+            appUsage: 'Active'
+        }
+    ]);
+
+    // UI State
+    const [activeTab, setActiveTab] = useState('overview');
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState('');
+    const [editingItem, setEditingItem] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedAggregator, setSelectedAggregator] = useState('');
+
+    // Dashboard metrics
+    const dashboardMetrics = {
+        totalKekesAssigned: 25,
+        kekesPickedUp: 20,
+        kekesActivelyDeployed: 18,
+        kekesYetToPickup: 5,
+        totalDailyCollection: 187500,
+        cardPaymentRatio: 0.79,
+        totalRebatesIssued: 9375,
+        akupayCommission: 18750,
+        picngSettlement: 159375
     };
 
-    useEffect(() => {
+    // Chart data
+    const dailyCollectionData = [
+        { date: 'Mon', collection: 175000, target: 180000 },
+        { date: 'Tue', collection: 182000, target: 180000 },
+        { date: 'Wed', collection: 178000, target: 180000 },
+        { date: 'Thu', collection: 185000, target: 180000 },
+        { date: 'Fri', collection: 187500, target: 180000 },
+        { date: 'Sat', collection: 195000, target: 180000 },
+        { date: 'Sun', collection: 172000, target: 180000 }
+    ];
 
-    }, [])
+    const paymentMethodData = [
+        { name: 'Card Payments', value: 79, color: '#10B981' },
+        { name: 'Cash Payments', value: 21, color: '#F59E0B' }
+    ];
 
+    const locationPerformanceData = [
+        { location: 'Victoria Island', revenue: 45000, kekeCount: 6 },
+        { location: 'Ikeja', revenue: 38000, kekeCount: 5 },
+        { location: 'Surulere', revenue: 32000, kekeCount: 4 },
+        { location: 'Yaba', revenue: 28000, kekeCount: 3 }
+    ];
 
-    const loginForm = useFormik({
-        async onSubmit<Values>(values: any, {resetForm, setErrors}: any) {
+    // Modal management
+    const openModal = (type, item = null) => {
+        setModalType(type);
+        setEditingItem(item);
+        setShowModal(true);
+    };
 
-            setIsSubmitting(true);
+    const closeModal = () => {
+        setShowModal(false);
+        setEditingItem(null);
+        setModalType('');
+    };
 
-            const payload =  {
-                username: values.username,
-                password: values.password,
-            }
+    // CRUD operations for Keke Assets
+    const handleSaveKeke = (formData) => {
+        if (editingItem) {
+            setKekeAssets(prev => prev.map(keke =>
+                keke.id === editingItem.id ? { ...keke, ...formData } : keke
+            ));
+        } else {
+            const newKeke = {
+                id: `KK${String(kekeAssets.length + 1).padStart(3, '0')}`,
+                ...formData,
+                dailyRevenue: 0,
+                cardPaymentRatio: 0,
+                rebatesIssued: 0
+            };
+            setKekeAssets(prev => [...prev, newKeke]);
+        }
+        closeModal();
+    };
 
-            try {
+    const handleDeleteKeke = (id) => {
+        setKekeAssets(prev => prev.filter(keke => keke.id !== id));
+    };
 
-                const {data}  =  await loginAxiosClient.post(`v1/authenticate/customers`, payload);
+    // CRUD operations for Aggregators
+    const handleSaveAggregator = (formData) => {
+        if (editingItem) {
+            setAggregators(prev => prev.map(agg =>
+                agg.id === editingItem.id ? { ...agg, ...formData } : agg
+            ));
+        } else {
+            const newAggregator = {
+                id: `AGG${String(aggregators.length + 1).padStart(3, '0')}`,
+                ...formData,
+                kekesDeployed: 0,
+                avgDailyCollection: 0,
+                cardPaymentRatio: 0
+            };
+            setAggregators(prev => [...prev, newAggregator]);
+        }
+        closeModal();
+    };
 
-                if (data.accessToken) {
+    const handleDeleteAggregator = (id) => {
+        setAggregators(prev => prev.filter(agg => agg.id !== id));
+    };
 
-                    await sessionStorage.setItem('token', data.accessToken);
-                    await sessionStorage.setItem('customerId', data.customerId);
-                    //await login(data.accessToken, data.customerId);
-                    setIsSubmitting(false);
-                    showToast('Login successfull', 'success');
-                    setSessionData('atoken', data.accessToken);
-                    setSessionData('display', data.name);
-                    setSessionData('refe', data.customerId);
-                    setSessionData('user', data.username);
-                    setSessionData('role', data?.group?.name);
-                    await router.push('/myspace');
+    // CRUD operations for Drivers
+    const handleSaveDriver = (formData) => {
+        if (editingItem) {
+            setDrivers(prev => prev.map(driver =>
+                driver.id === editingItem.id ? { ...driver, ...formData } : driver
+            ));
+        } else {
+            const newDriver = {
+                id: `DRV${String(drivers.length + 1).padStart(3, '0')}`,
+                ...formData
+            };
+            setDrivers(prev => [...prev, newDriver]);
+        }
+        closeModal();
+    };
 
-                } else {
-                    setIsSubmitting(false);
-                    setFailureOpen(true);
+    const handleDeleteDriver = (id) => {
+        setDrivers(prev => prev.filter(driver => driver.id !== id));
+    };
 
-                }
-            }catch(err:any){
-                setIsSubmitting(false);
-                setFailureOpen(true);
-
-            }
-        },
-
-        initialValues: {
-            username: '',
-            password: '',
-        },
-        validationSchema: loginValidationSchema,
+    // Filter functions
+    const filteredKekeAssets = kekeAssets.filter(keke => {
+        const matchesSearch = keke.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            keke.driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            keke.location.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesAggregator = !selectedAggregator || keke.aggregator === selectedAggregator;
+        return matchesSearch && matchesAggregator;
     });
 
-    return (
-
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div
-                    className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-                <div
-                    className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-                    style={{animationDelay: '2s'}}></div>
-                <div
-                    className="absolute top-40 left-1/2 w-60 h-60 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-                    style={{animationDelay: '4s'}}></div>
+    // Reusable components
+    const MetricCard = ({ title, value, icon: Icon, trend, color = "blue" }) => (
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-sm font-medium text-gray-600">{title}</p>
+                    <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
+                    {trend && (
+                        <p className={`text-sm ${trend > 0 ? 'text-green-600' : 'text-red-600'} flex items-center mt-1`}>
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            {trend > 0 ? '+' : ''}{trend}%
+                        </p>
+                    )}
+                </div>
+                <Icon className={`w-12 h-12 text-${color}-600`} />
             </div>
+        </div>
+    );
 
-            <div className="relative z-10 flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8">
-                <div className="w-full max-w-7xl mx-auto">
-                    <div
-                        className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-                            {/* Left side - Decorative */}
-                            <div
-                                className="relative bg-gradient-to-br from-cyan-600 via-cyan-500 to-blue-700 p-8 sm:p-12 lg:p-16">
-                                {/* Geometric pattern overlay */}
-                                <div className="absolute inset-0 opacity-10">
-                                    <div className="absolute inset-0" style={{
-                                        backgroundImage: `
-                                    radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
-                                    radial-gradient(circle at 75% 75%, white 2px, transparent 2px)
-                                `,
-                                        backgroundSize: '60px 60px'
-                                    }}></div>
-                                </div>
+    const Modal = ({ children }) => (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto">
+                {children}
+            </div>
+        </div>
+    );
 
-                                <div className="relative z-10 h-full flex flex-col justify-between text-white">
-                                    <div>
-                                        {/* Logo placeholder */}
-                                        <div className="mb-8 lg:mb-12">
-                                            <div
-                                                className="w-48 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                                                <span className="text-white font-bold text-xl">IBanking</span>
-                                            </div>
-                                        </div>
+    // Form components
+    const KekeForm = () => {
+        const [formData, setFormData] = useState(editingItem || {
+            registrationNumber: '',
+            aggregator: '',
+            driver: '',
+            location: '',
+            status: 'Active',
+            deploymentDate: new Date().toISOString().split('T')[0]
+        });
 
-                                        <div className="space-y-6">
-                                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                                                Welcome to
-                                                <span className="block text-cyan-200">IBanking</span>
-                                            </h1>
-                                            <p className="text-lg sm:text-xl text-cyan-100 leading-relaxed max-w-md">
-                                                Secure, fast, and reliable banking solutions tailored for your needs
-                                            </p>
-                                        </div>
-                                    </div>
+        return (
+            <Modal>
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">
+                        {editingItem ? 'Edit Keke Asset' : 'Add New Keke Asset'}
+                    </h3>
+                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Registration Number
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.registrationNumber}
+                            onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Aggregator
+                        </label>
+                        <select
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.aggregator}
+                            onChange={(e) => setFormData({...formData, aggregator: e.target.value})}
+                        >
+                            <option value="">Select Aggregator</option>
+                            {aggregators.map(agg => (
+                                <option key={agg.id} value={agg.name}>{agg.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Driver Name
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.driver}
+                            onChange={(e) => setFormData({...formData, driver: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Location
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.location}
+                            onChange={(e) => setFormData({...formData, location: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Status
+                        </label>
+                        <select
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.status}
+                            onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        >
+                            <option value="Active">Active</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                        onClick={closeModal}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => handleSaveKeke(formData)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        {editingItem ? 'Update' : 'Create'}
+                    </button>
+                </div>
+            </Modal>
+        );
+    };
 
-                                    {/* Features list */}
-                                    <div className="hidden lg:block space-y-4">
-                                        <div className="flex items-center space-x-3 text-cyan-100">
-                                            <div className="w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                            <span>24/7 Customer Support</span>
-                                        </div>
-                                        <div className="flex items-center space-x-3 text-cyan-100">
-                                            <div className="w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                            <span>Advanced Security</span>
-                                        </div>
-                                        <div className="flex items-center space-x-3 text-cyan-100">
-                                            <div className="w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                            <span>Mobile Banking</span>
-                                        </div>
-                                    </div>
+    const AggregatorForm = () => {
+        const [formData, setFormData] = useState(editingItem || {
+            name: '',
+            kekesAssigned: 0
+        });
 
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-12 h-1 bg-cyan-300 rounded-full"></div>
-                                        <span className="text-cyan-100 font-medium">Customer Self-Registration</span>
-                                    </div>
-                                </div>
-                            </div>
+        return (
+            <Modal>
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">
+                        {editingItem ? 'Edit Aggregator' : 'Add New Aggregator'}
+                    </h3>
+                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Aggregator Name
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.name}
+                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Keke Assets Assigned
+                        </label>
+                        <input
+                            type="number"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.kekesAssigned}
+                            onChange={(e) => setFormData({...formData, kekesAssigned: parseInt(e.target.value) || 0})}
+                        />
+                    </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                        onClick={closeModal}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => handleSaveAggregator(formData)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        {editingItem ? 'Update' : 'Create'}
+                    </button>
+                </div>
+            </Modal>
+        );
+    };
 
-                            {/* Right side - Registration Form */}
-                            <div className="p-6 sm:p-8 lg:p-12 xl:p-16">
-                                <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-                                    {/* Mobile logo */}
-                                    <div className="lg:hidden text-center mb-8">
-                                        <div
-                                            className="inline-block w-32 h-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                            <span className="text-white font-bold">IBanking</span>
-                                        </div>
-                                    </div>
+    const DriverForm = () => {
+        const [formData, setFormData] = useState(editingItem || {
+            name: '',
+            phone: '',
+            kekeId: '',
+            licenseExpiry: '',
+            kycStatus: 'Pending',
+            appUsage: 'Inactive'
+        });
 
-                                    <div className="text-center mb-8 lg:mb-12 relative">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <Image
-                                                    src="/images/logo.svg"
-                                                    alt="IBanking Logo"
-                                                    width={250}
-                                                    height={120}
-                                                    className="m-4"
-                                                />
-                                            </div>
-                                            <div className="absolute right-0 top-0">
-                                                <button
-                                                    onClick={() => handleNavigation('/login')}
-                                                    className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-md text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-colors duration-200"
-                                                >
-                                                    Sign In
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <br/>
+        return (
+            <Modal>
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">
+                        {editingItem ? 'Edit Driver' : 'Add New Driver'}
+                    </h3>
+                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Driver Name
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.name}
+                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Assigned Keke ID
+                        </label>
+                        <select
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.kekeId}
+                            onChange={(e) => setFormData({...formData, kekeId: e.target.value})}
+                        >
+                            <option value="">Select Keke</option>
+                            {kekeAssets.map(keke => (
+                                <option key={keke.id} value={keke.id}>{keke.id} - {keke.registrationNumber}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            License Expiry Date
+                        </label>
+                        <input
+                            type="date"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.licenseExpiry}
+                            onChange={(e) => setFormData({...formData, licenseExpiry: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            KYC Status
+                        </label>
+                        <select
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={formData.kycStatus}
+                            onChange={(e) => setFormData({...formData, kycStatus: e.target.value})}
+                        >
+                            <option value="Pending">Pending</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                        onClick={closeModal}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => handleSaveDriver(formData)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        {editingItem ? 'Update' : 'Create'}
+                    </button>
+                </div>
+            </Modal>
+        );
+    };
 
-                                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">
-                                            Create Your Account
-                                        </h2>
-                                        <p className="text-gray-600 text-sm sm:text-base">
-                                            Join thousands of satisfied customers banking with us
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-4 sm:space-y-6">
-                                        {registrationOptions.map((option) => (
-                                            <div
-                                                key={option.id}
-                                                className="group relative"
-                                                onMouseEnter={() => {
-                                                    setHoveredCard(option.id);
-                                                    // Prefetch when user hovers over the card
-                                                    router.prefetch(option.href);
-                                                }}
-                                                onMouseLeave={() => setHoveredCard(null)}
-                                            >
-                                                <button
-                                                    onClick={() => handleNavigation(option.href)}
-                                                    className={`
-                                                        w-full p-4 sm:p-5 rounded-2xl
-                                                        bg-gradient-to-r ${option.gradient}
-                                                        text-white font-semibold
-                                                        shadow-lg hover:shadow-xl
-                                                        transform transition-all duration-300 ease-out
-                                                        hover:-translate-y-1 hover:scale-[1.02]
-                                                        flex items-center justify-between
-                                                        group-hover:shadow-2xl
-                                                        ${hoveredCard === option.id ? 'ring-4 ring-white/30' : ''}
-                                                        block
-                                                    `}
-                                                >
-                                                    <div className="flex items-center space-x-4">
-                                                        <div
-                                                            className="text-2xl sm:text-3xl opacity-90 group-hover:scale-110 transition-transform duration-300">
-                                                            {option.icon}
-                                                        </div>
-                                                        <div className="text-left">
-                                                            <div
-                                                                className="text-lg sm:text-xl font-bold">{option.title}</div>
-                                                            <div
-                                                                className="text-xs sm:text-sm text-white/80 hidden sm:block">
-                                                                {option.description}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div
-                                                        className="text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
-                                                        →
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-8 lg:mt-12 text-center">
-                                        <p className="text-sm text-gray-500">
-                                            Already have an account?{" "}
-                                            <button
-                                                onClick={() => handleNavigation('/login')}
-                                                className="font-semibold text-cyan-600 hover:text-cyan-700 transition-colors duration-200 hover:underline"
-                                            >
-                                                Sign in
-                                            </button>
-                                        </p>
-                                    </div>
-
-                                    <div className="mt-8 lg:mt-12 text-center">
-                                        <p className="text-xs text-gray-400">
-                                            © {new Date().getFullYear()} IBanking. All rights reserved.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+    return (
+        <div className="min-h-screen bg-gray-100">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-4">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">PICNG Asset & Payment Dashboard</h1>
+                            <p className="text-sm text-gray-600">Powered by Akupay • July 2025</p>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                <Download className="w-4 h-4" />
+                                <span>Export Data</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Loading overlay */}
-            {isNavigating && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+            {/* Navigation Tabs */}
+            <div className="bg-white border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <nav className="flex space-x-8">
+                        {[
+                            { id: 'overview', name: 'Overview', icon: Activity },
+                            { id: 'assets', name: 'Asset Management', icon: Truck },
+                            { id: 'aggregators', name: 'Aggregators', icon: Users },
+                            { id: 'transactions', name: 'Transactions', icon: CreditCard },
+                            { id: 'financial', name: 'Financial', icon: DollarSign },
+                            { id: 'drivers', name: 'Drivers', icon: Users }
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                                    activeTab === tab.id
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                }`}
+                            >
+                                <tab.icon className="w-4 h-4" />
+                                <span>{tab.name}</span>
+                            </button>
+                        ))}
+                    </nav>
                 </div>
-            )}
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                {/* Overview Tab */}
+                {activeTab === 'overview' && (
+                    <div className="space-y-8">
+                        {/* Key Metrics */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <MetricCard
+                                title="Total Kekes Assigned"
+                                value={dashboardMetrics.totalKekesAssigned}
+                                icon={Truck}
+                                trend={5.2}
+                                color="blue"
+                            />
+                            <MetricCard
+                                title="Actively Deployed"
+                                value={dashboardMetrics.kekesActivelyDeployed}
+                                icon={CheckCircle}
+                                trend={2.1}
+                                color="green"
+                            />
+                            <MetricCard
+                                title="Daily Collection"
+                                value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                                icon={DollarSign}
+                                trend={8.3}
+                                color="emerald"
+                            />
+                            <MetricCard
+                                title="Card Payment Ratio"
+                                value={`${(dashboardMetrics.cardPaymentRatio * 100).toFixed(1)}%`}
+                                icon={CreditCard}
+                                trend={3.7}
+                                color="purple"
+                            />
+                        </div>
+
+                        {/* Charts Row */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Daily Collections Chart */}
+                            <div className="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 className="text-lg font-semibold mb-4">Daily Collections vs Target</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={dailyCollectionData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis />
+                                        <Tooltip formatter={(value) => [`₦${value.toLocaleString()}`, '']} />
+                                        <Area type="monotone" dataKey="collection" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
+                                        <Area type="monotone" dataKey="target" stroke="#10B981" fill="transparent" strokeDasharray="5 5" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            {/* Payment Methods Pie Chart */}
+                            <div className="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 className="text-lg font-semibold mb-4">Payment Methods Distribution</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart>
+                                        <Pie
+                                            data={paymentMethodData}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={100}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            label={({name, value}) => `${name}: ${value}%`}
+                                        >
+                                            {paymentMethodData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {/* Location Performance */}
+                        <div className="bg-white p-6 rounded-lg shadow-sm border">
+                            <h3 className="text-lg font-semibold mb-4">Location Performance</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={locationPerformanceData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="location" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value, name) => [
+                                        name === 'revenue' ? `₦${value.toLocaleString()}` : value,
+                                        name === 'revenue' ? 'Revenue' : 'Keke Count'
+                                    ]} />
+                                    <Bar dataKey="revenue" fill="#3B82F6" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+
+                {/* Asset Management Tab */}
+                {activeTab === 'assets' && (
+                    <div className="space-y-6">
+                        {/* Filters and Actions */}
+                        <div className="bg-white p-6 rounded-lg shadow-sm border">
+                            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                                <div className="flex items-center space-x-4">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search assets..."
+                                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <select
+                                        className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        value={selectedAggregator}
+                                        onChange={(e) => setSelectedAggregator(e.target.value)}
+                                    >
+                                        <option value="">All Aggregators</option>
+                                        {aggregators.map(agg => (
+                                            <option key={agg.id} value={agg.name}>{agg.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <button
+                                    onClick={() => openModal('keke')}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Add Keke Asset</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Assets Table */}
+                        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Keke ID
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Registration
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Driver
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Aggregator
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Location
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Daily Revenue
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Card Ratio
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredKekeAssets.map((keke) => (
+                                        <tr key={keke.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {keke.id}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {keke.registrationNumber}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {keke.driver}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {keke.aggregator}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <div className="flex items-center">
+                                                    <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                                                    {keke.location}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              keke.status === 'Active'
+                                  ? 'bg-green-100 text-green-800'
+                                  : keke.status === 'Maintenance'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-red-100 text-red-800'
+                          }`}>
+                            {keke.status}
+                          </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                ₦{keke.dailyRevenue.toLocaleString()}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {(keke.cardPaymentRatio * 100).toFixed(1)}%
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => openModal('keke', keke)}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteKeke(keke.id)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button className="text-gray-600 hover:text-gray-900">
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Aggregators Tab */}
+                {activeTab === 'aggregators' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-bold text-gray-900">Aggregator Management</h2>
+                            <button
+                                onClick={() => openModal('aggregator')}
+                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Add Aggregator</span>
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {aggregators.map((aggregator) => (
+                                <div key={aggregator.id} className="bg-white p-6 rounded-lg shadow-sm border">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <h3 className="text-lg font-semibold text-gray-900">{aggregator.name}</h3>
+                                        <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={() => openModal('aggregator', aggregator)}
+                                                className="text-blue-600 hover:text-blue-900"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteAggregator(aggregator.id)}
+                                                className="text-red-600 hover:text-red-900"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Keke Assets Assigned:</span>
+                                            <span className="text-sm font-medium">{aggregator.kekesAssigned}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Deployed:</span>
+                                            <span className="text-sm font-medium">{aggregator.kekesDeployed}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Deployment Rate:</span>
+                                            <span className="text-sm font-medium">
+                        {((aggregator.kekesDeployed / aggregator.kekesAssigned) * 100).toFixed(1)}%
+                      </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Avg Daily Collection:</span>
+                                            <span className="text-sm font-medium">₦{aggregator.avgDailyCollection.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Card Payment Ratio:</span>
+                                            <span className="text-sm font-medium">{(aggregator.cardPaymentRatio * 100).toFixed(1)}%</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 pt-4 border-t">
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-blue-600 h-2 rounded-full"
+                                                style={{width: `${(aggregator.kekesDeployed / aggregator.kekesAssigned) * 100}%`}}
+                                            ></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">Deployment Progress</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Transactions Tab */}
+                {activeTab === 'transactions' && (
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Transaction Dashboard</h2>
+
+                        {/* Transaction Metrics */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <MetricCard
+                                title="Total Collection Today"
+                                value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                                icon={DollarSign}
+                                trend={8.3}
+                                color="emerald"
+                            />
+                            <MetricCard
+                                title="Card Transactions"
+                                value={`${(dashboardMetrics.cardPaymentRatio * 100).toFixed(1)}%`}
+                                icon={CreditCard}
+                                trend={3.7}
+                                color="blue"
+                            />
+                            <MetricCard
+                                title="Total Rebates Issued"
+                                value={`₦${dashboardMetrics.totalRebatesIssued.toLocaleString()}`}
+                                icon={TrendingUp}
+                                trend={12.5}
+                                color="purple"
+                            />
+                        </div>
+
+                        {/* Transaction Charts */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 className="text-lg font-semibold mb-4">Daily Collection Trend</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={dailyCollectionData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis />
+                                        <Tooltip formatter={(value) => [`₦${value.toLocaleString()}`, '']} />
+                                        <Line type="monotone" dataKey="collection" stroke="#3B82F6" strokeWidth={2} />
+                                        <Line type="monotone" dataKey="target" stroke="#10B981" strokeDasharray="5 5" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 className="text-lg font-semibold mb-4">Location Revenue</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={locationPerformanceData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="location" />
+                                        <YAxis />
+                                        <Tooltip formatter={(value) => [`₦${value.toLocaleString()}`, 'Revenue']} />
+                                        <Bar dataKey="revenue" fill="#8B5CF6" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Financial Tab */}
+                {activeTab === 'financial' && (
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Financial Distribution</h2>
+
+                        {/* Financial Metrics */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <MetricCard
+                                title="Total Collection"
+                                value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                                icon={DollarSign}
+                                color="emerald"
+                            />
+                            <MetricCard
+                                title="Akupay Commission"
+                                value={`₦${dashboardMetrics.akupayCommission.toLocaleString()}`}
+                                icon={CreditCard}
+                                color="blue"
+                            />
+                            <MetricCard
+                                title="Rebates Issued"
+                                value={`₦${dashboardMetrics.totalRebatesIssued.toLocaleString()}`}
+                                icon={TrendingUp}
+                                color="purple"
+                            />
+                            <MetricCard
+                                title="PICNG Settlement"
+                                value={`₦${dashboardMetrics.picngSettlement.toLocaleString()}`}
+                                icon={CheckCircle}
+                                color="green"
+                            />
+                        </div>
+
+                        {/* Financial Breakdown Table */}
+                        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-200">
+                                <h3 className="text-lg font-semibold">Per-Keke Financial Summary</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Keke ID
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Daily Revenue
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Card %
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Rebates Given
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Akupay Earnings
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Net to PICNG
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    {kekeAssets.map((keke) => {
+                                        const akupayEarnings = keke.dailyRevenue * 0.1; // 10% commission
+                                        const netToPicng = keke.dailyRevenue - akupayEarnings - keke.rebatesIssued;
+
+                                        return (
+                                            <tr key={keke.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    {keke.id}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    ₦{keke.dailyRevenue.toLocaleString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {(keke.cardPaymentRatio * 100).toFixed(1)}%
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    ₦{keke.rebatesIssued.toLocaleString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    ₦{akupayEarnings.toLocaleString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    ₦{netToPicng.toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Drivers Tab */}
+                {activeTab === 'drivers' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-bold text-gray-900">Driver Management</h2>
+                            <button
+                                onClick={() => openModal('driver')}
+                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Add Driver</span>
+                            </button>
+                        </div>
+
+                        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Driver ID
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Name
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Phone
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Assigned Keke
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            License Expiry
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            KYC Status
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            App Usage
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    {drivers.map((driver) => {
+                                        const isLicenseExpiring = new Date(driver.licenseExpiry) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+                                        return (
+                                            <tr key={driver.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    {driver.id}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {driver.name}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {driver.phone}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {driver.kekeId || 'Not Assigned'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <div className="flex items-center">
+                                                        {driver.licenseExpiry}
+                                                        {isLicenseExpiring && (
+                                                            <AlertTriangle className="w-4 h-4 ml-2 text-yellow-500" />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                driver.kycStatus === 'Complete'
+                                    ? 'bg-green-100 text-green-800'
+                                    : driver.kycStatus === 'Pending'
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-red-100 text-red-800'
+                            }`}>
+                              {driver.kycStatus}
+                            </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                driver.appUsage === 'Active'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {driver.appUsage}
+                            </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex items-center space-x-2">
+                                                        <button
+                                                            onClick={() => openModal('driver', driver)}
+                                                            className="text-blue-600 hover:text-blue-900"
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteDriver(driver.id)}
+                                                            className="text-red-600 hover:text-red-900"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Modals */}
+            {showModal && modalType === 'keke' && <KekeForm />}
+            {showModal && modalType === 'aggregator' && <AggregatorForm />}
+            {showModal && modalType === 'driver' && <DriverForm />}
         </div>
-
-        /* <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 relative overflow-hidden">
-             {/!* Background decorative elements *!/}
-             <div className="absolute inset-0 overflow-hidden">
-                 <div
-                     className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
-                 <div
-                     className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-                 <div
-                     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-cyan-300/10 to-blue-300/10 rounded-full blur-2xl"></div>
-             </div>
-
-             {/!* Toast Notification *!/}
-             {toast && (
-                 <ToastNotification
-                     message={toast.message}
-                     type={toast.type}
-                     onClose={() => setToast(null)}
-                 />
-             )}
-
-             {/!* Failure Modal *!/}
-             <Dialog open={failureOpen} onClose={setFailureOpen} className="relative z-10">
-                 <DialogBackdrop
-                     transition
-                     className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
-                 />
-
-                 <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                     <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                         <DialogPanel
-                             transition
-                             className="relative transform overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm text-left shadow-2xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95 border border-red-200/50"
-                         >
-                             <div className="bg-gradient-to-br from-red-50 to-rose-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                 <div className="text-center">
-                                     {/!* Failure Icon with Animation *!/}
-                                     <div
-                                         className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mb-4 animate-pulse shadow-lg">
-                                         <XCircleIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white"/>
-                                     </div>
-
-                                     <DialogTitle as="h3" className="text-lg sm:text-xl font-bold text-red-800 mb-2">
-                                         Login Failed
-                                     </DialogTitle>
-
-                                     <div
-                                         className="w-16 h-1 bg-gradient-to-r from-red-500 to-rose-500 mx-auto rounded-full mb-4"></div>
-
-                                     <div className="space-y-3 mb-6">
-                                         <p className="text-sm sm:text-base text-red-700 font-medium">
-                                             Incorrect credentials provided.
-                                         </p>
-
-                                         <div
-                                             className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200">
-                                             <div className="space-y-2 text-sm">
-                                                 <div className="flex justify-between">
-                                                     <span className="text-gray-600">Error Code:</span>
-                                                     <span className="font-semibold text-red-700">#ERR_401</span>
-                                                 </div>
-                                                 <div className="flex justify-between">
-                                                     <span className="text-gray-600">Reason:</span>
-                                                     <span
-                                                         className="font-semibold text-red-700">Incorrect credentials</span>
-                                                 </div>
-                                                 <div className="flex justify-between">
-                                                     <span className="text-gray-600">Status:</span>
-                                                     <span className="font-semibold text-red-700">Failed</span>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                     </div>
-
-                                     <div className="flex space-x-3">
-                                         <button
-                                             onClick={() => setFailureOpen(false)}
-                                             className="flex-1 inline-flex justify-center rounded-lg bg-white px-4 py-2 sm:py-3 text-sm font-semibold text-gray-900 shadow-md ring-1 ring-gray-300 ring-inset hover:bg-gray-50 transition-all duration-300"
-                                         >
-                                             Cancel
-                                         </button>
-                                         <button
-                                             onClick={() => {
-                                                 setFailureOpen(false);
-                                             }}
-                                             className="flex-1 inline-flex justify-center rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 sm:py-3 text-sm font-semibold text-white shadow-lg hover:from-red-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105"
-                                         >
-                                             Try Again
-                                         </button>
-                                     </div>
-                                 </div>
-                             </div>
-                         </DialogPanel>
-                     </div>
-                 </div>
-             </Dialog>
-
-             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                 <div className="flex flex-col min-h-screen">
-                     {/!* Main Content *!/}
-                     <div className="flex-grow flex items-center justify-center py-8 sm:py-12">
-                         <div className="w-full max-w-md lg:max-w-lg">
-                             {/!* Logo Section *!/}
-                             <div className="mx-auto mb-8 sm:mb-12 text-center">
-                                 <div className="flex items-center justify-center space-x-3">
-                                     <div className="relative">
-                                         <Image
-                                             width={190}
-                                             height={90}
-                                             src="/images/logo.svg"
-                                             alt="Company Logo"
-                                             className="m-2"
-                                         />
-                                     </div>
-                                 </div>
-                             </div>
-
-                             {/!* Login Card *!/}
-                             <div
-                                 className="bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-white/20">
-                                 <div className="text-center mb-6 sm:mb-8">
-                                     <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Administration</h2>
-                                     <p className="mt-2 text-gray-500 text-sm sm:text-base">Sign in to continue</p>
-                                     <div
-                                         className="w-80 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
-                                 </div>
-
-                                 <form onSubmit={loginForm.handleSubmit} className="space-y-6">
-                                     {/!* Username Field *!/}
-                                     <div>
-                                         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                                             <div className="flex items-center">
-                                                 <svg className="w-4 h-4 mr-2 text-cyan-500" fill="none"
-                                                      stroke="currentColor" viewBox="0 0 24 24">
-                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                                 </svg>
-                                                 Username
-                                             </div>
-                                         </label>
-                                         <div className="relative group">
-                                             <div
-                                                 className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                                                 <svg
-                                                     className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-cyan-500 transition-colors"
-                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                                 </svg>
-                                             </div>
-                                             <input
-                                                 name="username"
-                                                 className={`w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 text-sm sm:text-base rounded-xl border focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 transform focus:scale-[1.02] focus:shadow-lg ${
-                                                     loginForm.errors.username && loginForm.touched.username
-                                                         ? "border-red-500"
-                                                         : "border-gray-300"
-                                                 }`}
-                                                 type="text"
-                                                 placeholder="Enter your username"
-                                                 required
-                                                 onChange={loginForm.handleChange}
-                                                 onBlur={loginForm.handleBlur}
-                                                 value={loginForm.values.username}
-                                             />
-                                         </div>
-                                         {loginForm.errors.username && loginForm.touched.username && (
-                                             <p className="mt-2 text-sm text-red-600">
-                                                 {loginForm.errors.username}
-                                             </p>
-                                         )}
-                                     </div>
-
-                                     {/!* Password Field *!/}
-                                     <div className="relative">
-                                         <div className="flex justify-between items-center mb-2">
-                                             <label className="block text-sm sm:text-base font-medium text-gray-700">
-                                                 <div className="flex items-center">
-                                                     <svg className="w-4 h-4 mr-2 text-cyan-500" fill="none"
-                                                          stroke="currentColor" viewBox="0 0 24 24">
-                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                                     </svg>
-                                                     Password
-                                                 </div>
-                                             </label>
-                                             <Link
-                                                 href="/password-reset"
-                                                 className="text-xs sm:text-sm font-medium text-cyan-500 hover:text-cyan-400 transition-colors"
-                                             >
-                                                 Forgot password?
-                                             </Link>
-                                         </div>
-                                         <div className="relative group">
-                                             <div
-                                                 className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                                                 <svg
-                                                     className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-cyan-500 transition-colors"
-                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                           d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                                 </svg>
-                                             </div>
-                                             <input
-                                                 name="password"
-                                                 className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 text-sm sm:text-base rounded-xl border focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 transform focus:scale-[1.02] focus:shadow-lg ${
-                                                     loginForm.errors.password && loginForm.touched.password
-                                                         ? "border-red-500"
-                                                         : "border-gray-300"
-                                                 }`}
-                                                 type={showPassword ? "text" : "password"}
-                                                 placeholder="Enter your password"
-                                                 required
-                                                 onChange={loginForm.handleChange}
-                                                 onBlur={loginForm.handleBlur}
-                                                 value={loginForm.values.password}
-                                             />
-                                             <button
-                                                 type="button"
-                                                 className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center"
-                                                 onClick={() => setShowPassword(!showPassword)}
-                                             >
-                                                 {showPassword ? (
-                                                     <FaEyeSlash
-                                                         className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600"/>
-                                                 ) : (
-                                                     <FaEye
-                                                         className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600"/>
-                                                 )}
-                                             </button>
-                                         </div>
-                                         {loginForm.errors.password && loginForm.touched.password && (
-                                             <p className="mt-2 text-sm text-red-600">
-                                                 {loginForm.errors.password}
-                                             </p>
-                                         )}
-                                     </div>
-
-                                     {/!* Submit Button *!/}
-                                     <div>
-                                         <button
-                                             className="w-full py-3 sm:py-4 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-medium text-sm sm:text-base rounded-xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02]"
-                                             disabled={loginForm.isSubmitting}
-                                             type="submit"
-                                         >
-                                             {loginForm.isSubmitting ? (
-                                                 <span className="flex items-center justify-center">
-                             <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                                  fill="none" viewBox="0 0 24 24">
-                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                       strokeWidth="4"></circle>
-                               <path className="opacity-75" fill="currentColor"
-                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                             </svg>
-                             Processing...
-                           </span>
-                                             ) : (
-                                                 "Log In"
-                                             )}
-                                         </button>
-                                     </div>
-                                 </form>
-
-                                 {/!* Sign Up Link *!/}
-                                 <div className="mt-6 sm:mt-8 text-center">
-                                     <p className="text-sm text-gray-500">
-                                         Don't have an account?{" "}
-                                         <Link
-                                             href="/register"
-                                             className="font-medium text-cyan-400 hover:text-cyan-400 transition-colors"
-                                         >
-                                             Create new
-                                         </Link>
-                                     </p>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-
-                     {/!* Footer *!/}
-                     <div className="py-4 sm:py-6 text-center">
-                         <p className="text-xs sm:text-sm text-gray-500">
-                             © {new Date().getFullYear()} IBanking. All rights reserved.
-                         </p>
-                     </div>
-                 </div>
-
-                 {/!* Loading Overlay *!/}
-                 {isSubmitting && (
-                     <div
-                         className="fixed inset-0 bg-gradient-to-br from-black/40 via-slate-900/30 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                         <div
-                             className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 border border-white/30 relative overflow-hidden">
-
-                             {/!* Animated background gradient *!/}
-                             <div
-                                 className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-blue-50/30 animate-pulse"></div>
-
-                             {/!* Enhanced spinner with multiple rings *!/}
-                             <div className="relative mb-6">
-                                 <div
-                                     className="animate-spin rounded-full h-16 w-16 sm:h-20 sm:w-20 border-4 border-transparent border-t-cyan-500 border-r-cyan-400"></div>
-                                 <div
-                                     className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-blue-400 border-l-blue-300"
-                                     style={{animationDirection: 'reverse', animationDuration: '2s'}}></div>
-                                 <div
-                                     className="absolute inset-4 animate-pulse bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"></div>
-                             </div>
-
-                             {/!* Enhanced text with subtle animations *!/}
-                             <h3 className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent mb-3 text-center">
-                                 Verifying your credentials
-                                 <span className="inline-block animate-pulse">...</span>
-                             </h3>
-
-                             <p className="text-sm sm:text-base text-gray-600 text-center leading-relaxed mb-4">
-                                 Please wait while we securely verify your credentials
-                             </p>
-
-                             {/!* Progress indicator *!/}
-                             <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
-                                 <div
-                                     className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full animate-pulse"
-                                     style={{width: '70%'}}></div>
-                             </div>
-
-                             {/!* Status text *!/}
-                             <p className="text-xs text-gray-500 text-center animate-pulse">
-                                 Verifying login credentials...
-                             </p>
-
-                             {/!* Decorative elements *!/}
-                             <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
-                             <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"
-                                  style={{animationDelay: '0.5s'}}></div>
-                         </div>
-                     </div>
-                 )}
-             </div>
-         </section>*/
     );
-}
+};
+
+export default PICNGDashboard;
