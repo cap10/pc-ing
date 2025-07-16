@@ -1,0 +1,30 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies for building native modules
+RUN apk add --no-cache libc6-compat
+
+# Copy package files
+COPY package*.json yarn.lock* pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN \
+  if [ -f yarn.lock ]; then yarn install; \
+  elif [ -f package-lock.json ]; then npm install; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Install sharp for image optimization
+RUN yarn add sharp
+
+# Copy the rest of the application
+COPY . .
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV NODE_ENV=development
+
+CMD ["yarn", "dev"]

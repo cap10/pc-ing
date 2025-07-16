@@ -1,10 +1,40 @@
-version: '3.7'
+version: '3.8'
+
 services:
-  customer-web-app:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    platform: linux/amd64
-    image: cap10/myrepository:internet-banking-latest
+      args:
+        - NODE_ENV=production
+    image: pc-ing:latest
+    container_name: pc-ing-app
     ports:
-      - '3000:3000'
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); });"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+  # Development configuration
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: pc-ing:dev
+    container_name: pc-ing-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: yarn dev
