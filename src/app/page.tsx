@@ -1,13 +1,27 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuth, performLogout } from '../store/slices/authSlice';
+import { 
+    loadDataFromStorage,
+    setActiveTab,
+    addKekeAsset,
+    updateKekeAsset,
+    deleteKekeAsset,
+    addAggregator,
+    updateAggregator,
+    deleteAggregator,
+    addDriver,
+    updateDriver,
+    deleteDriver,
+    type KekeAsset,
+    type Aggregator,
+    type Driver
+} from '../store/slices/dataSlice';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'sonner';
 import {
-    Users,
-    Truck,
     CreditCard,
     TrendingUp,
     MapPin,
@@ -16,13 +30,11 @@ import {
     Trash2,
     Search,
     Download,
-    Eye,
     DollarSign,
-    Activity,
     AlertTriangle,
     CheckCircle
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 // Import components
 import Sidenav from '../components/ui/Sidenav';
@@ -37,6 +49,7 @@ const PICNGDashboard = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { isAuthenticated, canEdit, user } = useAuth();
+    const { kekeAssets, aggregators, drivers, isLoaded, activeTab } = useAppSelector((state) => state.data);
     
     // State for mobile sidenav
     const [isSidenavOpen, setIsSidenavOpen] = useState(false);
@@ -54,91 +67,11 @@ const PICNGDashboard = () => {
         itemType: ''
     });
     
-    // State for different data entities
-    const [kekeAssets, setKekeAssets] = useState([
-        {
-            id: 'KK001',
-            registrationNumber: 'ABC-123-XY',
-            aggregator: 'City Riders Coop',
-            driver: 'Ahmed Ibrahim',
-            location: 'Victoria Island',
-            status: 'Active',
-            dailyRevenue: 8500,
-            cardPaymentRatio: 0.75,
-            rebatesIssued: 425,
-            deploymentDate: '2025-06-15'
-        },
-        {
-            id: 'KK002',
-            registrationNumber: 'DEF-456-ZW',
-            aggregator: 'Metro Transport',
-            driver: 'Chidi Okafor',
-            location: 'Ikeja',
-            status: 'Active',
-            dailyRevenue: 12000,
-            cardPaymentRatio: 0.82,
-            rebatesIssued: 600,
-            deploymentDate: '2025-06-10'
-        },
-        {
-            id: 'KK003',
-            registrationNumber: 'GHI-789-UV',
-            aggregator: 'City Riders Coop',
-            driver: 'Fatima Hassan',
-            location: 'Surulere',
-            status: 'Maintenance',
-            dailyRevenue: 0,
-            cardPaymentRatio: 0,
-            rebatesIssued: 0,
-            deploymentDate: '2025-06-20'
-        }
-    ]);
-
-    const [aggregators, setAggregators] = useState([
-        {
-            id: 'AGG001',
-            name: 'City Riders Coop',
-            kekesAssigned: 15,
-            kekesDeployed: 12,
-            avgDailyCollection: 9500,
-            cardPaymentRatio: 0.78
-        },
-        {
-            id: 'AGG002',
-            name: 'Metro Transport',
-            kekesAssigned: 10,
-            kekesDeployed: 8,
-            avgDailyCollection: 11200,
-            cardPaymentRatio: 0.85
-        }
-    ]);
-
-    const [drivers, setDrivers] = useState([
-        {
-            id: 'DRV001',
-            name: 'Ahmed Ibrahim',
-            phone: '+234-801-234-5678',
-            kekeId: 'KK001',
-            licenseExpiry: '2025-12-15',
-            kycStatus: 'Complete',
-            appUsage: 'Active'
-        },
-        {
-            id: 'DRV002',
-            name: 'Chidi Okafor',
-            phone: '+234-802-345-6789',
-            kekeId: 'KK002',
-            licenseExpiry: '2025-11-20',
-            kycStatus: 'Complete',
-            appUsage: 'Active'
-        }
-    ]);
 
     // UI State
-    const [activeTab, setActiveTab] = useState('overview');
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
-    const [editingItem, setEditingItem] = useState(null);
+    const [editingItem, setEditingItem] = useState<KekeAsset | Aggregator | Driver | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAggregator, setSelectedAggregator] = useState('');
 
@@ -179,7 +112,7 @@ const PICNGDashboard = () => {
     ];
 
     // Modal management
-    const openModal = (type, item = null) => {
+    const openModal = (type: string, item: KekeAsset | Aggregator | Driver | null = null) => {
         setModalType(type);
         setEditingItem(item);
         setShowModal(true);
@@ -192,7 +125,7 @@ const PICNGDashboard = () => {
     };
 
     // CRUD operations for Keke Assets
-    const handleSaveKeke = async (formData) => {
+    const handleSaveKeke = async (formData: Partial<KekeAsset>) => {
         setIsOperationLoading(true);
         
         try {
@@ -200,21 +133,12 @@ const PICNGDashboard = () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             if (editingItem) {
-                setKekeAssets(prev => prev.map(keke =>
-                    keke.id === editingItem.id ? { ...keke, ...formData } : keke
-                ));
+                dispatch(updateKekeAsset({ ...editingItem, ...formData } as KekeAsset));
                 toast.success('Keke asset updated successfully!', {
-                    description: `Updated ${formData.registrationNumber || editingItem.registrationNumber}`
+                    description: `Updated ${formData.registrationNumber || (editingItem as KekeAsset).registrationNumber}`
                 });
             } else {
-                const newKeke = {
-                    id: `KK${String(kekeAssets.length + 1).padStart(3, '0')}`,
-                    ...formData,
-                    dailyRevenue: 0,
-                    cardPaymentRatio: 0,
-                    rebatesIssued: 0
-                };
-                setKekeAssets(prev => [...prev, newKeke]);
+                dispatch(addKekeAsset(formData as Omit<KekeAsset, 'id'>));
                 toast.success('Keke asset created successfully!', {
                     description: `Added ${formData.registrationNumber}`
                 });
@@ -230,7 +154,7 @@ const PICNGDashboard = () => {
         }
     };
 
-    const handleDeleteKeke = (id) => {
+    const handleDeleteKeke = (id: string) => {
         setConfirmationModal({
             isOpen: true,
             title: 'Delete Keke Asset',
@@ -242,7 +166,7 @@ const PICNGDashboard = () => {
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                setKekeAssets(prev => prev.filter(keke => keke.id !== id));
+                dispatch(deleteKekeAsset(id));
                 toast.success('Keke asset deleted successfully!');
                 setIsOperationLoading(false);
             },
@@ -251,7 +175,7 @@ const PICNGDashboard = () => {
     };
 
     // CRUD operations for Aggregators
-    const handleSaveAggregator = async (formData) => {
+    const handleSaveAggregator = async (formData: Partial<Aggregator>) => {
         setIsOperationLoading(true);
         
         try {
@@ -259,21 +183,12 @@ const PICNGDashboard = () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             if (editingItem) {
-                setAggregators(prev => prev.map(agg =>
-                    agg.id === editingItem.id ? { ...agg, ...formData } : agg
-                ));
+                dispatch(updateAggregator({ ...editingItem, ...formData } as Aggregator));
                 toast.success('Aggregator updated successfully!', {
-                    description: `Updated ${formData.name || editingItem.name}`
+                    description: `Updated ${formData.name || (editingItem as Aggregator).name}`
                 });
             } else {
-                const newAggregator = {
-                    id: `AGG${String(aggregators.length + 1).padStart(3, '0')}`,
-                    ...formData,
-                    kekesDeployed: 0,
-                    avgDailyCollection: 0,
-                    cardPaymentRatio: 0
-                };
-                setAggregators(prev => [...prev, newAggregator]);
+                dispatch(addAggregator(formData as Omit<Aggregator, 'id'>));
                 toast.success('Aggregator created successfully!', {
                     description: `Added ${formData.name}`
                 });
@@ -289,7 +204,7 @@ const PICNGDashboard = () => {
         }
     };
 
-    const handleDeleteAggregator = (id) => {
+    const handleDeleteAggregator = (id: string) => {
         setConfirmationModal({
             isOpen: true,
             title: 'Delete Aggregator',
@@ -301,7 +216,7 @@ const PICNGDashboard = () => {
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                setAggregators(prev => prev.filter(agg => agg.id !== id));
+                dispatch(deleteAggregator(id));
                 toast.success('Aggregator deleted successfully!');
                 setIsOperationLoading(false);
             },
@@ -310,7 +225,7 @@ const PICNGDashboard = () => {
     };
 
     // CRUD operations for Drivers
-    const handleSaveDriver = async (formData) => {
+    const handleSaveDriver = async (formData: Partial<Driver>) => {
         setIsOperationLoading(true);
         
         try {
@@ -318,18 +233,12 @@ const PICNGDashboard = () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             if (editingItem) {
-                setDrivers(prev => prev.map(driver =>
-                    driver.id === editingItem.id ? { ...driver, ...formData } : driver
-                ));
+                dispatch(updateDriver({ ...editingItem, ...formData } as Driver));
                 toast.success('Driver updated successfully!', {
-                    description: `Updated ${formData.name || editingItem.name}`
+                    description: `Updated ${formData.name || (editingItem as Driver).name}`
                 });
             } else {
-                const newDriver = {
-                    id: `DRV${String(drivers.length + 1).padStart(3, '0')}`,
-                    ...formData
-                };
-                setDrivers(prev => [...prev, newDriver]);
+                dispatch(addDriver(formData as Omit<Driver, 'id'>));
                 toast.success('Driver created successfully!', {
                     description: `Added ${formData.name}`
                 });
@@ -345,7 +254,7 @@ const PICNGDashboard = () => {
         }
     };
 
-    const handleDeleteDriver = (id) => {
+    const handleDeleteDriver = (id: string) => {
         setConfirmationModal({
             isOpen: true,
             title: 'Delete Driver',
@@ -357,7 +266,7 @@ const PICNGDashboard = () => {
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                setDrivers(prev => prev.filter(driver => driver.id !== id));
+                dispatch(deleteDriver(id));
                 toast.success('Driver deleted successfully!');
                 setIsOperationLoading(false);
             },
@@ -368,6 +277,7 @@ const PICNGDashboard = () => {
     // Authentication check
     useEffect(() => {
         dispatch(checkAuth());
+        dispatch(loadDataFromStorage());
         setIsLoading(false);
     }, [dispatch]);
 
@@ -531,7 +441,7 @@ const PICNGDashboard = () => {
                 isSidenavOpen={isSidenavOpen}
                 setIsSidenavOpen={setIsSidenavOpen}
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={(tab: string) => dispatch(setActiveTab(tab))}
                 onLogout={handleLogout}
             />
 
@@ -551,17 +461,19 @@ const PICNGDashboard = () => {
                                     </svg>
                                 </button>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">PICNG Asset & Payment Dashboard</h1>
-                                    <p className="text-sm text-gray-600">
-                                        Powered by Akupay • July 2025 • {user?.username} ({user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'})
-                                    </p>
+                                    <h1 className="text-2xl capitalize font-bold text-gray-900">
+                                        {activeTab}
+                                    </h1>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
                                 <button 
                                     onClick={handleExportData}
                                     disabled={isOperationLoading}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{
+                                        backgroundColor: 'rgb(11, 79, 38)'
+                                    }}
                                 >
                                     {isOperationLoading ? (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
@@ -621,7 +533,10 @@ const PICNGDashboard = () => {
                                 {canEdit && (
                                     <button
                                         onClick={() => openModal('keke')}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                        className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80"
+                                        style={{
+                                            backgroundColor: 'rgb(11, 79, 38)'
+                                        }}
                                     >
                                         <Plus className="w-4 h-4" />
                                         <span>Add Keke Asset</span>
@@ -721,9 +636,9 @@ const PICNGDashboard = () => {
                                                             </button>
                                                         </>
                                                     )}
-                                                    <button className="text-gray-600 hover:text-gray-900">
+                                                    {/* <button className="text-gray-600 hover:text-gray-900">
                                                         <Eye className="w-4 h-4" />
-                                                    </button>
+                                                    </button> */}
                                                 </div>
                                             </td>
                                         </tr>
@@ -743,7 +658,10 @@ const PICNGDashboard = () => {
                             {canEdit && (
                                 <button
                                     onClick={() => openModal('aggregator')}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                    className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80"
+                                    style={{
+                                        backgroundColor: 'rgb(11, 79, 38)'
+                                    }}
                                 >
                                     <Plus className="w-4 h-4" />
                                     <span>Add Aggregator</span>
@@ -983,7 +901,10 @@ const PICNGDashboard = () => {
                             {canEdit && (
                                 <button
                                     onClick={() => openModal('driver')}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                    className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80"
+                                    style={{
+                                        backgroundColor: 'rgb(11, 79, 38)'
+                                    }}
                                 >
                                     <Plus className="w-4 h-4" />
                                     <span>Add Driver</span>

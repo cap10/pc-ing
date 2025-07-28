@@ -16,6 +16,17 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
     paymentMethodData,
     locationPerformanceData
 }) => {
+    // Custom label for the center of the pie chart
+    const renderCenterLabel = () => {
+        const total = paymentMethodData.reduce((sum, entry) => sum + entry.value, 0);
+        return (
+            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-600 text-sm font-medium">
+                <tspan x="50%" dy="-0.5em">Total</tspan>
+                <tspan x="50%" dy="1.2em" className="text-lg font-bold">{total}%</tspan>
+            </text>
+        );
+    };
+
     return (
         <div className="space-y-8">
             {/* Key Metrics */}
@@ -76,8 +87,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                                 data={paymentMethodData}
                                 cx="50%"
                                 cy="50%"
+                                innerRadius={60}
                                 outerRadius={100}
-                                fill="#8884d8"
+                                paddingAngle={2}
                                 dataKey="value"
                                 label={({name, value}) => `${name}: ${value}%`}
                             >
@@ -85,7 +97,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                             </Pie>
-                            <Tooltip />
+                            {renderCenterLabel()}
+                            <Tooltip formatter={(value, name) => [`${value}%`, name]} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>

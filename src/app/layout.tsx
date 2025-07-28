@@ -6,6 +6,9 @@ import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 
@@ -29,7 +32,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></link>
       </head>
       <body
-        className={`${inter.className} antialiased group`}
+        className={`${inter.variable} font-sans antialiased group`}
       >
         <Providers>
           <Toaster 

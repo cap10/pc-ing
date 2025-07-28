@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
   X,
   LogOut,
@@ -7,6 +8,7 @@ import {
   Users,
   CreditCard,
   DollarSign,
+  ChevronLeftCircleIcon,
 } from "lucide-react";
 
 interface SidenavProps {
@@ -63,18 +65,26 @@ const Sidenav: React.FC<SidenavProps> = ({
         className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           isSidenavOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{ backgroundColor: "#0B4F26" }}
+        style={{ backgroundColor: "#083d1e" }}
       >
         <div
-          className="flex items-center justify-between h-16 px-6"
+          className="relative flex items-center justify-between h-16 sm:h-[72px] px-6 border-b border-b-white border-opacity-30"
           style={{ backgroundColor: "#083d1e" }}
         >
-          <h2 className="text-white font-semibold text-lg">PICNG Dashboard</h2>
+          <div className="flex items-center gap-2 font-semibold text-white text-xl">
+            <Image
+              src="/images/picng_logo.svg"
+              alt="PICNG Logo"
+              fill
+              className="!h-9 w-full !relative"
+            />
+            PICNG
+          </div>
           <button
             onClick={() => setIsSidenavOpen(false)}
-            className="lg:hidden text-white hover:text-gray-200"
+            className="lg:hidden text-black hover:text-gray-200"
           >
-            <X className="w-6 h-6" />
+            <ChevronLeftCircleIcon color="#fff" className="w-6 h-6" />
           </button>
         </div>
 
