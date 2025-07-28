@@ -1,5 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '../store/hooks';
+import { checkAuth, performLogout } from '../store/slices/authSlice';
+import { useAuth } from '../hooks/useAuth';
+import { toast } from 'sonner';
 import {
     Users,
     Truck,
@@ -15,12 +20,40 @@ import {
     DollarSign,
     Activity,
     AlertTriangle,
-    CheckCircle,
-    X
+    CheckCircle
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
 
+// Import components
+import Sidenav from '../components/ui/Sidenav';
+import MetricCard from '../components/ui/MetricCard';
+import OverviewTab from '../components/tabs/OverviewTab';
+import KekeForm from '../components/forms/KekeForm';
+import AggregatorForm from '../components/forms/AggregatorForm';
+import DriverForm from '../components/forms/DriverForm';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
+
 const PICNGDashboard = () => {
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+    const { isAuthenticated, canEdit, user } = useAuth();
+    
+    // State for mobile sidenav
+    const [isSidenavOpen, setIsSidenavOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    // Loading states for operations
+    const [isOperationLoading, setIsOperationLoading] = useState(false);
+    
+    // Confirmation modal states
+    const [confirmationModal, setConfirmationModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        itemType: ''
+    });
+    
     // State for different data entities
     const [kekeAssets, setKekeAssets] = useState([
         {
@@ -159,69 +192,326 @@ const PICNGDashboard = () => {
     };
 
     // CRUD operations for Keke Assets
-    const handleSaveKeke = (formData) => {
-        if (editingItem) {
-            setKekeAssets(prev => prev.map(keke =>
-                keke.id === editingItem.id ? { ...keke, ...formData } : keke
-            ));
-        } else {
-            const newKeke = {
-                id: `KK${String(kekeAssets.length + 1).padStart(3, '0')}`,
-                ...formData,
-                dailyRevenue: 0,
-                cardPaymentRatio: 0,
-                rebatesIssued: 0
-            };
-            setKekeAssets(prev => [...prev, newKeke]);
+    const handleSaveKeke = async (formData) => {
+        setIsOperationLoading(true);
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (editingItem) {
+                setKekeAssets(prev => prev.map(keke =>
+                    keke.id === editingItem.id ? { ...keke, ...formData } : keke
+                ));
+                toast.success('Keke asset updated successfully!', {
+                    description: `Updated ${formData.registrationNumber || editingItem.registrationNumber}`
+                });
+            } else {
+                const newKeke = {
+                    id: `KK${String(kekeAssets.length + 1).padStart(3, '0')}`,
+                    ...formData,
+                    dailyRevenue: 0,
+                    cardPaymentRatio: 0,
+                    rebatesIssued: 0
+                };
+                setKekeAssets(prev => [...prev, newKeke]);
+                toast.success('Keke asset created successfully!', {
+                    description: `Added ${formData.registrationNumber}`
+                });
+            }
+            closeModal();
+        } catch (error) {
+            console.error('Save operation failed:', error);
+            toast.error('Operation failed', {
+                description: 'Please try again or contact support.'
+            });
+        } finally {
+            setIsOperationLoading(false);
         }
-        closeModal();
     };
 
     const handleDeleteKeke = (id) => {
-        setKekeAssets(prev => prev.filter(keke => keke.id !== id));
+        setConfirmationModal({
+            isOpen: true,
+            title: 'Delete Keke Asset',
+            message: 'Are you sure you want to delete this Keke asset? This action cannot be undone.',
+            onConfirm: async () => {
+                setIsOperationLoading(true);
+                setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                setKekeAssets(prev => prev.filter(keke => keke.id !== id));
+                toast.success('Keke asset deleted successfully!');
+                setIsOperationLoading(false);
+            },
+            itemType: 'keke'
+        });
     };
 
     // CRUD operations for Aggregators
-    const handleSaveAggregator = (formData) => {
-        if (editingItem) {
-            setAggregators(prev => prev.map(agg =>
-                agg.id === editingItem.id ? { ...agg, ...formData } : agg
-            ));
-        } else {
-            const newAggregator = {
-                id: `AGG${String(aggregators.length + 1).padStart(3, '0')}`,
-                ...formData,
-                kekesDeployed: 0,
-                avgDailyCollection: 0,
-                cardPaymentRatio: 0
-            };
-            setAggregators(prev => [...prev, newAggregator]);
+    const handleSaveAggregator = async (formData) => {
+        setIsOperationLoading(true);
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (editingItem) {
+                setAggregators(prev => prev.map(agg =>
+                    agg.id === editingItem.id ? { ...agg, ...formData } : agg
+                ));
+                toast.success('Aggregator updated successfully!', {
+                    description: `Updated ${formData.name || editingItem.name}`
+                });
+            } else {
+                const newAggregator = {
+                    id: `AGG${String(aggregators.length + 1).padStart(3, '0')}`,
+                    ...formData,
+                    kekesDeployed: 0,
+                    avgDailyCollection: 0,
+                    cardPaymentRatio: 0
+                };
+                setAggregators(prev => [...prev, newAggregator]);
+                toast.success('Aggregator created successfully!', {
+                    description: `Added ${formData.name}`
+                });
+            }
+            closeModal();
+        } catch (error) {
+            console.error('Save operation failed:', error);
+            toast.error('Operation failed', {
+                description: 'Please try again or contact support.'
+            });
+        } finally {
+            setIsOperationLoading(false);
         }
-        closeModal();
     };
 
     const handleDeleteAggregator = (id) => {
-        setAggregators(prev => prev.filter(agg => agg.id !== id));
+        setConfirmationModal({
+            isOpen: true,
+            title: 'Delete Aggregator',
+            message: 'Are you sure you want to delete this aggregator? This action cannot be undone.',
+            onConfirm: async () => {
+                setIsOperationLoading(true);
+                setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                setAggregators(prev => prev.filter(agg => agg.id !== id));
+                toast.success('Aggregator deleted successfully!');
+                setIsOperationLoading(false);
+            },
+            itemType: 'aggregator'
+        });
     };
 
     // CRUD operations for Drivers
-    const handleSaveDriver = (formData) => {
-        if (editingItem) {
-            setDrivers(prev => prev.map(driver =>
-                driver.id === editingItem.id ? { ...driver, ...formData } : driver
-            ));
-        } else {
-            const newDriver = {
-                id: `DRV${String(drivers.length + 1).padStart(3, '0')}`,
-                ...formData
-            };
-            setDrivers(prev => [...prev, newDriver]);
+    const handleSaveDriver = async (formData) => {
+        setIsOperationLoading(true);
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (editingItem) {
+                setDrivers(prev => prev.map(driver =>
+                    driver.id === editingItem.id ? { ...driver, ...formData } : driver
+                ));
+                toast.success('Driver updated successfully!', {
+                    description: `Updated ${formData.name || editingItem.name}`
+                });
+            } else {
+                const newDriver = {
+                    id: `DRV${String(drivers.length + 1).padStart(3, '0')}`,
+                    ...formData
+                };
+                setDrivers(prev => [...prev, newDriver]);
+                toast.success('Driver created successfully!', {
+                    description: `Added ${formData.name}`
+                });
+            }
+            closeModal();
+        } catch (error) {
+            console.error('Save operation failed:', error);
+            toast.error('Operation failed', {
+                description: 'Please try again or contact support.'
+            });
+        } finally {
+            setIsOperationLoading(false);
         }
-        closeModal();
     };
 
     const handleDeleteDriver = (id) => {
-        setDrivers(prev => prev.filter(driver => driver.id !== id));
+        setConfirmationModal({
+            isOpen: true,
+            title: 'Delete Driver',
+            message: 'Are you sure you want to delete this driver? This action cannot be undone.',
+            onConfirm: async () => {
+                setIsOperationLoading(true);
+                setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                setDrivers(prev => prev.filter(driver => driver.id !== id));
+                toast.success('Driver deleted successfully!');
+                setIsOperationLoading(false);
+            },
+            itemType: 'driver'
+        });
+    };
+
+    // Authentication check
+    useEffect(() => {
+        dispatch(checkAuth());
+        setIsLoading(false);
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/login');
+        }
+    }, [isLoading, isAuthenticated, router]);
+
+    // Handle logout
+    const handleLogout = () => {
+        dispatch(performLogout());
+        router.push('/login');
+    };
+
+    // Show loading screen
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#0B4F26' }}></div>
+            </div>
+        );
+    }
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+        return null;
+    }
+
+    // Export data function
+    const handleExportData = async () => {
+        setIsOperationLoading(true);
+        
+        try {
+            // Simulate processing time
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const exportData = {
+            exportDate: new Date().toISOString(),
+            exportedBy: user?.username,
+            summary: {
+                totalKekesAssigned: dashboardMetrics.totalKekesAssigned,
+                kekesActivelyDeployed: dashboardMetrics.kekesActivelyDeployed,
+                totalDailyCollection: dashboardMetrics.totalDailyCollection,
+                cardPaymentRatio: dashboardMetrics.cardPaymentRatio,
+                totalRebatesIssued: dashboardMetrics.totalRebatesIssued
+            },
+            kekeAssets: kekeAssets.map(keke => ({
+                id: keke.id,
+                registrationNumber: keke.registrationNumber,
+                aggregator: keke.aggregator,
+                driver: keke.driver,
+                location: keke.location,
+                status: keke.status,
+                dailyRevenue: keke.dailyRevenue,
+                cardPaymentRatio: keke.cardPaymentRatio,
+                deploymentDate: keke.deploymentDate
+            })),
+            aggregators: aggregators.map(agg => ({
+                id: agg.id,
+                name: agg.name,
+                kekesAssigned: agg.kekesAssigned,
+                kekesDeployed: agg.kekesDeployed,
+                avgDailyCollection: agg.avgDailyCollection,
+                cardPaymentRatio: agg.cardPaymentRatio
+            })),
+            drivers: drivers.map(driver => ({
+                id: driver.id,
+                name: driver.name,
+                phone: driver.phone,
+                kekeId: driver.kekeId,
+                licenseExpiry: driver.licenseExpiry,
+                kycStatus: driver.kycStatus,
+                appUsage: driver.appUsage
+            }))
+        };
+
+        // Convert to CSV format
+        const csvContent = generateCSV(exportData);
+        
+        // Create and download file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `PICNG_Dashboard_Export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success message
+        toast.success('Data exported successfully!', {
+            description: `Exported to PICNG_Dashboard_Export_${new Date().toISOString().split('T')[0]}.csv`
+        });
+        } catch (error) {
+            console.error('Export failed:', error);
+            toast.error('Failed to export data', {
+                description: 'Please try again or contact support if the issue persists.'
+            });
+        } finally {
+            setIsOperationLoading(false);
+        }
+    };
+
+    // Generate CSV from data
+    const generateCSV = (data: any) => {
+        let csv = 'PICNG Dashboard Export\n';
+        csv += `Export Date,${data.exportDate}\n`;
+        csv += `Exported By,${data.exportedBy}\n\n`;
+        
+        // Summary section
+        csv += 'SUMMARY\n';
+        csv += 'Metric,Value\n';
+        csv += `Total Kekes Assigned,${data.summary.totalKekesAssigned}\n`;
+        csv += `Kekes Actively Deployed,${data.summary.kekesActivelyDeployed}\n`;
+        csv += `Total Daily Collection,₦${data.summary.totalDailyCollection}\n`;
+        csv += `Card Payment Ratio,${(data.summary.cardPaymentRatio * 100).toFixed(1)}%\n`;
+        csv += `Total Rebates Issued,₦${data.summary.totalRebatesIssued}\n\n`;
+        
+        // Keke Assets section
+        csv += 'KEKE ASSETS\n';
+        csv += 'ID,Registration Number,Aggregator,Driver,Location,Status,Daily Revenue,Card Payment Ratio,Deployment Date\n';
+        data.kekeAssets.forEach((keke: any) => {
+            csv += `${keke.id},${keke.registrationNumber},${keke.aggregator},${keke.driver},${keke.location},${keke.status},₦${keke.dailyRevenue},${(keke.cardPaymentRatio * 100).toFixed(1)}%,${keke.deploymentDate}\n`;
+        });
+        csv += '\n';
+        
+        // Aggregators section
+        csv += 'AGGREGATORS\n';
+        csv += 'ID,Name,Kekes Assigned,Kekes Deployed,Avg Daily Collection,Card Payment Ratio\n';
+        data.aggregators.forEach((agg: any) => {
+            csv += `${agg.id},${agg.name},${agg.kekesAssigned},${agg.kekesDeployed},₦${agg.avgDailyCollection},${(agg.cardPaymentRatio * 100).toFixed(1)}%\n`;
+        });
+        csv += '\n';
+        
+        // Drivers section
+        csv += 'DRIVERS\n';
+        csv += 'ID,Name,Phone,Keke ID,License Expiry,KYC Status,App Usage\n';
+        data.drivers.forEach((driver: any) => {
+            csv += `${driver.id},${driver.name},${driver.phone},${driver.kekeId || 'Not Assigned'},${driver.licenseExpiry},${driver.kycStatus},${driver.appUsage}\n`;
+        });
+        
+        return csv;
     };
 
     // Filter functions
@@ -233,441 +523,71 @@ const PICNGDashboard = () => {
         return matchesSearch && matchesAggregator;
     });
 
-    // Reusable components
-    const MetricCard = ({ title, value, icon: Icon, trend, color = "blue" }) => (
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-sm font-medium text-gray-600">{title}</p>
-                    <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
-                    {trend && (
-                        <p className={`text-sm ${trend > 0 ? 'text-green-600' : 'text-red-600'} flex items-center mt-1`}>
-                            <TrendingUp className="w-4 h-4 mr-1" />
-                            {trend > 0 ? '+' : ''}{trend}%
-                        </p>
-                    )}
-                </div>
-                <Icon className={`w-12 h-12 text-${color}-600`} />
-            </div>
-        </div>
-    );
-
-    const Modal = ({ children }) => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto">
-                {children}
-            </div>
-        </div>
-    );
-
-    // Form components
-    const KekeForm = () => {
-        const [formData, setFormData] = useState(editingItem || {
-            registrationNumber: '',
-            aggregator: '',
-            driver: '',
-            location: '',
-            status: 'Active',
-            deploymentDate: new Date().toISOString().split('T')[0]
-        });
-
-        return (
-            <Modal>
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">
-                        {editingItem ? 'Edit Keke Asset' : 'Add New Keke Asset'}
-                    </h3>
-                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Registration Number
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.registrationNumber}
-                            onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Aggregator
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.aggregator}
-                            onChange={(e) => setFormData({...formData, aggregator: e.target.value})}
-                        >
-                            <option value="">Select Aggregator</option>
-                            {aggregators.map(agg => (
-                                <option key={agg.id} value={agg.name}>{agg.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Driver Name
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.driver}
-                            onChange={(e) => setFormData({...formData, driver: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Location
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.location}
-                            onChange={(e) => setFormData({...formData, location: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Status
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.status}
-                            onChange={(e) => setFormData({...formData, status: e.target.value})}
-                        >
-                            <option value="Active">Active</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                        onClick={closeModal}
-                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => handleSaveKeke(formData)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        {editingItem ? 'Update' : 'Create'}
-                    </button>
-                </div>
-            </Modal>
-        );
-    };
-
-    const AggregatorForm = () => {
-        const [formData, setFormData] = useState(editingItem || {
-            name: '',
-            kekesAssigned: 0
-        });
-
-        return (
-            <Modal>
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">
-                        {editingItem ? 'Edit Aggregator' : 'Add New Aggregator'}
-                    </h3>
-                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Aggregator Name
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Keke Assets Assigned
-                        </label>
-                        <input
-                            type="number"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.kekesAssigned}
-                            onChange={(e) => setFormData({...formData, kekesAssigned: parseInt(e.target.value) || 0})}
-                        />
-                    </div>
-                </div>
-                <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                        onClick={closeModal}
-                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => handleSaveAggregator(formData)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        {editingItem ? 'Update' : 'Create'}
-                    </button>
-                </div>
-            </Modal>
-        );
-    };
-
-    const DriverForm = () => {
-        const [formData, setFormData] = useState(editingItem || {
-            name: '',
-            phone: '',
-            kekeId: '',
-            licenseExpiry: '',
-            kycStatus: 'Pending',
-            appUsage: 'Inactive'
-        });
-
-        return (
-            <Modal>
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">
-                        {editingItem ? 'Edit Driver' : 'Add New Driver'}
-                    </h3>
-                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Driver Name
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                        </label>
-                        <input
-                            type="tel"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Assigned Keke ID
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.kekeId}
-                            onChange={(e) => setFormData({...formData, kekeId: e.target.value})}
-                        >
-                            <option value="">Select Keke</option>
-                            {kekeAssets.map(keke => (
-                                <option key={keke.id} value={keke.id}>{keke.id} - {keke.registrationNumber}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            License Expiry Date
-                        </label>
-                        <input
-                            type="date"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.licenseExpiry}
-                            onChange={(e) => setFormData({...formData, licenseExpiry: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            KYC Status
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.kycStatus}
-                            onChange={(e) => setFormData({...formData, kycStatus: e.target.value})}
-                        >
-                            <option value="Pending">Pending</option>
-                            <option value="Complete">Complete</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
-                    </div>
-                </div>
-                <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                        onClick={closeModal}
-                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => handleSaveDriver(formData)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        {editingItem ? 'Update' : 'Create'}
-                    </button>
-                </div>
-            </Modal>
-        );
-    };
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center py-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">PICNG Asset & Payment Dashboard</h1>
-                            <p className="text-sm text-gray-600">Powered by Akupay • July 2025</p>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                                <Download className="w-4 h-4" />
-                                <span>Export Data</span>
-                            </button>
+        <div className="h-screen bg-gray-100 flex overflow-hidden">
+            {/* Sidenav Component */}
+            <Sidenav 
+                isSidenavOpen={isSidenavOpen}
+                setIsSidenavOpen={setIsSidenavOpen}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onLogout={handleLogout}
+            />
+
+            {/* Main content area */}
+            <div className="flex-1 flex flex-col min-w-0">
+                {/* Header */}
+                <div className="bg-white shadow-sm border-b">
+                    <div className="px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center py-4">
+                            <div className="flex items-center">
+                                <button 
+                                    onClick={() => setIsSidenavOpen(true)}
+                                    className="lg:hidden mr-4 text-gray-600 hover:text-gray-900"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-gray-900">PICNG Asset & Payment Dashboard</h1>
+                                    <p className="text-sm text-gray-600">
+                                        Powered by Akupay • July 2025 • {user?.username} ({user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'})
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <button 
+                                    onClick={handleExportData}
+                                    disabled={isOperationLoading}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isOperationLoading ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                                    ) : (
+                                        <Download className="w-4 h-4" />
+                                    )}
+                                    <span className="hidden sm:inline">
+                                        {isOperationLoading ? 'Exporting...' : 'Export Data'}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Navigation Tabs */}
-            <div className="bg-white border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <nav className="flex space-x-8">
-                        {[
-                            { id: 'overview', name: 'Overview', icon: Activity },
-                            { id: 'assets', name: 'Asset Management', icon: Truck },
-                            { id: 'aggregators', name: 'Aggregators', icon: Users },
-                            { id: 'transactions', name: 'Transactions', icon: CreditCard },
-                            { id: 'financial', name: 'Financial', icon: DollarSign },
-                            { id: 'drivers', name: 'Drivers', icon: Users }
-                        ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                                    activeTab === tab.id
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                }`}
-                            >
-                                <tab.icon className="w-4 h-4" />
-                                <span>{tab.name}</span>
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Main Content */}
+                <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 overflow-y-auto">
 
                 {/* Overview Tab */}
                 {activeTab === 'overview' && (
-                    <div className="space-y-8">
-                        {/* Key Metrics */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <MetricCard
-                                title="Total Kekes Assigned"
-                                value={dashboardMetrics.totalKekesAssigned}
-                                icon={Truck}
-                                trend={5.2}
-                                color="blue"
-                            />
-                            <MetricCard
-                                title="Actively Deployed"
-                                value={dashboardMetrics.kekesActivelyDeployed}
-                                icon={CheckCircle}
-                                trend={2.1}
-                                color="green"
-                            />
-                            <MetricCard
-                                title="Daily Collection"
-                                value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
-                                icon={DollarSign}
-                                trend={8.3}
-                                color="emerald"
-                            />
-                            <MetricCard
-                                title="Card Payment Ratio"
-                                value={`${(dashboardMetrics.cardPaymentRatio * 100).toFixed(1)}%`}
-                                icon={CreditCard}
-                                trend={3.7}
-                                color="purple"
-                            />
-                        </div>
-
-                        {/* Charts Row */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Daily Collections Chart */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm border">
-                                <h3 className="text-lg font-semibold mb-4">Daily Collections vs Target</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <AreaChart data={dailyCollectionData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="date" />
-                                        <YAxis />
-                                        <Tooltip formatter={(value) => [`₦${value.toLocaleString()}`, '']} />
-                                        <Area type="monotone" dataKey="collection" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
-                                        <Area type="monotone" dataKey="target" stroke="#10B981" fill="transparent" strokeDasharray="5 5" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            {/* Payment Methods Pie Chart */}
-                            <div className="bg-white p-6 rounded-lg shadow-sm border">
-                                <h3 className="text-lg font-semibold mb-4">Payment Methods Distribution</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={paymentMethodData}
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius={100}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label={({name, value}) => `${name}: ${value}%`}
-                                        >
-                                            {paymentMethodData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-
-                        {/* Location Performance */}
-                        <div className="bg-white p-6 rounded-lg shadow-sm border">
-                            <h3 className="text-lg font-semibold mb-4">Location Performance</h3>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={locationPerformanceData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="location" />
-                                    <YAxis />
-                                    <Tooltip formatter={(value, name) => [
-                                        name === 'revenue' ? `₦${value.toLocaleString()}` : value,
-                                        name === 'revenue' ? 'Revenue' : 'Keke Count'
-                                    ]} />
-                                    <Bar dataKey="revenue" fill="#3B82F6" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
+                    <OverviewTab 
+                        dashboardMetrics={dashboardMetrics}
+                        dailyCollectionData={dailyCollectionData}
+                        paymentMethodData={paymentMethodData}
+                        locationPerformanceData={locationPerformanceData}
+                    />
                 )}
 
                 {/* Asset Management Tab */}
@@ -698,13 +618,15 @@ const PICNGDashboard = () => {
                                         ))}
                                     </select>
                                 </div>
-                                <button
-                                    onClick={() => openModal('keke')}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    <span>Add Keke Asset</span>
-                                </button>
+                                {canEdit && (
+                                    <button
+                                        onClick={() => openModal('keke')}
+                                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        <span>Add Keke Asset</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -783,18 +705,22 @@ const PICNGDashboard = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center space-x-2">
-                                                    <button
-                                                        onClick={() => openModal('keke', keke)}
-                                                        className="text-blue-600 hover:text-blue-900"
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteKeke(keke.id)}
-                                                        className="text-red-600 hover:text-red-900"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    {canEdit && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => openModal('keke', keke)}
+                                                                className="text-blue-600 hover:text-blue-900"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteKeke(keke.id)}
+                                                                className="text-red-600 hover:text-red-900"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </>
+                                                    )}
                                                     <button className="text-gray-600 hover:text-gray-900">
                                                         <Eye className="w-4 h-4" />
                                                     </button>
@@ -814,13 +740,15 @@ const PICNGDashboard = () => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-2xl font-bold text-gray-900">Aggregator Management</h2>
-                            <button
-                                onClick={() => openModal('aggregator')}
-                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>Add Aggregator</span>
-                            </button>
+                            {canEdit && (
+                                <button
+                                    onClick={() => openModal('aggregator')}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Add Aggregator</span>
+                                </button>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -829,18 +757,22 @@ const PICNGDashboard = () => {
                                     <div className="flex justify-between items-start mb-4">
                                         <h3 className="text-lg font-semibold text-gray-900">{aggregator.name}</h3>
                                         <div className="flex items-center space-x-2">
-                                            <button
-                                                onClick={() => openModal('aggregator', aggregator)}
-                                                className="text-blue-600 hover:text-blue-900"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteAggregator(aggregator.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            {canEdit && (
+                                                <>
+                                                    <button
+                                                        onClick={() => openModal('aggregator', aggregator)}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteAggregator(aggregator.id)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
@@ -1048,13 +980,15 @@ const PICNGDashboard = () => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-2xl font-bold text-gray-900">Driver Management</h2>
-                            <button
-                                onClick={() => openModal('driver')}
-                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>Add Driver</span>
-                            </button>
+                            {canEdit && (
+                                <button
+                                    onClick={() => openModal('driver')}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Add Driver</span>
+                                </button>
+                            )}
                         </div>
 
                         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -1136,18 +1070,22 @@ const PICNGDashboard = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center space-x-2">
-                                                        <button
-                                                            onClick={() => openModal('driver', driver)}
-                                                            className="text-blue-600 hover:text-blue-900"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteDriver(driver.id)}
-                                                            className="text-red-600 hover:text-red-900"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        {canEdit && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => openModal('driver', driver)}
+                                                                    className="text-blue-600 hover:text-blue-900"
+                                                                >
+                                                                    <Edit className="w-4 h-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteDriver(driver.id)}
+                                                                    className="text-red-600 hover:text-red-900"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -1159,12 +1097,53 @@ const PICNGDashboard = () => {
                         </div>
                     </div>
                 )}
+                </div>
             </div>
 
             {/* Modals */}
-            {showModal && modalType === 'keke' && <KekeForm />}
-            {showModal && modalType === 'aggregator' && <AggregatorForm />}
-            {showModal && modalType === 'driver' && <DriverForm />}
+            {showModal && modalType === 'keke' && (
+                <KekeForm 
+                    editingItem={editingItem}
+                    aggregators={aggregators}
+                    onClose={closeModal}
+                    onSave={handleSaveKeke}
+                />
+            )}
+            {showModal && modalType === 'aggregator' && (
+                <AggregatorForm 
+                    editingItem={editingItem}
+                    onClose={closeModal}
+                    onSave={handleSaveAggregator}
+                />
+            )}
+            {showModal && modalType === 'driver' && (
+                <DriverForm 
+                    editingItem={editingItem}
+                    kekeAssets={kekeAssets}
+                    onClose={closeModal}
+                    onSave={handleSaveDriver}
+                />
+            )}
+            
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmationModal.isOpen}
+                onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmationModal.onConfirm}
+                title={confirmationModal.title}
+                message={confirmationModal.message}
+                isLoading={isOperationLoading}
+            />
+            
+            {/* Loading Overlay */}
+            {isOperationLoading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+                    <div className="bg-white rounded-lg p-4 flex items-center space-x-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#0B4F26' }}></div>
+                        <span className="text-gray-700">Processing...</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
