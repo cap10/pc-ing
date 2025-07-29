@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import Modal from '../ui/Modal';
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '../ui/Modal';
 
 interface KekeFormProps {
     editingItem: any;
@@ -20,103 +19,148 @@ const KekeForm: React.FC<KekeFormProps> = ({ editingItem, aggregators, onClose, 
         deploymentDate: new Date().toISOString().split('T')[0]
     });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            await onSave(formData);
+        } catch (error) {
+            console.error('Form submission failed:', error);
+            toast.error('Form submission failed', {
+                description: 'Please check your input and try again.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
-        <Modal>
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">
-                    {editingItem ? 'Edit Keke Asset' : 'Add New Keke Asset'}
-                </h3>
-                <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Registration Number
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.registrationNumber}
-                        onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Aggregator
-                    </label>
-                    <select
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.aggregator}
-                        onChange={(e) => setFormData({...formData, aggregator: e.target.value})}
-                    >
-                        <option value="">Select Aggregator</option>
-                        {aggregators.map(agg => (
-                            <option key={agg.id} value={agg.name}>{agg.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Driver Name
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.driver}
-                        onChange={(e) => setFormData({...formData, driver: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Location
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.location}
-                        onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                    </label>
-                    <select
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.status}
-                        onChange={(e) => setFormData({...formData, status: e.target.value})}
-                    >
-                        <option value="Active">Active</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-                <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                    Cancel
-                </button>
-                <button
-                    onClick={async () => {
-                        try {
-                            await onSave(formData);
-                        } catch (error) {
-                            console.error('Form submission failed:', error);
-                            toast.error('Form submission failed', {
-                                description: 'Please check your input and try again.'
-                            });
-                        }
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                    {editingItem ? 'Update' : 'Create'}
-                </button>
-            </div>
+        <Modal isOpen={true} onClose={onClose}>
+            <ModalHeader onClose={onClose}>
+                {editingItem ? 'Edit Keke Asset' : 'Add New Keke Asset'}
+            </ModalHeader>
+            
+            <form onSubmit={handleSubmit}>
+                <ModalBody>
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Registration Number
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.registrationNumber}
+                                onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
+                                placeholder="e.g., ABC-123-XY"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Aggregator
+                            </label>
+                            <select
+                                required
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.aggregator}
+                                onChange={(e) => setFormData({...formData, aggregator: e.target.value})}
+                            >
+                                <option value="">Select Aggregator</option>
+                                {aggregators.map(agg => (
+                                    <option key={agg.id} value={agg.name}>{agg.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Driver Name
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.driver}
+                                onChange={(e) => setFormData({...formData, driver: e.target.value})}
+                                placeholder="Enter driver name"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Location
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.location}
+                                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                                placeholder="Enter location"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Status
+                            </label>
+                            <select
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.status}
+                                onChange={(e) => setFormData({...formData, status: e.target.value})}
+                            >
+                                <option value="Active">Active</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Deployment Date
+                            </label>
+                            <input
+                                type="date"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.deploymentDate}
+                                onChange={(e) => setFormData({...formData, deploymentDate: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                </ModalBody>
+
+                <ModalFooter>
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all font-medium"
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-6 py-2.5 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                            style={{ backgroundColor: 'rgb(11, 79, 38)' }}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                                    Processing...
+                                </>
+                            ) : (
+                                editingItem ? 'Update Asset' : 'Create Asset'
+                            )}
+                        </button>
+                    </div>
+                </ModalFooter>
+            </form>
         </Modal>
     );
 };

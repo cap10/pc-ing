@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import Modal from '../ui/Modal';
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '../ui/Modal';
 
 interface DriverFormProps {
     editingItem: any;
@@ -20,103 +19,171 @@ const DriverForm: React.FC<DriverFormProps> = ({ editingItem, kekeAssets, onClos
         appUsage: 'Inactive'
     });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            await onSave(formData);
+        } catch (error) {
+            console.error('Form submission failed:', error);
+            toast.error('Form submission failed', {
+                description: 'Please check your input and try again.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
-        <Modal>
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">
-                    {editingItem ? 'Edit Driver' : 'Add New Driver'}
-                </h3>
-                <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Driver Name
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                    </label>
-                    <input
-                        type="tel"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Assigned Keke ID
-                    </label>
-                    <select
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.kekeId}
-                        onChange={(e) => setFormData({...formData, kekeId: e.target.value})}
-                    >
-                        <option value="">Select Keke</option>
-                        {kekeAssets.map(keke => (
-                            <option key={keke.id} value={keke.id}>{keke.id} - {keke.registrationNumber}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        License Expiry Date
-                    </label>
-                    <input
-                        type="date"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.licenseExpiry}
-                        onChange={(e) => setFormData({...formData, licenseExpiry: e.target.value})}
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        KYC Status
-                    </label>
-                    <select
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.kycStatus}
-                        onChange={(e) => setFormData({...formData, kycStatus: e.target.value})}
-                    >
-                        <option value="Pending">Pending</option>
-                        <option value="Complete">Complete</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-                <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                    Cancel
-                </button>
-                <button
-                    onClick={async () => {
-                        try {
-                            await onSave(formData);
-                        } catch (error) {
-                            console.error('Form submission failed:', error);
-                            toast.error('Form submission failed', {
-                                description: 'Please check your input and try again.'
-                            });
-                        }
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                    {editingItem ? 'Update' : 'Create'}
-                </button>
-            </div>
+        <Modal isOpen={true} onClose={onClose}>
+            <ModalHeader onClose={onClose}>
+                {editingItem ? 'Edit Driver' : 'Add New Driver'}
+            </ModalHeader>
+            
+            <form onSubmit={handleSubmit}>
+                <ModalBody>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Driver Name
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                    placeholder="Enter driver name"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Phone Number
+                                </label>
+                                <input
+                                    type="tel"
+                                    required
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                    placeholder="+234-XXX-XXX-XXXX"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Assigned Keke
+                            </label>
+                            <select
+                                required
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                value={formData.kekeId}
+                                onChange={(e) => setFormData({...formData, kekeId: e.target.value})}
+                            >
+                                <option value="">Select Keke</option>
+                                {kekeAssets.map(keke => (
+                                    <option key={keke.id} value={keke.id}>
+                                        {keke.id} - {keke.registrationNumber}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    License Expiry Date
+                                </label>
+                                <input
+                                    type="date"
+                                    required
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    value={formData.licenseExpiry}
+                                    onChange={(e) => setFormData({...formData, licenseExpiry: e.target.value})}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    KYC Status
+                                </label>
+                                <select
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    value={formData.kycStatus}
+                                    onChange={(e) => setFormData({...formData, kycStatus: e.target.value})}
+                                >
+                                    <option value="Pending">Pending</option>
+                                    <option value="Complete">Complete</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                App Usage Status
+                            </label>
+                            <div className="flex items-center space-x-4">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="appUsage"
+                                        value="Active"
+                                        checked={formData.appUsage === 'Active'}
+                                        onChange={(e) => setFormData({...formData, appUsage: e.target.value})}
+                                        className="mr-2 text-green-600 focus:ring-green-500"
+                                    />
+                                    <span className="text-sm">Active</span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="appUsage"
+                                        value="Inactive"
+                                        checked={formData.appUsage === 'Inactive'}
+                                        onChange={(e) => setFormData({...formData, appUsage: e.target.value})}
+                                        className="mr-2 text-green-600 focus:ring-green-500"
+                                    />
+                                    <span className="text-sm">Inactive</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </ModalBody>
+
+                <ModalFooter>
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all font-medium"
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-6 py-2.5 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                            style={{ backgroundColor: 'rgb(11, 79, 38)' }}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                                    Processing...
+                                </>
+                            ) : (
+                                editingItem ? 'Update Driver' : 'Create Driver'
+                            )}
+                        </button>
+                    </div>
+                </ModalFooter>
+            </form>
         </Modal>
     );
 };
