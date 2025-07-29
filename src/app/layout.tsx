@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
+import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 
@@ -28,17 +32,16 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></link>
       </head>
       <body
-        className={`${inter.className} antialiased group`}
+        className={`${inter.variable} font-sans antialiased group`}
       >
-        <Toaster 
-        position="bottom-center" 
-        toastOptions={
-          {
-            success: {style: {border: '1px solid green'}},
-            error: {style: {border: '1px solid red'}}
-          }
-        }/>
-        {children}
+        <Providers>
+          <Toaster 
+            position="top-right" 
+            theme="light"
+            richColors
+          />
+          {children}
+        </Providers>
       </body>
     </html>
   );
