@@ -6,13 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - NODE_ENV=production
+        - NODE_ENV=development
     image: pc-ing:latest
     container_name: pc-ing-app
     ports:
       - "3478:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3000
     restart: unless-stopped
     healthcheck:
@@ -22,4 +22,4 @@ services:
       retries: 3
       start_period: 40s
     
-  
+ 
