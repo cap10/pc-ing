@@ -1,25 +1,41 @@
 version: '3.8'
 
 services:
-  web:
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - NODE_ENV=production
+  #   image: pc-ing:latest
+  #   container_name: pc-ing-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3000
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); });"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+    
+  # Development configuration
+  dev:
     build:
       context: .
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=development
-    image: pc-ing:latest
-    container_name: pc-ing-app
+      dockerfile: Dockerfile.dev
+    image: pc-ing:dev
+    container_name: pc-ing-dev
+    restart: unless-stopped
     ports:
       - "3478:3000"
     environment:
       - NODE_ENV=development
-      - PORT=3000
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); });"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    
- 
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: yarn dev
