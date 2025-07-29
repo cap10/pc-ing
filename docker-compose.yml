@@ -22,19 +22,4 @@ services:
       retries: 3
       start_period: 40s
     
-  # Development configuration
-  dev:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    image: pc-ing:dev
-    container_name: pc-ing-dev
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
-    command: yarn dev
+  
