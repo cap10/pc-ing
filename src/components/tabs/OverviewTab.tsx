@@ -6,14 +6,14 @@ import { customTooltipStyle } from '../../utils/chartConfig';
 
 interface OverviewTabProps {
     dashboardMetrics: any;
-    dailyCollectionData: any[];
+    weeklyCollectionData: any[];
     paymentMethodData: any[];
     locationPerformanceData: any[];
 }
 
 const OverviewTab: React.FC<OverviewTabProps> = ({
     dashboardMetrics,
-    dailyCollectionData,
+    weeklyCollectionData,
     paymentMethodData,
     locationPerformanceData
 }) => {
@@ -47,8 +47,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                     color="black"
                 />
                 <MetricCard
-                    title="Daily Collection"
-                    value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                    title="Weekly Collection"
+                    value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
                     icon={DollarSign}
                     trend={8.3}
                    color="black"
@@ -68,7 +68,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-xl font-bold text-gray-900">Daily Collections vs Target</h3>
+                            <h3 className="text-xl font-bold text-gray-900">Weekly Collections vs Target</h3>
                             <p className="text-sm text-gray-500 mt-1">Weekly performance overview</p>
                         </div>
                         <div className="flex items-center space-x-4 text-xs">
@@ -83,7 +83,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                         </div>
                     </div>
                     <ResponsiveContainer width="100%" height={320}>
-                        <AreaChart data={dailyCollectionData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                        <AreaChart data={weeklyCollectionData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                             <defs>
                                 <linearGradient id="collectionGradient" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>

@@ -8,7 +8,7 @@ export interface KekeAsset {
     driver: string;
     location: string;
     status: string;
-    dailyRevenue: number;
+    weeklyRevenue: number;
     cardPaymentRatio: number;
     rebatesIssued: number;
     deploymentDate: string;
@@ -19,7 +19,7 @@ export interface Aggregator {
     name: string;
     kekesAssigned: number;
     kekesDeployed: number;
-    avgDailyCollection: number;
+    avgWeeklyCollection: number;
     cardPaymentRatio: number;
 }
 
@@ -50,7 +50,7 @@ const initialKekeAssets: KekeAsset[] = [
         driver: 'Ahmed Ibrahim',
         location: 'Victoria Island',
         status: 'Active',
-        dailyRevenue: 8500,
+        weeklyRevenue: 8500,
         cardPaymentRatio: 0.75,
         rebatesIssued: 425,
         deploymentDate: '2025-06-15'
@@ -62,7 +62,7 @@ const initialKekeAssets: KekeAsset[] = [
         driver: 'Chidi Okafor',
         location: 'Ikeja',
         status: 'Active',
-        dailyRevenue: 12000,
+        weeklyRevenue: 12000,
         cardPaymentRatio: 0.82,
         rebatesIssued: 600,
         deploymentDate: '2025-06-10'
@@ -74,7 +74,7 @@ const initialKekeAssets: KekeAsset[] = [
         driver: 'Fatima Hassan',
         location: 'Surulere',
         status: 'Maintenance',
-        dailyRevenue: 0,
+        weeklyRevenue: 0,
         cardPaymentRatio: 0,
         rebatesIssued: 0,
         deploymentDate: '2025-06-20'
@@ -87,7 +87,7 @@ const initialAggregators: Aggregator[] = [
         name: 'City Riders Coop',
         kekesAssigned: 15,
         kekesDeployed: 12,
-        avgDailyCollection: 180000,
+        avgWeeklyCollection: 180000,
         cardPaymentRatio: 0.78
     },
     {
@@ -95,7 +95,7 @@ const initialAggregators: Aggregator[] = [
         name: 'Metro Transport',
         kekesAssigned: 20,
         kekesDeployed: 18,
-        avgDailyCollection: 240000,
+        avgWeeklyCollection: 240000,
         cardPaymentRatio: 0.85
     }
 ];
@@ -170,7 +170,7 @@ const dataSlice = createSlice({
             const newKeke: KekeAsset = {
                 id: `KK${String(state.kekeAssets.length + 1).padStart(3, '0')}`,
                 ...action.payload,
-                dailyRevenue: 0,
+                weeklyRevenue: 0,
                 cardPaymentRatio: 0,
                 rebatesIssued: 0
             };
@@ -203,7 +203,7 @@ const dataSlice = createSlice({
                 id: `AGG${String(state.aggregators.length + 1).padStart(3, '0')}`,
                 ...action.payload,
                 kekesDeployed: 0,
-                avgDailyCollection: 0,
+                avgWeeklyCollection: 0,
                 cardPaymentRatio: 0
             };
             state.aggregators.push(newAggregator);

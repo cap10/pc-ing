@@ -100,7 +100,7 @@ const PICNGDashboard = () => {
     kekesPickedUp: 20,
     kekesActivelyDeployed: 18,
     kekesYetToPickup: 5,
-    totalDailyCollection: 187500,
+    totalWeeklyCollection: 187500,
     cardPaymentRatio: 0.79,
     totalRebatesIssued: 9375,
     akupayCommission: 18750,
@@ -108,14 +108,14 @@ const PICNGDashboard = () => {
   };
 
   // Chart data
-  const dailyCollectionData = [
-    { date: "Mon", collection: 175000, target: 180000 },
-    { date: "Tue", collection: 182000, target: 180000 },
-    { date: "Wed", collection: 178000, target: 180000 },
-    { date: "Thu", collection: 185000, target: 180000 },
-    { date: "Fri", collection: 187500, target: 180000 },
-    { date: "Sat", collection: 195000, target: 180000 },
-    { date: "Sun", collection: 172000, target: 180000 },
+  const weeklyCollectionData = [
+    { date: "Week 1", collection: 175000, target: 180000 },
+    { date: "Week 2", collection: 182000, target: 180000 },
+    { date: "Week 3", collection: 178000, target: 180000 },
+    { date: "Week 4", collection: 185000, target: 180000 },
+    { date: "Week 5", collection: 187500, target: 180000 },
+    { date: "Week 6", collection: 195000, target: 180000 },
+    { date: "Week 7", collection: 172000, target: 180000 },
   ];
 
   const paymentMethodData = [
@@ -358,7 +358,7 @@ const PICNGDashboard = () => {
         summary: {
           totalKekesAssigned: dashboardMetrics.totalKekesAssigned,
           kekesActivelyDeployed: dashboardMetrics.kekesActivelyDeployed,
-          totalDailyCollection: dashboardMetrics.totalDailyCollection,
+          totalWeeklyCollection: dashboardMetrics.totalWeeklyCollection,
           cardPaymentRatio: dashboardMetrics.cardPaymentRatio,
           totalRebatesIssued: dashboardMetrics.totalRebatesIssued,
         },
@@ -369,7 +369,7 @@ const PICNGDashboard = () => {
           driver: keke.driver,
           location: keke.location,
           status: keke.status,
-          dailyRevenue: keke.dailyRevenue,
+          weeklyRevenue: keke.weeklyRevenue,
           cardPaymentRatio: keke.cardPaymentRatio,
           deploymentDate: keke.deploymentDate,
         })),
@@ -378,7 +378,7 @@ const PICNGDashboard = () => {
           name: agg.name,
           kekesAssigned: agg.kekesAssigned,
           kekesDeployed: agg.kekesDeployed,
-          avgDailyCollection: agg.avgDailyCollection,
+          avgWeeklyCollection: agg.avgWeeklyCollection,
           cardPaymentRatio: agg.cardPaymentRatio,
         })),
         drivers: drivers.map((driver) => ({
@@ -563,7 +563,7 @@ const PICNGDashboard = () => {
           {activeTab === "overview" && (
             <OverviewTab
               dashboardMetrics={dashboardMetrics}
-              dailyCollectionData={dailyCollectionData}
+              weeklyCollectionData={weeklyCollectionData}
               paymentMethodData={paymentMethodData}
               locationPerformanceData={locationPerformanceData}
             />
@@ -669,10 +669,10 @@ const PICNGDashboard = () => {
                     ),
                   },
                   {
-                    key: "dailyRevenue",
-                    header: "Daily Revenue",
+                    key: "weeklyRevenue",
+                    header: "Weekly Revenue",
                     sortable: true,
-                    render: (keke) => `₦${keke.dailyRevenue.toLocaleString()}`,
+                    render: (keke) => `₦${(keke.weeklyRevenue || 0).toLocaleString()}`,
                   },
                   {
                     key: "cardPaymentRatio",
@@ -804,10 +804,10 @@ const PICNGDashboard = () => {
                       </div>
                       <div className="flex items-center justify-between py-2 border-b border-gray-50">
                         <span className="text-sm font-medium text-gray-500">
-                          Avg Daily Collection
+                          Avg Weekly Collection
                         </span>
                         <span className="text-sm font-bold text-black">
-                          ₦{aggregator.avgDailyCollection.toLocaleString()}
+                          ₦{(aggregator.avgWeeklyCollection || 0).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between py-2">
@@ -859,8 +859,8 @@ const PICNGDashboard = () => {
               {/* Transaction Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <MetricCard
-                  title="Total Collection Today"
-                  value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                  title="Total Collection This Week"
+                  value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
                   icon={DollarSign}
                   trend={8.3}
                   color="emerald"
@@ -889,7 +889,7 @@ const PICNGDashboard = () => {
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">
-                        Daily Collection Trend
+                        Weekly Collection Trend
                       </h3>
                       <p className="text-sm text-gray-500 mt-1">
                         Revenue performance tracking
@@ -908,7 +908,7 @@ const PICNGDashboard = () => {
                   </div>
                   <ResponsiveContainer width="100%" height={320}>
                     <LineChart
-                      data={dailyCollectionData}
+                      data={weeklyCollectionData}
                       margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
                     >
                       <defs>
@@ -1055,8 +1055,8 @@ const PICNGDashboard = () => {
               {/* Financial Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <MetricCard
-                  title="Total Collection"
-                  value={`₦${dashboardMetrics.totalDailyCollection.toLocaleString()}`}
+                  title="Total Weekly Collection"
+                  value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
                   icon={DollarSign}
                   color="emerald"
                 />
@@ -1095,7 +1095,7 @@ const PICNGDashboard = () => {
                           Keke ID
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Daily Revenue
+                          Weekly Revenue
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Card %
@@ -1113,11 +1113,11 @@ const PICNGDashboard = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {kekeAssets.map((keke) => {
-                        const akupayEarnings = keke.dailyRevenue * 0.1; // 10% commission
+                        const akupayEarnings = (keke.weeklyRevenue || 0) * 0.1; // 10% commission
                         const netToPicng =
-                          keke.dailyRevenue -
+                          (keke.weeklyRevenue || 0) -
                           akupayEarnings -
-                          keke.rebatesIssued;
+                          (keke.rebatesIssued || 0);
 
                         return (
                           <tr key={keke.id} className="hover:bg-gray-50">
@@ -1125,13 +1125,13 @@ const PICNGDashboard = () => {
                               {keke.id}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{keke.dailyRevenue.toLocaleString()}
+                              ₦{(keke.weeklyRevenue || 0).toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {(keke.cardPaymentRatio * 100).toFixed(1)}%
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{keke.rebatesIssued.toLocaleString()}
+                              ₦{(keke.rebatesIssued || 0).toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               ₦{akupayEarnings.toLocaleString()}
