@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Search,
   Download,
   Eye,
   DollarSign,
@@ -122,7 +122,7 @@ const PICNGDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
   const [editingItem, setEditingItem] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [selectedAggregator, setSelectedAggregator] = useState("");
 
   // Dashboard metrics
@@ -175,11 +175,11 @@ const PICNGDashboard = () => {
   };
 
   // CRUD operations for Keke Assets
-  const handleSaveKeke = (formData) => {
+  const handleSaveKeke = (formData: any) => {
     if (editingItem) {
       setKekeAssets((prev) =>
         prev.map((keke) =>
-          keke.id === editingItem.id ? { ...keke, ...formData } : keke
+          keke.id === (editingItem as any).id ? { ...keke, ...formData } : keke
         )
       );
     } else {
@@ -195,16 +195,16 @@ const PICNGDashboard = () => {
     closeModal();
   };
 
-  const handleDeleteKeke = (id) => {
+  const handleDeleteKeke = (id: string) => {
     setKekeAssets((prev) => prev.filter((keke) => keke.id !== id));
   };
 
   // CRUD operations for Aggregators
-  const handleSaveAggregator = (formData) => {
+  const handleSaveAggregator = (formData: any) => {
     if (editingItem) {
       setAggregators((prev) =>
         prev.map((agg) =>
-          agg.id === editingItem.id ? { ...agg, ...formData } : agg
+          agg.id === (editingItem as any).id ? { ...agg, ...formData } : agg
         )
       );
     } else {
@@ -220,16 +220,16 @@ const PICNGDashboard = () => {
     closeModal();
   };
 
-  const handleDeleteAggregator = (id) => {
+  const handleDeleteAggregator = (id: string) => {
     setAggregators((prev) => prev.filter((agg) => agg.id !== id));
   };
 
   // CRUD operations for Drivers
-  const handleSaveDriver = (formData) => {
+  const handleSaveDriver = (formData: any) => {
     if (editingItem) {
       setDrivers((prev) =>
         prev.map((driver) =>
-          driver.id === editingItem.id ? { ...driver, ...formData } : driver
+          driver.id === (editingItem as any).id ? { ...driver, ...formData } : driver
         )
       );
     } else {
@@ -242,7 +242,7 @@ const PICNGDashboard = () => {
     closeModal();
   };
 
-  const handleDeleteDriver = (id) => {
+  const handleDeleteDriver = (id: string) => {
     setDrivers((prev) => prev.filter((driver) => driver.id !== id));
   };
 
@@ -258,7 +258,7 @@ const PICNGDashboard = () => {
   });
 
   // Reusable components
-  const MetricCard = ({ title, value, icon: Icon, trend, color = "blue" }) => (
+  const MetricCard = ({ title, value, icon: Icon, trend, color = "blue" }: { title: any; value: any; icon: any; trend?: any; color?: string }) => (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       <div className="flex items-center justify-between">
         <div>
@@ -281,7 +281,7 @@ const PICNGDashboard = () => {
     </div>
   );
 
-  const Modal = ({ children }) => (
+  const Modal = ({ children }: { children: any }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto">
         {children}
@@ -1114,24 +1114,28 @@ const PICNGDashboard = () => {
                 title="Total Collection"
                 value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
                 icon={DollarSign}
+                trend={0}
                 color="emerald"
               />
               <MetricCard
                 title="Akupay Commission"
                 value={`₦${dashboardMetrics.akupayCommission.toLocaleString()}`}
                 icon={CreditCard}
+                trend={0}
                 color="blue"
               />
               <MetricCard
                 title="Rebates Issued"
                 value={`₦${dashboardMetrics.totalRebatesIssued.toLocaleString()}`}
                 icon={TrendingUp}
+                trend={0}
                 color="purple"
               />
               <MetricCard
                 title="PICNG Settlement"
                 value={`₦${dashboardMetrics.picngSettlement.toLocaleString()}`}
                 icon={CheckCircle}
+                trend={0}
                 color="green"
               />
             </div>

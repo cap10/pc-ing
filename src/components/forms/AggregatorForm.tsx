@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import Modal, { ModalHeader, ModalBody, ModalFooter } from '../ui/Modal';

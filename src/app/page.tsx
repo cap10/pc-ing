@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +29,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Search,
   Download,
   DollarSign,
   AlertTriangle,
@@ -44,11 +44,7 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-  PieChart,
-  Pie,
   Cell,
-  AreaChart,
-  Area,
 } from "recharts";
 
 // Import components
@@ -66,7 +62,7 @@ const PICNGDashboard = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, canEdit, user } = useAuth();
-  const { kekeAssets, aggregators, drivers, isLoaded, activeTab } =
+  const { kekeAssets, aggregators, drivers, activeTab } =
     useAppSelector((state) => state.data);
 
   // State for mobile sidenav
@@ -91,7 +87,7 @@ const PICNGDashboard = () => {
   const [editingItem, setEditingItem] = useState<
     KekeAsset | Aggregator | Driver | null
   >(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [selectedAggregator, setSelectedAggregator] = useState("");
 
   // Dashboard metrics

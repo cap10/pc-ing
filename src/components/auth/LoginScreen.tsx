@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Lock } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginScreenProps {
     onLogin: (username: string, password: string) => void;
