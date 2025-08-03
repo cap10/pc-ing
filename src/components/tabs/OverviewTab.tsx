@@ -113,12 +113,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
 
       {/* Charts Row */}
       <div className="grid gap-6">
-        {/* Daily Collections Chart */}
+        {/* Monthly Collections Chart */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-bold text-gray-900">
-                Weekly Collections vs Target
+                Monthly Collections vs Target
               </h3>
               <p className="text-sm text-gray-500 mt-1">
                 Target: ₦52,900 × {dashboardMetrics.kekesActivelyDeployed} deployed kekes
