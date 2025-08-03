@@ -30,7 +30,6 @@ import {
   Trash2,
   DollarSign,
   AlertTriangle,
-  CheckCircle,
   BanknoteIcon,
 } from "lucide-react";
 
