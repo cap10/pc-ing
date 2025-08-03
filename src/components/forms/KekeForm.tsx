@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import Modal, { ModalHeader, ModalBody, ModalFooter } from '../ui/Modal';
@@ -11,7 +12,7 @@ interface KekeFormProps {
 
 const KekeForm: React.FC<KekeFormProps> = ({ editingItem, aggregators, onClose, onSave }) => {
     const [formData, setFormData] = useState(editingItem || {
-        registrationNumber: '',
+        chassisNumber: '',
         aggregator: '',
         driver: '',
         location: '',
@@ -53,8 +54,8 @@ const KekeForm: React.FC<KekeFormProps> = ({ editingItem, aggregators, onClose, 
                                 type="text"
                                 required
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                value={formData.registrationNumber}
-                                onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
+                                value={formData.chassisNumber}
+                                onChange={(e) => setFormData({...formData, chassisNumber: e.target.value})}
                                 placeholder="e.g., ABC-123-XY"
                             />
                         </div>

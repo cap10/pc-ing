@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -23,33 +24,14 @@ import { useAuth } from "../hooks/useAuth";
 import { toast } from "sonner";
 import {
   CreditCard,
-  TrendingUp,
   MapPin,
   Plus,
   Edit,
   Trash2,
-  Search,
-  Download,
   DollarSign,
   AlertTriangle,
-  CheckCircle,
+  BanknoteIcon,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-} from "recharts";
 
 // Import components
 import Sidenav from "../components/ui/Sidenav";
@@ -60,14 +42,14 @@ import KekeForm from "../components/forms/KekeForm";
 import AggregatorForm from "../components/forms/AggregatorForm";
 import DriverForm from "../components/forms/DriverForm";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
-import { customTooltipStyle } from "../utils/chartConfig";
 
 const PICNGDashboard = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, canEdit, user } = useAuth();
-  const { kekeAssets, aggregators, drivers, isLoaded, activeTab } =
-    useAppSelector((state) => state.data);
+  const { isAuthenticated, canEdit } = useAuth();
+  const { kekeAssets, aggregators, drivers, activeTab } = useAppSelector(
+    (state) => state.data
+  );
 
   // State for mobile sidenav
   const [isSidenavOpen, setIsSidenavOpen] = useState(false);
@@ -91,31 +73,36 @@ const PICNGDashboard = () => {
   const [editingItem, setEditingItem] = useState<
     KekeAsset | Aggregator | Driver | null
   >(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [selectedAggregator, setSelectedAggregator] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("march");
 
   // Dashboard metrics
   const dashboardMetrics = {
-    totalKekesAssigned: 25,
-    kekesPickedUp: 20,
-    kekesActivelyDeployed: 18,
-    kekesYetToPickup: 5,
-    totalWeeklyCollection: 187500,
-    cardPaymentRatio: 0.79,
-    totalRebatesIssued: 9375,
-    akupayCommission: 18750,
-    picngSettlement: 159375,
+    totalKekesAssigned: 250,
+    kekesPickedUp: 73,
+    kekesActivelyDeployed: 68,
+    kekesYetToPickup: 177, // 250 - 73 = 177
+    totalRevenue: 2094000,
+    totalWeeklyCollection: 0, // No revenue collected in July
+    cardPaymentRatio: 0.32,
+    totalRebatesIssued: 0,
+    akupayCommission: 0,
+    picngSettlement: 0,
+    picngRevenue: 209400, // 10% of total revenue (₦2,094,000)
   };
 
   // Chart data
+  // Target: ₦52,900 per keke × 68 deployed kekes = ₦3,597,200 weekly target
+  const weeklyTarget = 52900 * dashboardMetrics.kekesActivelyDeployed;
   const weeklyCollectionData = [
-    { date: "Week 1", collection: 175000, target: 180000 },
-    { date: "Week 2", collection: 182000, target: 180000 },
-    { date: "Week 3", collection: 178000, target: 180000 },
-    { date: "Week 4", collection: 185000, target: 180000 },
-    { date: "Week 5", collection: 187500, target: 180000 },
-    { date: "Week 6", collection: 195000, target: 180000 },
-    { date: "Week 7", collection: 172000, target: 180000 },
+    { date: "Feb 2024", collection: 0, target: weeklyTarget }, // Project started, no revenue
+    { date: "Mar 2024", collection: 180000, target: weeklyTarget }, // First revenue
+    { date: "Apr 2024", collection: 720000, target: weeklyTarget },
+    { date: "May 2024", collection: 652000, target: weeklyTarget },
+    { date: "Jun 2024", collection: 542000, target: weeklyTarget },
+    { date: "Jul 2024", collection: 0, target: weeklyTarget }, // No revenue collected
   ];
 
   const paymentMethodData = [
@@ -123,12 +110,15 @@ const PICNGDashboard = () => {
     { name: "Cash Payments", value: 21, color: "#F59E0B" },
   ];
 
-  const locationPerformanceData = [
-    { location: "Victoria Island", revenue: 45000, kekeCount: 6 },
-    { location: "Ikeja", revenue: 38000, kekeCount: 5 },
-    { location: "Surulere", revenue: 32000, kekeCount: 4 },
-    { location: "Yaba", revenue: 28000, kekeCount: 3 },
-  ];
+  const cooperativePerformanceData = aggregators.map((aggregator) => ({
+    cooperative:
+      aggregator.name.length > 15
+        ? aggregator.name.substring(0, 15) + "..."
+        : aggregator.name,
+    revenue: aggregator.totalRevenue || 0,
+    kekeCount: aggregator.kekesDeployed,
+    assigned: aggregator.kekesAssigned,
+  }));
 
   // Modal management
   const openModal = (
@@ -158,14 +148,13 @@ const PICNGDashboard = () => {
         dispatch(updateKekeAsset({ ...editingItem, ...formData } as KekeAsset));
         toast.success("Keke asset updated successfully!", {
           description: `Updated ${
-            formData.registrationNumber ||
-            (editingItem as KekeAsset).registrationNumber
+            formData.chassisNumber || (editingItem as KekeAsset).chassisNumber
           }`,
         });
       } else {
         dispatch(addKekeAsset(formData as Omit<KekeAsset, "id">));
         toast.success("Keke asset created successfully!", {
-          description: `Added ${formData.registrationNumber}`,
+          description: `Added ${formData.chassisNumber}`,
         });
       }
       closeModal();
@@ -345,152 +334,163 @@ const PICNGDashboard = () => {
   }
 
   // Export data function
-  const handleExportData = async () => {
-    setIsOperationLoading(true);
+  //   const handleExportData = async () => {
+  //     setIsOperationLoading(true);
 
-    try {
-      // Simulate processing time
-      await new Promise((resolve) => setTimeout(resolve, 500));
+  //     try {
+  //       // Simulate processing time
+  //       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const exportData = {
-        exportDate: new Date().toISOString(),
-        exportedBy: user?.username,
-        summary: {
-          totalKekesAssigned: dashboardMetrics.totalKekesAssigned,
-          kekesActivelyDeployed: dashboardMetrics.kekesActivelyDeployed,
-          totalWeeklyCollection: dashboardMetrics.totalWeeklyCollection,
-          cardPaymentRatio: dashboardMetrics.cardPaymentRatio,
-          totalRebatesIssued: dashboardMetrics.totalRebatesIssued,
-        },
-        kekeAssets: kekeAssets.map((keke) => ({
-          id: keke.id,
-          registrationNumber: keke.registrationNumber,
-          aggregator: keke.aggregator,
-          driver: keke.driver,
-          location: keke.location,
-          status: keke.status,
-          weeklyRevenue: keke.weeklyRevenue,
-          cardPaymentRatio: keke.cardPaymentRatio,
-          deploymentDate: keke.deploymentDate,
-        })),
-        aggregators: aggregators.map((agg) => ({
-          id: agg.id,
-          name: agg.name,
-          kekesAssigned: agg.kekesAssigned,
-          kekesDeployed: agg.kekesDeployed,
-          avgWeeklyCollection: agg.avgWeeklyCollection,
-          cardPaymentRatio: agg.cardPaymentRatio,
-        })),
-        drivers: drivers.map((driver) => ({
-          id: driver.id,
-          name: driver.name,
-          phone: driver.phone,
-          kekeId: driver.kekeId,
-          licenseExpiry: driver.licenseExpiry,
-          kycStatus: driver.kycStatus,
-          appUsage: driver.appUsage,
-        })),
-      };
+  //       const exportData = {
+  //         exportDate: new Date().toISOString(),
+  //         exportedBy: user?.username,
+  //         summary: {
+  //           totalKekesAssigned: dashboardMetrics.totalKekesAssigned,
+  //           kekesActivelyDeployed: dashboardMetrics.kekesActivelyDeployed,
+  //           totalWeeklyCollection: dashboardMetrics.totalWeeklyCollection,
+  //           cardPaymentRatio: dashboardMetrics.cardPaymentRatio,
+  //           totalRebatesIssued: dashboardMetrics.totalRebatesIssued,
+  //         },
+  //         kekeAssets: kekeAssets.map((keke) => ({
+  //           id: keke.id,
+  //           chassisNumber: keke.chassisNumber,
+  //           aggregator: keke.aggregator,
+  //           driver: keke.driver,
+  //           location: keke.location,
+  //           status: keke.status,
+  //           weeklyRevenue: keke.weeklyRevenue,
+  //           cardPaymentRatio: keke.cardPaymentRatio,
+  //           deploymentDate: keke.deploymentDate,
+  //         })),
+  //         aggregators: aggregators.map((agg) => ({
+  //           id: agg.id,
+  //           name: agg.name,
+  //           kekesAssigned: agg.kekesAssigned,
+  //           kekesDeployed: agg.kekesDeployed,
+  //           avgWeeklyCollection: agg.avgWeeklyCollection,
+  //           cardPaymentRatio: agg.cardPaymentRatio,
+  //         })),
+  //         drivers: drivers.map((driver) => ({
+  //           id: driver.id,
+  //           name: driver.name,
+  //           chassisNumber: driver.chassisNumber,
+  //           kekeId: driver.kekeId,
+  //           licenseExpiry: driver.licenseExpiry,
+  //           kycStatus: driver.kycStatus,
+  //           appUsage: driver.appUsage,
+  //         })),
+  //       };
 
-      // Convert to CSV format
-      const csvContent = generateCSV(exportData);
+  //       // Convert to CSV format
+  //       const csvContent = generateCSV(exportData);
 
-      // Create and download file
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute(
-        "download",
-        `PICNG_Dashboard_Export_${new Date().toISOString().split("T")[0]}.csv`
+  //       // Create and download file
+  //       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  //       const link = document.createElement("a");
+  //       const url = URL.createObjectURL(blob);
+  //       link.setAttribute("href", url);
+  //       link.setAttribute(
+  //         "download",
+  //         `PICNG_Dashboard_Export_${new Date().toISOString().split("T")[0]}.csv`
+  //       );
+  //       link.style.visibility = "hidden";
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+
+  //       // Show success message
+  //       toast.success("Data exported successfully!", {
+  //         description: `Exported to PICNG_Dashboard_Export_${
+  //           new Date().toISOString().split("T")[0]
+  //         }.csv`,
+  //       });
+  //     } catch (error) {
+  //       console.error("Export failed:", error);
+  //       toast.error("Failed to export data", {
+  //         description:
+  //           "Please try again or contact support if the issue persists.",
+  //       });
+  //     } finally {
+  //       setIsOperationLoading(false);
+  //     }
+  //   };
+
+  //   // Generate CSV from data
+  //   const generateCSV = (data: any) => {
+  //     let csv = "PICNG Dashboard Export\n";
+  //     csv += `Export Date,${data.exportDate}\n`;
+  //     csv += `Exported By,${data.exportedBy}\n\n`;
+
+  //     // Summary section
+  //     csv += "SUMMARY\n";
+  //     csv += "Metric,Value\n";
+  //     csv += `Total Kekes Assigned,${data.summary.totalKekesAssigned}\n`;
+  //     csv += `Kekes Actively Deployed,${data.summary.kekesActivelyDeployed}\n`;
+  //     csv += `Total Daily Collection,₦${data.summary.totalDailyCollection}\n`;
+  //     csv += `Card Payment Ratio,${(data.summary.cardPaymentRatio * 100).toFixed(
+  //       1
+  //     )}%\n`;
+  //     csv += `Total Rebates Issued,₦${data.summary.totalRebatesIssued}\n\n`;
+
+  //     // Keke Assets section
+  //     csv += "KEKE ASSETS\n";
+  //     csv +=
+  //       "ID,Registration Number,Aggregator,Driver,Location,Status,Daily Revenue,Card Payment Ratio,Deployment Date\n";
+  //     data.kekeAssets.forEach((keke: any) => {
+  //       csv += `${keke.id},${keke.chassisNumber},${keke.aggregator},${
+  //         keke.driver
+  //       },${keke.location},${keke.status},₦${keke.dailyRevenue},${(
+  //         keke.cardPaymentRatio * 100
+  //       ).toFixed(1)}%,${keke.deploymentDate}\n`;
+  //     });
+  //     csv += "\n";
+
+  //     // Aggregators section
+  //     csv += "AGGREGATORS\n";
+  //     csv +=
+  //       "ID,Name,Kekes Assigned,Kekes Deployed,Avg Daily Collection,Card Payment Ratio\n";
+  //     data.aggregators.forEach((agg: any) => {
+  //       csv += `${agg.id},${agg.name},${agg.kekesAssigned},${
+  //         agg.kekesDeployed
+  //       },₦${agg.avgWeeklyCollection || 0},${(agg.cardPaymentRatio * 100).toFixed(
+  //         1
+  //       )}%\n`;
+  //     });
+  //     csv += "\n";
+
+  //     // Drivers section
+  //     csv += "DRIVERS\n";
+  //     csv += "ID,Name,Chassis Number,Keke ID,License Expiry,KYC Status,App Usage\n";
+  //     data.drivers.forEach((driver: any) => {
+  //       csv += `${driver.id},${driver.name},${driver.chassisNumber},${
+
+  //         driver.kekeId || "Not Assigned"
+  //       },${driver.licenseExpiry},${driver.kycStatus},${driver.appUsage}\n`;
+  //     });
+
+  //     return csv;
+  //   };
+
+  // Filter and sort functions
+  const filteredKekeAssets = kekeAssets
+    .filter((keke) => {
+      const matchesSearch =
+        keke.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        keke.driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        keke.location.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesAggregator =
+        !selectedAggregator || keke.aggregator === selectedAggregator;
+      const matchesStatus = !selectedStatus || keke.status === selectedStatus;
+      return matchesSearch && matchesAggregator && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Sort by status: Active first, then Maintenance, then Inactive
+      const statusOrder = { Active: 1, Maintenance: 2, Inactive: 3 };
+      return (
+        statusOrder[a.status as keyof typeof statusOrder] -
+        statusOrder[b.status as keyof typeof statusOrder]
       );
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Show success message
-      toast.success("Data exported successfully!", {
-        description: `Exported to PICNG_Dashboard_Export_${
-          new Date().toISOString().split("T")[0]
-        }.csv`,
-      });
-    } catch (error) {
-      console.error("Export failed:", error);
-      toast.error("Failed to export data", {
-        description:
-          "Please try again or contact support if the issue persists.",
-      });
-    } finally {
-      setIsOperationLoading(false);
-    }
-  };
-
-  // Generate CSV from data
-  const generateCSV = (data: any) => {
-    let csv = "PICNG Dashboard Export\n";
-    csv += `Export Date,${data.exportDate}\n`;
-    csv += `Exported By,${data.exportedBy}\n\n`;
-
-    // Summary section
-    csv += "SUMMARY\n";
-    csv += "Metric,Value\n";
-    csv += `Total Kekes Assigned,${data.summary.totalKekesAssigned}\n`;
-    csv += `Kekes Actively Deployed,${data.summary.kekesActivelyDeployed}\n`;
-    csv += `Total Daily Collection,₦${data.summary.totalDailyCollection}\n`;
-    csv += `Card Payment Ratio,${(data.summary.cardPaymentRatio * 100).toFixed(
-      1
-    )}%\n`;
-    csv += `Total Rebates Issued,₦${data.summary.totalRebatesIssued}\n\n`;
-
-    // Keke Assets section
-    csv += "KEKE ASSETS\n";
-    csv +=
-      "ID,Registration Number,Aggregator,Driver,Location,Status,Daily Revenue,Card Payment Ratio,Deployment Date\n";
-    data.kekeAssets.forEach((keke: any) => {
-      csv += `${keke.id},${keke.registrationNumber},${keke.aggregator},${
-        keke.driver
-      },${keke.location},${keke.status},₦${keke.dailyRevenue},${(
-        keke.cardPaymentRatio * 100
-      ).toFixed(1)}%,${keke.deploymentDate}\n`;
     });
-    csv += "\n";
-
-    // Aggregators section
-    csv += "AGGREGATORS\n";
-    csv +=
-      "ID,Name,Kekes Assigned,Kekes Deployed,Avg Daily Collection,Card Payment Ratio\n";
-    data.aggregators.forEach((agg: any) => {
-      csv += `${agg.id},${agg.name},${agg.kekesAssigned},${
-        agg.kekesDeployed
-      },₦${agg.avgDailyCollection},${(agg.cardPaymentRatio * 100).toFixed(
-        1
-      )}%\n`;
-    });
-    csv += "\n";
-
-    // Drivers section
-    csv += "DRIVERS\n";
-    csv += "ID,Name,Phone,Keke ID,License Expiry,KYC Status,App Usage\n";
-    data.drivers.forEach((driver: any) => {
-      csv += `${driver.id},${driver.name},${driver.phone},${
-        driver.kekeId || "Not Assigned"
-      },${driver.licenseExpiry},${driver.kycStatus},${driver.appUsage}\n`;
-    });
-
-    return csv;
-  };
-
-  // Filter functions
-  const filteredKekeAssets = kekeAssets.filter((keke) => {
-    const matchesSearch =
-      keke.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      keke.driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      keke.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesAggregator =
-      !selectedAggregator || keke.aggregator === selectedAggregator;
-    return matchesSearch && matchesAggregator;
-  });
 
   return (
     <div className="h-screen bg-gray-100 flex overflow-hidden">
@@ -534,7 +534,7 @@ const PICNGDashboard = () => {
                   </h1>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <button
                   onClick={handleExportData}
                   disabled={isOperationLoading}
@@ -552,7 +552,7 @@ const PICNGDashboard = () => {
                     {isOperationLoading ? "Exporting..." : "Export Data"}
                   </span>
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -565,7 +565,7 @@ const PICNGDashboard = () => {
               dashboardMetrics={dashboardMetrics}
               weeklyCollectionData={weeklyCollectionData}
               paymentMethodData={paymentMethodData}
-              locationPerformanceData={locationPerformanceData}
+              cooperativePerformanceData={cooperativePerformanceData}
             />
           )}
 
@@ -598,6 +598,16 @@ const PICNGDashboard = () => {
                         </option>
                       ))}
                     </select>
+                    <select
+                      className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                    >
+                      <option value="">All Status</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Maintenance">Maintenance</option>
+                    </select>
                   </div>
                   {canEdit && (
                     <button
@@ -625,8 +635,8 @@ const PICNGDashboard = () => {
                     className: "font-medium",
                   },
                   {
-                    key: "registrationNumber",
-                    header: "Registration",
+                    key: "chassisNumber",
+                    header: "Chassis Number",
                     sortable: true,
                   },
                   {
@@ -667,19 +677,6 @@ const PICNGDashboard = () => {
                         {keke.status}
                       </span>
                     ),
-                  },
-                  {
-                    key: "weeklyRevenue",
-                    header: "Weekly Revenue",
-                    sortable: true,
-                    render: (keke) => `₦${(keke.weeklyRevenue || 0).toLocaleString()}`,
-                  },
-                  {
-                    key: "cardPaymentRatio",
-                    header: "Card Ratio",
-                    sortable: true,
-                    render: (keke) =>
-                      `${(keke.cardPaymentRatio * 100).toFixed(1)}%`,
                   },
                   {
                     key: "actions",
@@ -731,7 +728,6 @@ const PICNGDashboard = () => {
                   </button>
                 )}
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {aggregators.map((aggregator) => (
                   <div
@@ -740,7 +736,7 @@ const PICNGDashboard = () => {
                   >
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900">
+                        <h3 className="text-lg font-bold text-gray-900  line-clamp-1">
                           {aggregator.name}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
@@ -792,39 +788,45 @@ const PICNGDashboard = () => {
                         <span className="text-sm font-medium text-gray-500">
                           Deployment Rate
                         </span>
-                        <span className={`text-sm font-bold ${
-                          (aggregator.kekesDeployed / aggregator.kekesAssigned) >= 0.8 
-                            ? 'text-green-600' 
-                            : (aggregator.kekesDeployed / aggregator.kekesAssigned) >= 0.6 
-                              ? 'text-yellow-600' 
-                              : 'text-red-600'
-                        }`}>
-                          {((aggregator.kekesDeployed / aggregator.kekesAssigned) * 100).toFixed(1)}%
+                        <span
+                          className={`text-sm font-bold ${
+                            aggregator.kekesDeployed /
+                              aggregator.kekesAssigned >=
+                            0.8
+                              ? "text-green-600"
+                              : aggregator.kekesDeployed /
+                                  aggregator.kekesAssigned >=
+                                0.6
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {(
+                            (aggregator.kekesDeployed /
+                              aggregator.kekesAssigned) *
+                            100
+                          ).toFixed(1)}
+                          %
                         </span>
                       </div>
-                      <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                      {/* <div className="flex items-center justify-between py-2 border-b border-gray-50">
                         <span className="text-sm font-medium text-gray-500">
                           Avg Weekly Collection
                         </span>
                         <span className="text-sm font-bold text-black">
-                          ₦{(aggregator.avgWeeklyCollection || 0).toLocaleString()}
+                          ₦
+                          {(
+                            aggregator.avgWeeklyCollection || 0
+                          ).toLocaleString()}
                         </span>
-                      </div>
+                      </div> */}
                       <div className="flex items-center justify-between py-2">
                         <span className="text-sm font-medium text-gray-500">
-                          Card Payment Ratio
+                          Total Revenue
                         </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold text-green-600">
-                            {(aggregator.cardPaymentRatio * 100).toFixed(1)}%
-                          </span>
-                          <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full"
-                              style={{ width: `${aggregator.cardPaymentRatio * 100}%` }}
-                            />
-                          </div>
-                        </div>
+                        <span className="text-sm font-bold text-black">
+                          ₦{(aggregator.totalRevenue || 0).toLocaleString()}
+                        </span>
                       </div>
                     </div>
 
@@ -841,7 +843,11 @@ const PICNGDashboard = () => {
                         <div
                           className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
                           style={{
-                            width: `${(aggregator.kekesDeployed / aggregator.kekesAssigned) * 100}%`
+                            width: `${
+                              (aggregator.kekesDeployed /
+                                aggregator.kekesAssigned) *
+                              100
+                            }%`,
                           }}
                         />
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />
@@ -853,291 +859,124 @@ const PICNGDashboard = () => {
             </div>
           )}
 
-          {/* Transactions Tab */}
-          {activeTab === "transactions" && (
-            <div className="space-y-6">
-              {/* Transaction Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard
-                  title="Total Collection This Week"
-                  value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
-                  icon={DollarSign}
-                  trend={8.3}
-                  color="emerald"
-                />
-                <MetricCard
-                  title="Card Transactions"
-                  value={`${(dashboardMetrics.cardPaymentRatio * 100).toFixed(
-                    1
-                  )}%`}
-                  icon={CreditCard}
-                  trend={3.7}
-                  color="blue"
-                />
-                <MetricCard
-                  title="Total Rebates Issued"
-                  value={`₦${dashboardMetrics.totalRebatesIssued.toLocaleString()}`}
-                  icon={TrendingUp}
-                  trend={12.5}
-                  color="purple"
-                />
-              </div>
-
-              {/* Transaction Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">
-                        Weekly Collection Trend
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Revenue performance tracking
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-4 text-xs">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mr-2"></div>
-                        <span className="text-gray-600">Collections</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-1 bg-emerald-500 rounded-full mr-2"></div>
-                        <span className="text-gray-600">Target</span>
-                      </div>
-                    </div>
-                  </div>
-                  <ResponsiveContainer width="100%" height={320}>
-                    <LineChart
-                      data={weeklyCollectionData}
-                      margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-                    >
-                      <defs>
-                        <linearGradient
-                          id="collectionLineGradient"
-                          x1="0"
-                          y1="0"
-                          x2="1"
-                          y2="0"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#3B82F6"
-                            stopOpacity={1}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#1D4ED8"
-                            stopOpacity={1}
-                          />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid
-                        strokeDasharray="0"
-                        stroke="#F1F5F9"
-                        vertical={false}
-                        horizontal={true}
-                      />
-                      <XAxis
-                        dataKey="date"
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 11, fill: "#64748B" }}
-                        dy={10}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 11, fill: "#64748B" }}
-                        domain={["dataMin - 10000", "dataMax + 10000"]}
-                        tickFormatter={(value) =>
-                          `₦${(value / 1000).toFixed(0)}K`
-                        }
-                      />
-                      <Tooltip
-                        {...customTooltipStyle}
-                        formatter={(value, name) => [
-                          `₦${value.toLocaleString()}`,
-                          name === "collection" ? "Collections" : "Target",
-                        ]}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="collection"
-                        stroke="url(#collectionLineGradient)"
-                        strokeWidth={3}
-                        dot={{ fill: "#3B82F6", strokeWidth: 2, r: 4 }}
-                        activeDot={{
-                          r: 6,
-                          stroke: "#3B82F6",
-                          strokeWidth: 2,
-                          fill: "#ffffff",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="target"
-                        stroke="#10B981"
-                        strokeWidth={2}
-                        strokeDasharray="8 4"
-                        dot={{ fill: "#10B981", strokeWidth: 2, r: 3 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">
-                        Location Revenue
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Revenue distribution by location
-                      </p>
-                    </div>
-                  </div>
-                  <ResponsiveContainer width="100%" height={320}>
-                    <BarChart data={locationPerformanceData} barGap={4}>
-                      <CartesianGrid
-                        strokeDasharray="0"
-                        stroke="#F3F4F6"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="location"
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 11, fill: "#6B7280" }}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 11, fill: "#6B7280" }}
-                        domain={[0, "dataMax + 5000"]}
-                        tickFormatter={(value) =>
-                          `₦${(value / 1000).toFixed(0)}K`
-                        }
-                        dx={-20}
-                      />
-                      <Tooltip
-                        {...customTooltipStyle}
-                        formatter={(value) => [
-                          `₦${value.toLocaleString()}`,
-                          "Revenue",
-                        ]}
-                      />
-                      <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
-                        {locationPerformanceData.map((_, index) => {
-                          const colors = [
-                            "#3b82f6",
-                            "#ef4444",
-                            "#10b981",
-                            "#f59e0b",
-                          ];
-                          return (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={colors[index % colors.length]}
-                            />
-                          );
-                        })}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Financial Tab */}
           {activeTab === "financial" && (
             <div className="space-y-6">
               {/* Financial Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <MetricCard
-                  title="Total Weekly Collection"
-                  value={`₦${dashboardMetrics.totalWeeklyCollection.toLocaleString()}`}
+                  title="Total Collection"
+                  value={`₦${dashboardMetrics.totalRevenue.toLocaleString()}`}
                   icon={DollarSign}
                   color="emerald"
                 />
                 <MetricCard
-                  title="Akupay Commission"
-                  value={`₦${dashboardMetrics.akupayCommission.toLocaleString()}`}
-                  icon={CreditCard}
+                  title="Settlements"
+                  breakdown={[
+                    {
+                      label: "PICNG",
+                      value: `₦${0}`,
+                    },
+                    {
+                      label: "Aggregator",
+                      value: `₦${0}`,
+                    },
+                    {
+                      label: "Aku",
+                      value: `₦${0}`,
+                    },
+                  ]}
+                  icon={BanknoteIcon}
                   color="blue"
                 />
                 <MetricCard
-                  title="Rebates Issued"
-                  value={`₦${dashboardMetrics.totalRebatesIssued.toLocaleString()}`}
-                  icon={TrendingUp}
-                  color="purple"
-                />
-                <MetricCard
-                  title="PICNG Settlement"
-                  value={`₦${dashboardMetrics.picngSettlement.toLocaleString()}`}
-                  icon={CheckCircle}
-                  color="green"
+                  title="Project Loan"
+                  breakdown={[
+                    {
+                      label: "Principal",
+                      value: `-₦${(125000000).toLocaleString()}`,
+                    },
+                    {
+                      label: "Interest",
+                      value: `-₦${(50000000).toLocaleString()}`,
+                    },
+                  ]}
+                  icon={CreditCard}
+                  trend={3.7}
+                  color="black"
                 />
               </div>
 
-              {/* Financial Breakdown Table */}
+              {/* Cooperative Financial Summary Table */}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                   <h3 className="text-lg font-semibold">
-                    Per-Keke Financial Summary
+                    Cooperative Revenue Summary
                   </h3>
+                  <select
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                  >
+                    <option value="march">March 2024</option>
+                    <option value="april">April 2024</option>
+                    <option value="may">May 2024</option>
+                    <option value="june">June 2024</option>
+                    <option value="july">July 2024</option>
+                  </select>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Keke ID
+                          Cooperative Name
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Weekly Revenue
+                          Revenue
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Card %
+                          Aku Revenue
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Rebates Given
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Akupay Earnings
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Net to PICNG
+                          Kekes Deployed
                         </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {kekeAssets.map((keke) => {
-                        const akupayEarnings = (keke.weeklyRevenue || 0) * 0.1; // 10% commission
-                        const netToPicng =
-                          (keke.weeklyRevenue || 0) -
-                          akupayEarnings -
-                          (keke.rebatesIssued || 0);
+                      {aggregators.map((aggregator) => {
+                        const getMonthRevenue = (month: string) => {
+                          switch (month) {
+                            case "march":
+                              return aggregator.marchRevenue || 0;
+                            case "april":
+                              return aggregator.aprilRevenue || 0;
+                            case "may":
+                              return aggregator.mayRevenue || 0;
+                            case "june":
+                              return aggregator.juneRevenue || 0;
+                            case "july":
+                              return aggregator.julyRevenue || 0;
+                            default:
+                              return 0;
+                          }
+                        };
+
+                        const monthRevenue = getMonthRevenue(selectedMonth);
 
                         return (
-                          <tr key={keke.id} className="hover:bg-gray-50">
+                          <tr key={aggregator.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {keke.id}
+                              {aggregator.name}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                              ₦{monthRevenue.toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{(keke.weeklyRevenue || 0).toLocaleString()}
+                              ₦0
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {(keke.cardPaymentRatio * 100).toFixed(1)}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{(keke.rebatesIssued || 0).toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{akupayEarnings.toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              ₦{netToPicng.toLocaleString()}
+                              {aggregator.kekesDeployed}
                             </td>
                           </tr>
                         );
@@ -1167,120 +1006,115 @@ const PICNGDashboard = () => {
                 )}
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Driver ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Phone
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Assigned Keke
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          License Expiry
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          KYC Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          App Usage
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {drivers.map((driver) => {
-                        const isLicenseExpiring =
-                          new Date(driver.licenseExpiry) <=
-                          new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-
-                        return (
-                          <tr key={driver.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {driver.id}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {driver.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {driver.phone}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {driver.kekeId || "Not Assigned"}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center">
-                                {driver.licenseExpiry}
-                                {isLicenseExpiring && (
-                                  <AlertTriangle className="w-4 h-4 ml-2 text-yellow-500" />
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span
-                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                  driver.kycStatus === "Complete"
-                                    ? "bg-green-100 text-green-800"
-                                    : driver.kycStatus === "Pending"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {driver.kycStatus}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span
-                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                  driver.appUsage === "Active"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {driver.appUsage}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex items-center space-x-2">
-                                {canEdit && (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        openModal("driver", driver)
-                                      }
-                                      className="text-blue-600 hover:text-blue-900"
-                                    >
-                                      <Edit className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteDriver(driver.id)
-                                      }
-                                      className="text-red-600 hover:text-red-900"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <Table
+                data={drivers}
+                columns={[
+                  {
+                    key: "id",
+                    header: "Driver ID",
+                    sortable: true,
+                    className: "font-medium",
+                  },
+                  {
+                    key: "name",
+                    header: "Name",
+                    sortable: true,
+                  },
+                  {
+                    key: "chassisNumber",
+                    header: "Chassis Number",
+                    sortable: true,
+                  },
+                  {
+                    key: "kekeId",
+                    header: "Assigned Keke",
+                    sortable: true,
+                    render: (driver) => driver.kekeId || "Not Assigned",
+                  },
+                  {
+                    key: "licenseExpiry",
+                    header: "License Expiry",
+                    sortable: true,
+                    render: (driver) => {
+                      const isLicenseExpiring =
+                        new Date(driver.licenseExpiry) <=
+                        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                      return (
+                        <div className="flex items-center">
+                          {driver.licenseExpiry}
+                          {isLicenseExpiring && (
+                            <AlertTriangle className="w-4 h-4 ml-2 text-yellow-500" />
+                          )}
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    key: "kycStatus",
+                    header: "KYC Status",
+                    sortable: true,
+                    render: (driver) => (
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          driver.kycStatus === "Complete"
+                            ? "bg-green-100 text-green-800"
+                            : driver.kycStatus === "Pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {driver.kycStatus}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "appUsage",
+                    header: "App Usage",
+                    sortable: true,
+                    render: (driver) => (
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          driver.appUsage === "Active"
+                            ? "bg-green-100 text-green-800"
+                            : driver.appUsage === "Unused"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {driver.appUsage}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "actions",
+                    header: "Actions",
+                    render: (driver) => (
+                      <div className="flex items-center space-x-2">
+                        {canEdit && (
+                          <>
+                            <button
+                              onClick={() => openModal("driver", driver)}
+                              className="text-blue-600 hover:text-blue-900 transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDriver(driver.id)}
+                              className="text-red-600 hover:text-red-900 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ),
+                  },
+                ]}
+                itemsPerPage={10}
+                searchable={true}
+                searchPlaceholder="Search drivers..."
+                emptyMessage="No drivers found"
+              />
             </div>
           )}
         </div>

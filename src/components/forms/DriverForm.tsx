@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import Modal, { ModalHeader, ModalBody, ModalFooter } from '../ui/Modal';
@@ -12,7 +13,7 @@ interface DriverFormProps {
 const DriverForm: React.FC<DriverFormProps> = ({ editingItem, kekeAssets, onClose, onSave }) => {
     const [formData, setFormData] = useState(editingItem || {
         name: '',
-        phone: '',
+        chassisNumber: '',
         kekeId: '',
         licenseExpiry: '',
         kycStatus: 'Pending',
@@ -62,15 +63,15 @@ const DriverForm: React.FC<DriverFormProps> = ({ editingItem, kekeAssets, onClos
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number
+                                    Chassis Number
                                 </label>
                                 <input
-                                    type="tel"
+                                    type="text"
                                     required
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                    placeholder="+234-XXX-XXX-XXXX"
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50"
+                                    value={formData.chassisNumber}
+                                    readOnly
+                                    placeholder="Select a keke to auto-populate"
                                 />
                             </div>
                         </div>
@@ -83,12 +84,19 @@ const DriverForm: React.FC<DriverFormProps> = ({ editingItem, kekeAssets, onClos
                                 required
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                 value={formData.kekeId}
-                                onChange={(e) => setFormData({...formData, kekeId: e.target.value})}
+                                onChange={(e) => {
+                                    const selectedKeke = kekeAssets.find(keke => keke.id === e.target.value);
+                                    setFormData({
+                                        ...formData, 
+                                        kekeId: e.target.value,
+                                        chassisNumber: selectedKeke ? selectedKeke.chassisNumber : ''
+                                    });
+                                }}
                             >
                                 <option value="">Select Keke</option>
                                 {kekeAssets.map(keke => (
                                     <option key={keke.id} value={keke.id}>
-                                        {keke.id} - {keke.registrationNumber}
+                                        {keke.id} - {keke.chassisNumber}
                                     </option>
                                 ))}
                             </select>
@@ -139,6 +147,17 @@ const DriverForm: React.FC<DriverFormProps> = ({ editingItem, kekeAssets, onClos
                                         className="mr-2 text-green-600 focus:ring-green-500"
                                     />
                                     <span className="text-sm">Active</span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="appUsage"
+                                        value="Unused"
+                                        checked={formData.appUsage === 'Unused'}
+                                        onChange={(e) => setFormData({...formData, appUsage: e.target.value})}
+                                        className="mr-2 text-yellow-600 focus:ring-yellow-500"
+                                    />
+                                    <span className="text-sm">Unused</span>
                                 </label>
                                 <label className="flex items-center">
                                     <input
