@@ -5,7 +5,6 @@ import {
   Activity,
   Truck,
   Users,
-  CreditCard,
   DollarSign,
   ChevronLeftCircleIcon,
 } from "lucide-react";
@@ -29,7 +28,7 @@ const Sidenav: React.FC<SidenavProps> = ({
     { id: "overview", name: "Overview", icon: Activity },
     { id: "assets", name: "Asset Management", icon: Truck },
     { id: "aggregators", name: "Aggregators", icon: Users },
-    { id: "transactions", name: "Transactions", icon: CreditCard },
+    // { id: "transactions", name: "Transactions", icon: CreditCard },
     { id: "financial", name: "Financial", icon: DollarSign },
     { id: "drivers", name: "Drivers", icon: Users },
   ];
