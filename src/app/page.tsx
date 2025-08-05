@@ -609,18 +609,29 @@ const PICNGDashboard = () => {
                       <option value="Maintenance">Maintenance</option>
                     </select>
                   </div>
-                  {canEdit && (
+                  <div className="flex items-center gap-4">
+                    {canEdit && (
+                      <button
+                        onClick={() => openModal("keke")}
+                        className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80"
+                        style={{
+                          backgroundColor: "rgb(11, 79, 38)",
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add Keke Asset</span>
+                      </button>
+                    )}
                     <button
-                      onClick={() => openModal("keke")}
+                      onClick={() => window.open("https://www.tramigocloud.com/live-tracking", "_blank")}
                       className="flex items-center space-x-2 px-4 py-2 text-white rounded-md hover:opacity-80"
                       style={{
-                        backgroundColor: "rgb(11, 79, 38)",
+                        backgroundColor: "red",
                       }}
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>Add Keke Asset</span>
+                      <span>Track Assets</span>
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
 
