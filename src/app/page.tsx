@@ -79,18 +79,20 @@ const PICNGDashboard = () => {
   const [selectedMonth, setSelectedMonth] = useState("march");
 
   // Dashboard metrics
+  const totalRevenue = aggregators.reduce((sum, agg) => sum + (agg.totalRevenue || 0), 0);
+  const augustRevenue = aggregators.reduce((sum, agg) => sum + (agg.augustRevenue || 0), 0);
   const dashboardMetrics = {
     totalKekesAssigned: 250,
     kekesPickedUp: 73,
     kekesActivelyDeployed: 68,
     kekesYetToPickup: 177, // 250 - 73 = 177
-    totalRevenue: 2094000,
-    totalWeeklyCollection: 0, // No revenue collected in July
+    totalRevenue: totalRevenue,
+    totalWeeklyCollection: augustRevenue, // August revenue
     cardPaymentRatio: 0.32,
     totalRebatesIssued: 0,
     akupayCommission: 0,
     picngSettlement: 0,
-    picngRevenue: 209400, // 10% of total revenue (₦2,094,000)
+    picngRevenue: totalRevenue * 0.1, // 10% of total revenue
   };
 
   // Chart data
@@ -103,6 +105,7 @@ const PICNGDashboard = () => {
     { date: "May 2024", collection: 652000, target: weeklyTarget },
     { date: "Jun 2024", collection: 542000, target: weeklyTarget },
     { date: "Jul 2024", collection: 0, target: weeklyTarget }, // No revenue collected
+    { date: "Aug 2024", collection: augustRevenue, target: weeklyTarget }, // Current month
   ];
 
   const paymentMethodData = [
@@ -934,6 +937,7 @@ const PICNGDashboard = () => {
                     <option value="may">May 2024</option>
                     <option value="june">June 2024</option>
                     <option value="july">July 2024</option>
+                    <option value="august">August 2024</option>
                   </select>
                 </div>
                 <div className="overflow-x-auto">
@@ -968,6 +972,8 @@ const PICNGDashboard = () => {
                               return aggregator.juneRevenue || 0;
                             case "july":
                               return aggregator.julyRevenue || 0;
+                            case "august":
+                              return aggregator.augustRevenue || 0;
                             default:
                               return 0;
                           }
