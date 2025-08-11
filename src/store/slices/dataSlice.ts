@@ -27,6 +27,7 @@ export interface Aggregator {
   mayRevenue?: number;
   juneRevenue?: number;
   julyRevenue?: number;
+  augustRevenue?: number;
 }
 
 export interface Driver {
@@ -943,6 +944,8 @@ const initialAggregators: Aggregator[] = [
     kekesDeployed: 20,
     avgWeeklyCollection: 0,
     cardPaymentRatio: 0.85,
+    totalRevenue: 770000,
+    augustRevenue: 770000,
   },
   {
     id: "AGG003",
