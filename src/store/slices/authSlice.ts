@@ -26,7 +26,7 @@ const initialState: AuthState = {
 // Mock users database
 const USERS_DB: Record<string, { password: string; role: UserRole }> = {
     akuadmin: { password: 'AkuAppTest', role: 'SUPER_ADMIN' },
-    picngadmin: { password: 'picngadmin123', role: 'ADMIN' },
+    'picngadmin@admin.com': { password: 'picngadmin123', role: 'ADMIN' },
 };
 
 const authSlice = createSlice({
