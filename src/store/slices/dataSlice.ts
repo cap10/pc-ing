@@ -952,8 +952,10 @@ const initialAggregators: Aggregator[] = [
     name: "Odo-oro youth empowerment program",
     kekesAssigned: 20,
     kekesDeployed: 13,
-    avgWeeklyCollection: 0,
+    avgWeeklyCollection: 36054,
     cardPaymentRatio: 0,
+    totalRevenue: 468700,
+    augustRevenue: 468700,
   },
   {
     id: "AGG004",
