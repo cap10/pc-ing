@@ -938,6 +938,7 @@ const PICNGDashboard = () => {
                     <option value="june">June 2024</option>
                     <option value="july">July 2024</option>
                     <option value="august">August 2024</option>
+                    <option value="september">September 2024</option>
                   </select>
                 </div>
                 <div className="overflow-x-auto">
@@ -974,6 +975,8 @@ const PICNGDashboard = () => {
                               return aggregator.julyRevenue || 0;
                             case "august":
                               return aggregator.augustRevenue || 0;
+                            case "september":
+                              return aggregator.septemberRevenue || 0;
                             default:
                               return 0;
                           }
