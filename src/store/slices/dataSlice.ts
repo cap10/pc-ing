@@ -29,6 +29,9 @@ export interface Aggregator {
   julyRevenue?: number;
   augustRevenue?: number;
   septemberRevenue?: number;
+  octoberRevenue?: number;
+  novemberRevenue?: number;
+  decemberRevenue?: number;
 }
 
 export interface Driver {
@@ -937,8 +940,9 @@ const initialAggregators: Aggregator[] = [
     kekesDeployed: 20,
     avgWeeklyCollection: 0,
     cardPaymentRatio: 0.78,
-    totalRevenue: 1040000,
+    totalRevenue: 3040000,
     septemberRevenue: 1040000,
+    octoberRevenue: 2000000,
   },
   {
     id: "AGG002",
@@ -947,9 +951,12 @@ const initialAggregators: Aggregator[] = [
     kekesDeployed: 20,
     avgWeeklyCollection: 0,
     cardPaymentRatio: 0.85,
-    totalRevenue: 1457800,
+    totalRevenue: 3574500,
     augustRevenue: 770000,
     septemberRevenue: 687800,
+    octoberRevenue: 1180500,
+    novemberRevenue: 496000,
+    decemberRevenue: 440200,
   },
   {
     id: "AGG003",
@@ -958,9 +965,10 @@ const initialAggregators: Aggregator[] = [
     kekesDeployed: 13,
     avgWeeklyCollection: 36054,
     cardPaymentRatio: 0,
-    totalRevenue: 2815300,
-    augustRevenue: 1556100,
-    septemberRevenue: 1259200,
+    totalRevenue: 4363400,
+    augustRevenue: 1716400,
+    septemberRevenue: 1196200,
+    octoberRevenue: 1450800,
   },
   {
     id: "AGG004",
