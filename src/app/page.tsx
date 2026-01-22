@@ -81,6 +81,10 @@ const PICNGDashboard = () => {
   // Dashboard metrics
   const totalRevenue = aggregators.reduce((sum, agg) => sum + (agg.totalRevenue || 0), 0);
   const augustRevenue = aggregators.reduce((sum, agg) => sum + (agg.augustRevenue || 0), 0);
+  const septemberRevenue = aggregators.reduce((sum, agg) => sum + (agg.septemberRevenue || 0), 0);
+  const octoberRevenue = aggregators.reduce((sum, agg) => sum + (agg.octoberRevenue || 0), 0);
+  const novemberRevenue = aggregators.reduce((sum, agg) => sum + (agg.novemberRevenue || 0), 0);
+  const decemberRevenue = aggregators.reduce((sum, agg) => sum + (agg.decemberRevenue || 0), 0);
   const dashboardMetrics = {
     totalKekesAssigned: 250,
     kekesPickedUp: 73,
@@ -99,13 +103,17 @@ const PICNGDashboard = () => {
   // Target: ₦52,900 per keke × 68 deployed kekes = ₦3,597,200 weekly target
   const weeklyTarget = 52900 * dashboardMetrics.kekesActivelyDeployed;
   const weeklyCollectionData = [
-    { date: "Feb 2024", collection: 0, target: weeklyTarget }, // Project started, no revenue
-    { date: "Mar 2024", collection: 180000, target: weeklyTarget }, // First revenue
-    { date: "Apr 2024", collection: 720000, target: weeklyTarget },
-    { date: "May 2024", collection: 652000, target: weeklyTarget },
-    { date: "Jun 2024", collection: 542000, target: weeklyTarget },
-    { date: "Jul 2024", collection: 0, target: weeklyTarget }, // No revenue collected
-    { date: "Aug 2024", collection: augustRevenue, target: weeklyTarget }, // Current month
+    { date: "Feb 2025", collection: 0, target: weeklyTarget }, // Project started, no revenue
+    { date: "Mar 2025", collection: 180000, target: weeklyTarget }, // First revenue
+    { date: "Apr 2025", collection: 720000, target: weeklyTarget },
+    { date: "May 2025", collection: 652000, target: weeklyTarget },
+    { date: "Jun 2025", collection: 542000, target: weeklyTarget },
+    { date: "Jul 2025", collection: 0, target: weeklyTarget }, // No revenue collected
+    { date: "Aug 2025", collection: augustRevenue, target: weeklyTarget },
+    { date: "Sep 2025", collection: septemberRevenue, target: weeklyTarget },
+    { date: "Oct 2025", collection: octoberRevenue, target: weeklyTarget },
+    { date: "Nov 2025", collection: novemberRevenue, target: weeklyTarget },
+    { date: "Dec 2025", collection: decemberRevenue, target: weeklyTarget }, // Current month
   ];
 
   const paymentMethodData = [
@@ -932,13 +940,16 @@ const PICNGDashboard = () => {
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
                   >
-                    <option value="march">March 2024</option>
-                    <option value="april">April 2024</option>
-                    <option value="may">May 2024</option>
-                    <option value="june">June 2024</option>
-                    <option value="july">July 2024</option>
-                    <option value="august">August 2024</option>
-                    <option value="september">September 2024</option>
+                    <option value="march">March 2025</option>
+                    <option value="april">April 2025</option>
+                    <option value="may">May 2025</option>
+                    <option value="june">June 2025</option>
+                    <option value="july">July 2025</option>
+                    <option value="august">August 2025</option>
+                    <option value="september">September 2025</option>
+                    <option value="october">October 2025</option>
+                    <option value="november">November 2025</option>
+                    <option value="december">December 2025</option>
                   </select>
                 </div>
                 <div className="overflow-x-auto">
@@ -977,6 +988,12 @@ const PICNGDashboard = () => {
                               return aggregator.augustRevenue || 0;
                             case "september":
                               return aggregator.septemberRevenue || 0;
+                            case "october":
+                              return aggregator.octoberRevenue || 0;
+                            case "november":
+                              return aggregator.novemberRevenue || 0;
+                            case "december":
+                              return aggregator.decemberRevenue || 0;
                             default:
                               return 0;
                           }
