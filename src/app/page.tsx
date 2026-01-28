@@ -78,8 +78,13 @@ const PICNGDashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("march");
 
-  // Dashboard metrics
+  // Dashboard metrics - Calculate monthly revenues from all aggregators
   const totalRevenue = aggregators.reduce((sum, agg) => sum + (agg.totalRevenue || 0), 0);
+  const marchRevenue = aggregators.reduce((sum, agg) => sum + (agg.marchRevenue || 0), 0);
+  const aprilRevenue = aggregators.reduce((sum, agg) => sum + (agg.aprilRevenue || 0), 0);
+  const mayRevenue = aggregators.reduce((sum, agg) => sum + (agg.mayRevenue || 0), 0);
+  const juneRevenue = aggregators.reduce((sum, agg) => sum + (agg.juneRevenue || 0), 0);
+  const julyRevenue = aggregators.reduce((sum, agg) => sum + (agg.julyRevenue || 0), 0);
   const augustRevenue = aggregators.reduce((sum, agg) => sum + (agg.augustRevenue || 0), 0);
   const septemberRevenue = aggregators.reduce((sum, agg) => sum + (agg.septemberRevenue || 0), 0);
   const octoberRevenue = aggregators.reduce((sum, agg) => sum + (agg.octoberRevenue || 0), 0);
@@ -104,16 +109,16 @@ const PICNGDashboard = () => {
   const weeklyTarget = 52900 * dashboardMetrics.kekesActivelyDeployed;
   const weeklyCollectionData = [
     { date: "Feb 2025", collection: 0, target: weeklyTarget }, // Project started, no revenue
-    { date: "Mar 2025", collection: 180000, target: weeklyTarget }, // First revenue
-    { date: "Apr 2025", collection: 720000, target: weeklyTarget },
-    { date: "May 2025", collection: 652000, target: weeklyTarget },
-    { date: "Jun 2025", collection: 542000, target: weeklyTarget },
-    { date: "Jul 2025", collection: 0, target: weeklyTarget }, // No revenue collected
+    { date: "Mar 2025", collection: marchRevenue, target: weeklyTarget }, // First revenue
+    { date: "Apr 2025", collection: aprilRevenue, target: weeklyTarget },
+    { date: "May 2025", collection: mayRevenue, target: weeklyTarget },
+    { date: "Jun 2025", collection: juneRevenue, target: weeklyTarget },
+    { date: "Jul 2025", collection: julyRevenue, target: weeklyTarget },
     { date: "Aug 2025", collection: augustRevenue, target: weeklyTarget },
     { date: "Sep 2025", collection: septemberRevenue, target: weeklyTarget },
     { date: "Oct 2025", collection: octoberRevenue, target: weeklyTarget },
     { date: "Nov 2025", collection: novemberRevenue, target: weeklyTarget },
-    { date: "Dec 2025", collection: decemberRevenue, target: weeklyTarget }, // Current month
+    { date: "Dec 2025", collection: decemberRevenue, target: weeklyTarget },
   ];
 
   const paymentMethodData = [
